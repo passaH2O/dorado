@@ -24,46 +24,19 @@ sqrt05 = np.sqrt(0.5)
 # create params and then assign the parameters
 params = pobj()
 
-params.inlet = [50,51,52]
-params.Np_water = 1
-params.Qp_water = 0.01
+params.seed_xloc = [50,51,52]
+params.seed_yloc = [50,51,52]
+params.Np_tracer = 3
 params.dx = 50.
-params.qxn = np.zeros((100,100))
-params.qyn = np.zeros((100,100))
-params.qwn = np.zeros((100,100))
-params.indices = np.array([[0,0]])
-params.looped = np.array([0])
-params.itmax = 1
 params.depth = np.ones((100,100))
-params.free_surf_flag = np.array([0])
 params.stage = np.ones((100,100))
-params.distances = np.array([[sqrt2, 1, sqrt2],
-                           [1, 1, 1],
-                           [sqrt2, 1, sqrt2]])
 params.qx = np.zeros((100,100))
 params.qy = np.zeros((100,100))
-params.ivec = np.array([[-sqrt05, 0, sqrt05],
-                      [-1, 0, 1],
-                      [-sqrt05, 0, sqrt05]])
-params.jvec = np.array([[-sqrt05, -1, -sqrt05],
-                      [0, 0, 0],
-                      [sqrt05, 1, sqrt05]])
-params.dry_depth = 0.01
-params.gamma = 0.02
-params.iwalk = np.array([[-1, 0, 1],
-                       [-1, 0, 1],
-                       [-1, 0, 1]])
-params.jwalk = np.array([[-1, -1, -1],
-                       [0, 0, 0],
-                       [1, 1, 1]])
-params.L = 100
-params.W = 100
-params.cell_type = np.zeros((100,100))
-params.L0 = 1
-params.CTR = 50
-params.sfc_visit = np.zeros((100,100))
-params.sfc_sum = np.zeros((100,100))
-params.theta_water = 1.0
+params.theta = 1.0
+
+# create some discharge
+params.qx[40:60,40:60] = 0.25
+params.qy[30:45,30:45] = 0.50
 
 # try running it
 from particle_track import Particle
@@ -75,12 +48,14 @@ test.init_water_iteration()
 # make pre-iteration plot
 plt.figure()
 plt.subplot(2,1,1)
-plt.imshow(test.qwn)
+qwn = np.sqrt(test.qxn**2+test.qyn**2)
+plt.imshow(qwn)
 
 # do iteration
 test.run_water_iteration()
 
 # make post-iteration plot
 plt.subplot(2,1,2)
-plt.imshow(test.qwn)
+qwn = np.sqrt(test.qxn**2+test.qyn**2)
+plt.imshow(qwn)
 plt.show()

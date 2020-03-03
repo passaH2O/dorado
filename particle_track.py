@@ -20,204 +20,186 @@ class Particle():
         Methods require a set of parameters to be assigned
         Try to assign each value from the parameter file, otherwise raise error
         '''
+
+        ########## REQUIRED PARAMETERS ##########
+        ### Define the seeding locations as list of x and y locations
         try:
-            self.inlet = params.inlet
+            self.seed_xloc = params.seed_xloc
         except:
-            raise ValueError("No inlet location defined")
+            raise ValueError("No tracer seeding x-locations defined")
 
         try:
-            self.Np_water = params.Np_water
+            self.seed_yloc = params.seed_yloc
         except:
-            raise ValueError("Number of water parcels not specified")
+            raise ValueError("No tracer seeding y-locations defined")
 
+        ### Define the number of tracers to be simulated
         try:
-            self.Qp_water = params.Qp_water
+            self.Np_tracer = params.Np_tracer
         except:
-            raise ValueError("Volume of each water parcel not specified")
+            raise ValueError("Number of tracer particles not specified")
 
+        ### Define the length along one cell face (assuming square cells)
         try:
             self.dx = params.dx
         except:
             raise ValueError("Cell size not specified")
 
-        try:
-            self.qxn = params.qxn
-        except: # might be able to define w/o being specified
-            raise ValueError("x components of discharge not specified")
-
-        try:
-            self.qyn = params.qyn
-        except: # might be able to define w/o being specified
-            raise ValueError("y components of discharge not specified")
-
-        try:
-            self.qwn = params.qwn
-        except: # might be able to define w/o being specified
-            raise ValueError("Per parcel discharge values not specified???")
-
-        try:
-            self.indices = params.indices
-        except:
-            # should be able to write method to define empty array for indices
-            pass
-
-        try:
-            self.looped = params.looped
-        except:
-            # should be able to write method to define empty array if not given
-            pass
-
-        try:
-            self.itmax = params.itmax
-        except:
-            self.itmax = 1 # max number of iterations is 1 if undefined
-
+        ### Define the water depth array
         try:
             self.depth = params.depth
         except:
             raise ValueError("Depth array not specified")
 
-        try:
-            self.free_surf_flag = params.free_surf_flag
-        except:
-            raise ValueError("still dont know what this is ..")
-
+        ### Define the water stage array
         try:
             self.stage = params.stage
         except:
             raise ValueError("Stage values not specified")
 
-        try:
-            self.distances = params.distances
-        except:
-            # can define this if not given
-            pass
-
+        ### Define x-component of discharge for all cells in domain
         try:
             self.qx = params.qx
         except:
             raise ValueError("x-components of discharge values not specified")
 
+        ### Define y-component of discharge for all cells in domain
         try:
             self.qy = params.qy
         except:
             raise ValueError("y-components of discharge values not specified")
 
+        ### Define the theta used to weight the random walk
         try:
-            self.ivec = params.ivec
+            self.theta = params.theta
         except:
-            # can define this if not given
-            pass
+            raise ValueError("Theta weight not defined")
 
+
+        ########## OPTIONAL PARAMETERS (Have default values) ##########
+        ### Number of iterations for parcel routing
         try:
-            self.jvec = params.jvec
+            self.itmax = params.itmax
         except:
-            # can define this if not given
-            pass
+            print('Max iterations not specified - using 1')
+            self.itmax = 1 # max number of iterations is 1 if undefined
 
+        ### Minimum depth for cell to be considered wet
         try:
             self.dry_depth = params.dry_depth
         except:
-            raise ValueError("minimum depth for wetness not defined")
+            print("minimum depth for wetness not defined - using 0.1")
+            self.dry_depth = 0.1
 
+        ### Gamma parameter
         try:
             self.gamma = params.gamma
         except:
-            raise ValueError("parameter gamma not specified")
+            print("parameter gamma not specified - using 0.05")
+            self.gamma = 0.05
 
-        try:
-            self.iwalk = params.iwalk
-        except:
-            # can be defined if not given
-            pass
-
-        try:
-            self.jwalk = params.jwalk
-        except:
-            # can be defined if not given
-            pass
-
-        try:
-            self.L = params.L
-        except:
-            self.L = np.shape(qx,1) # check syntax
-
-        try:
-            self.W = params.W
-        except:
-            self.W = np.shape(qx,2) # check syntax
-
+        ### Cell types
         try:
             self.cell_type = params.cell_type
         except:
-            raise ValueError("Cell Types not specified")
+            print("Cell Types not specified - using zeros")
+            self.cell_type = np.zeros(np.shape(self.stage))
 
-        try:
-            self.L0 = params.L0
-        except:
-            # might be able to get around this
-            pass
 
-        try:
-            self.CTR = params.CTR
-        except:
-            self.CTR = np.round(self.W/2)
+        ########## DEFAULT PARAMETERS (Can be defined otherwise) ##########
 
-        try:
-            self.sfc_visit = params.sfc_visit
-        except:
-            self.sfc_visit = np.zeros_like(self.depth)
+        sqrt2 = np.sqrt(2)
+        sqrt05 = np.sqrt(0.5)
 
+        ### Define distances between cells in D8 sense
         try:
-            self.sfc_sum = params.sfc_sum
+            self.distances = params.distances
         except:
-            self.sfc_sum = np.zeros_like(self.depth)
+            # defined this if not given
+            self.distances = np.array([[sqrt2, 1, sqrt2],
+                                       [1, 1, 1],
+                                       [sqrt2, 1, sqrt2]])
 
+        ### D8 components of x-unit vector
         try:
-            self.theta_water = params.theta_water
+            self.ivec = params.ivec
         except:
-            raise ValueError("Theta Water not defined")
+            # define this if not given
+            self.ivec = np.array([[-sqrt05, 0, sqrt05],
+                                  [-1, 0, 1],
+                                  [-sqrt05, 0, sqrt05]])
+
+        ### D8 components of y-unit vector
+        try:
+            self.jvec = params.jvec
+        except:
+            # define this if not given
+            self.jvec = np.array([[-sqrt05, -1, -sqrt05],
+                                  [0, 0, 0],
+                                  [sqrt05, 1, sqrt05]])
+
+        ### Positive/Negative x-directions
+        try:
+            self.iwalk = params.iwalk
+        except:
+            # defined if not given
+            self.iwalk = np.array([[-1, 0, 1],
+                                   [-1, 0, 1],
+                                   [-1, 0, 1]])
+
+        ### Positive/Negative y-directions
+        try:
+            self.jwalk = params.jwalk
+        except:
+            # defined if not given
+            self.jwalk = np.array([[-1, -1, -1],
+                                   [0, 0, 0],
+                                   [1, 1, 1]])
 
 
 
     def init_water_iteration(self):
 
-        self.qxn[:] = 0; self.qyn[:] = 0; self.qwn[:] = 0
+        self.qxn = np.zeros(np.shape(self.stage))
+        self.qyn = np.zeros(np.shape(self.stage))
+        self.free_surf_flag = np.zeros((self.Np_tracer,), dtype=np.int)
+        self.indices = np.zeros((self.Np_tracer, int(self.itmax)), dtype = np.int)
 
-        self.free_surf_flag[:] = 0
-        self.indices[:] = 0
-        self.sfc_visit[:] = 0
-        self.sfc_sum[:] = 0
+        self.sfc_visit = np.zeros(np.shape(self.stage))
+        self.sfc_sum = np.zeros(np.shape(self.stage))
 
         self.pad_stage = np.pad(self.stage, 1, 'edge')
 
         self.pad_depth = np.pad(self.depth, 1, 'edge')
 
-        self.pad_cell_type = np.pad(self.cell_type, 1, 'edge')
+        self.pad_cell_type = np.pad(self.cell_type, 1, 'constant', constant_values = -1)
 
 
 
     def run_water_iteration(self):
 
         iter = 0 # set iteration counter to 0
-        start_indices = map(lambda x: self.random_pick_inlet(self.inlet),
-                                      range(self.Np_water)) # set starting index for the water parcel
+        start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
+                                      range(self.Np_tracer)) # set starting x-index for all tracers
 
-        self.qxn.flat[start_indices] += 1 # add 1 to x-component of discharge at the start location
-        self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2. # initial per parcel water discharge
+        start_yindices = map(lambda x: self.random_pick_seed(self.seed_yloc),
+                                      range(self.Np_tracer)) # set starting y-index for all tracers
 
-        self.indices[:,0] = start_indices # save the start index for the parcel
-        current_inds = list(start_indices) # list of the start location indices
+        self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
+        self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
 
-        self.looped[:] = 0 # set this loop toggle to 0
+        # merge x and y indices into list of tuple (x,y) pairs
+        start_pairs = [(start_xindices[i],start_yindices[i]) for i in range(0,len(start_xindices))]
 
+        # self.indices[:,0] = start_indices # save the start index for the parcel
+        current_inds = start_pairs # list of the start location indices
 
-        while (sum(current_inds) > 0) & (iter < self.itmax):
+        while (np.sum(current_inds) > 0) & (iter < self.itmax):
 
             iter += 1 # add +1 to the iter counter
 
-            inds = np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
-            inds_tuple = [(inds[0][i], inds[1][i]) for i in range(len(inds[0]))] # split the indices into tuples
+            inds = current_inds #np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
+            inds_tuple = [(inds[i][0], inds[i][1]) for i in range(len(inds))] # split the indices into tuples
 
 
             new_cells = map(lambda x: self.get_weight(x)
@@ -227,7 +209,6 @@ class Particle():
             new_inds = map(lambda x,y: self.calculate_new_ind(x,y)
                             if y != 4 else 0, inds_tuple, new_cells) # for each particle get the new index
 
-
             dist = map(lambda x,y,z: self.step_update(x,y,z) if x > 0
                        else 0, current_inds, new_inds, new_cells) # move each particle to the new index
 
@@ -235,28 +216,24 @@ class Particle():
             new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
             new_inds[np.array(dist) == 0] = 0
 
+            # self.indices[:,iter] = new_inds # assign the new index to indices array
 
-            self.indices[:,iter] = new_inds # assign the new index to indices array
+            new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
 
-            current_inds = self.check_for_loops(new_inds, iter) # run check for loops function
+            # self.indices[:,iter] = current_inds # assign indices as the current_inds list
 
-            current_inds = self.check_for_boundary(current_inds) # see if the indices are at boundaries
-
-            self.indices[:,iter] = current_inds # assign indices as the current_inds list
-
-            current_inds[self.free_surf_flag > 0] = 0 # check this free surface flag ???
+            # current_inds[self.free_surf_flag > 0] = 0 # check this free surface flag ???
 
 
 
-
-    ### random pick inlet cell function (can be adapted to control particle drop location)
-    def random_pick_inlet(self, choices, probs = None):
+    ### random pick seeding location
+    def random_pick_seed(self, choices, probs = None):
         '''
         Randomly pick a number from array choices weighted by array probs
         Values in choices are column indices
         Return a tuple of the randomly picked index for row 0
         '''
-        # randomly pick the inlet cell to use given a list of inlet indices
+        # randomly pick tracer drop cell to use given a list of potential spots
         if not probs:
             probs = np.array([1 for i in range(len(choices))])
         # find the corresponding index value from the input 'choices' list of indices
@@ -264,7 +241,6 @@ class Particle():
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
 
         return choices[idx]
-
 
 
 
@@ -303,8 +279,8 @@ class Particle():
 
         # define actual weight by using gamma, and the defined weights
         self.weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
-        # modify the weight by the depth and theta_water parameter
-        self.weight = depth_ind ** self.theta_water * self.weight
+        # modify the weight by the depth and theta weighting parameter
+        self.weight = depth_ind ** self.theta * self.weight
         # if the depth is below the minimum depth then location is not considered
         # therefore set the associated weight to nan
         self.weight[depth_ind <= self.dry_depth] = np.nan
@@ -316,7 +292,6 @@ class Particle():
 
 
 
-
     ### calculate new index
     def calculate_new_ind(self, ind, new_cell):
         # add the index and the flattened x and y walk component
@@ -324,10 +299,9 @@ class Particle():
         new_ind = (ind[0] + self.jwalk.flat[new_cell], ind[1] +
                    self.iwalk.flat[new_cell])
         # using the new_ind value re-ravel the index into a properly shaped array
-        new_ind_flat = np.ravel_multi_index(new_ind, self.depth.shape)
+        #new_ind_flat = np.ravel_multi_index(new_ind, self.depth.shape)
 
-        return new_ind_flat
-
+        return new_ind#new_ind_flat
 
 
 
@@ -343,76 +317,29 @@ class Particle():
         if dist > 0:
             # identify original discharge locations in flattened arrays
             # add the new location to the original index information
-            self.qxn.flat[ind] += jstep / dist
-            self.qyn.flat[ind] += istep / dist
-            self.qwn.flat[ind] += self.Qp_water / self.dx / 2.
+            self.qxn.flat[ind[0]] += jstep / dist
+            self.qyn.flat[ind[1]] += istep / dist
             # identify the new index for discharge
             # add the distance to the new values
-            self.qxn.flat[new_ind] += jstep / dist
-            self.qyn.flat[new_ind] += istep / dist
-            self.qwn.flat[new_ind] += self.Qp_water / self.dx / 2.
+            self.qxn.flat[new_ind[0]] += jstep / dist
+            self.qyn.flat[new_ind[1]] += istep / dist
 
         return dist
 
 
 
-
-    ### check loops
-    def check_for_loops(self, inds, it):
-
-        looped = [len(i[i>0]) != len(set(i[i>0])) for i in self.indices]
-
-        for n in range(self.Np_water):
-
-            ind = inds[n]
-
-            if (looped[n]) and (ind > 0) and (it > self.L0):
-
-                self.looped[n] += 1
-
-                it = np.unravel_index(ind, self.depth.shape)
-
-                px, py = it
-
-                Fx = px - 1
-                Fy = py - self.CTR
-
-                Fw = np.sqrt(Fx**2 + Fy**2)
-
-                if Fw != 0:
-                    px = px + np.round(Fx / Fw * 5.)
-                    py = py + np.round(Fy / Fw * 5.)
-
-                px = max(px, self.L0)
-                px = int(min(self.L - 2, px))
-
-                py = max(1, py)
-                py = int(min(self.W - 2, py))
-
-                nind = np.ravel_multi_index((px,py), self.depth.shape)
-
-                inds[n] = nind
-
-                self.free_surf_flag[n] = -1
-
-
-        return inds
-
-
-
-
     ### bndy check
-    def check_for_boundary(self, inds):
-        # check if the cell is on an edge (type==-1) if it is on and edge AND it is
-        # also conditional on a free_surf_flag??? not sure that that flag is
-        self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
+    def check_for_boundary(self, new_inds, current_inds):
+        # check if the new indices are on edges (type==-1)
+        # if so then don't let parcel go there
+        for i in range(0,len(new_inds)):
+            if self.pad_cell_type[new_inds[i][0],new_inds[i][1]] == -1:
+                new_inds[i][0] = current_inds[i][0]
+                new_inds[i][1] = current_inds[i][1]
+            else:
+                pass
 
-        self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
-
-        inds[self.free_surf_flag == 2] = 0 # if free surface flag is 2, make that ind value 0
-
-        return inds
-
+        return new_inds
 
 
 
