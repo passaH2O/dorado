@@ -188,30 +188,33 @@ class Particle():
         self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
         self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
 
-        # merge x and y indices into list of tuple (x,y) pairs
-        start_pairs = [(start_xindices[i],start_yindices[i]) for i in range(0,len(start_xindices))]
+        # merge x and y indices into list of [x,y] pairs
+        start_pairs = [[start_xindices[i],start_yindices[i]] for i in range(0,len(start_xindices))]
 
         # self.indices[:,0] = start_indices # save the start index for the parcel
         current_inds = start_pairs # list of the start location indices
+        # for i in range(0,len(current_inds)):
+        #     plt.scatter(current_inds[i][1],current_inds[i][0],c='b',s=7)
+
+        # print('current inds: ' + str(current_inds))
 
         while (np.sum(current_inds) > 0) & (iter < self.itmax):
 
             iter += 1 # add +1 to the iter counter
+            print('iter: ' + str(iter))
 
             inds = current_inds #np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
             inds_tuple = [(inds[i][0], inds[i][1]) for i in range(len(inds))] # split the indices into tuples
 
-
             new_cells = map(lambda x: self.get_weight(x)
                             if x != (0,0) else 4, inds_tuple) # for each particle index get the weights
-
 
             new_inds = map(lambda x,y: self.calculate_new_ind(x,y)
                             if y != 4 else 0, inds_tuple, new_cells) # for each particle get the new index
 
+
             dist = map(lambda x,y,z: self.step_update(x,y,z) if x > 0
                        else 0, current_inds, new_inds, new_cells) # move each particle to the new index
-
 
             new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
             new_inds[np.array(dist) == 0] = 0
@@ -220,9 +223,22 @@ class Particle():
 
             new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
 
+            # update current inds to the new ones
+            current_inds = new_inds.tolist()
+
+            # if np.mod(iter,30) == 0:
+            #     print('new inds: ' + str(new_inds))
+            #     for i in range(0,len(new_inds)):
+            #         plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=2)
+
+        for i in range(0,len(new_inds)):
+            plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=7)
+
             # self.indices[:,iter] = current_inds # assign indices as the current_inds list
 
             # current_inds[self.free_surf_flag > 0] = 0 # check this free surface flag ???
+
+        return start_pairs, new_inds
 
 
 

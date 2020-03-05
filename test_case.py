@@ -24,19 +24,41 @@ sqrt05 = np.sqrt(0.5)
 # create params and then assign the parameters
 params = pobj()
 
-params.seed_xloc = [50,51,52]
-params.seed_yloc = [50,51,52]
-params.Np_tracer = 3
-params.dx = 50.
-params.depth = np.ones((100,100))
-params.stage = np.ones((100,100))
-params.qx = np.zeros((100,100))
-params.qy = np.zeros((100,100))
-params.theta = 1.0
+# pull some from a deltarcm output so stage is varied
+rcm_output = Dataset('jgrdup_50_pydeltarcm.nc','r')
 
-# create some discharge
-params.qx[40:60,40:60] = 0.25
-params.qy[30:45,30:45] = 0.50
+# pull stage
+rcm_stage = rcm_output.variables['stage'][:]
+params.stage = rcm_stage.data[-1,:,:]
+# plt.figure()
+# plt.imshow(params.stage)
+# plt.show()
+
+# pull depth
+rcm_depth = rcm_output.variables['depth'][:]
+params.depth = rcm_depth.data[-1,:,:]
+# plt.figure()
+# plt.imshow(params.depth)
+# plt.show()
+
+params.seed_xloc = list(range(17,23))
+params.seed_yloc = list(range(126,131))
+params.Np_tracer = 250
+params.dx = 50.
+params.qx = np.zeros(np.shape(params.depth))
+params.qy = np.zeros(np.shape(params.depth))
+params.theta = 1.0
+# params.gamma = 10.0
+params.itmax = 50
+
+# create some discharge -- doesn't matter? stage used to weight?
+# params.qx[40:60,40:60] = 100.0
+# params.qy[30:45,30:45] = 0.0
+# plt.figure()
+# plt.imshow(np.sqrt(params.qx**2+params.qy**2))
+# plt.colorbar()
+# plt.title('Discharge field')
+# plt.show()
 
 # try running it
 from particle_track import Particle
@@ -45,17 +67,23 @@ test = Particle(params)
 
 test.init_water_iteration()
 
-# make pre-iteration plot
+# # make pre-iteration plot
+# plt.figure()
+# plt.subplot(2,1,1)
+# qwn = np.sqrt(test.qxn**2+test.qyn**2)
+# plt.imshow(qwn)
+
+# do iterations
 plt.figure()
-plt.subplot(2,1,1)
-qwn = np.sqrt(test.qxn**2+test.qyn**2)
-plt.imshow(qwn)
-
-# do iteration
-test.run_water_iteration()
-
-# make post-iteration plot
-plt.subplot(2,1,2)
-qwn = np.sqrt(test.qxn**2+test.qyn**2)
-plt.imshow(qwn)
+start_inds, new_inds = test.run_water_iteration()
+for j in range(0,len(start_inds)):
+    plt.scatter(start_inds[j][1],start_inds[j][0],c='b',s=7)
+    plt.scatter(new_inds[j][1],new_inds[j][0],c='r',s=4)
+plt.imshow(params.stage)
 plt.show()
+
+# # make post-iteration plot
+# plt.subplot(2,1,2)
+# qwn = np.sqrt(test.qxn**2+test.qyn**2)
+# plt.imshow(qwn)
+# plt.show()
