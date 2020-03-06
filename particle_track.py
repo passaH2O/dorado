@@ -55,7 +55,8 @@ class Particle():
         try:
             self.stage = params.stage
         except:
-            raise ValueError("Stage values not specified")
+            print("Stage values not specified - using depth values")
+            self.stage = self.depth
 
         ### Define x-component of discharge for all cells in domain
         try:
@@ -176,14 +177,15 @@ class Particle():
 
 
 
-    def run_water_iteration(self):
+    def run_water_iteration(self,start_xindices=None,start_yindices=None):
 
         iter = 0 # set iteration counter to 0
-        start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
-                                      range(self.Np_tracer)) # set starting x-index for all tracers
-
-        start_yindices = map(lambda x: self.random_pick_seed(self.seed_yloc),
-                                      range(self.Np_tracer)) # set starting y-index for all tracers
+        if start_xindices == None:
+            start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
+                                        range(self.Np_tracer)) # set starting x-index for all tracers
+        if start_yindices == None:
+            start_yindices = map(lambda x: self.random_pick_seed(self.seed_yloc),
+                                        range(self.Np_tracer)) # set starting y-index for all tracers
 
         self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
         self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
@@ -231,8 +233,8 @@ class Particle():
             #     for i in range(0,len(new_inds)):
             #         plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=2)
 
-        for i in range(0,len(new_inds)):
-            plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=7)
+        # for i in range(0,len(new_inds)):
+        #     plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=7)
 
             # self.indices[:,iter] = current_inds # assign indices as the current_inds list
 
