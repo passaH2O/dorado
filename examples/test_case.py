@@ -12,14 +12,11 @@ import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
+from particlerouting.particle_track import Particle
 
 # define an empty class
 class pobj():
     pass
-
-# define square root variables
-sqrt2 = np.sqrt(2)
-sqrt05 = np.sqrt(0.5)
 
 # create params and then assign the parameters
 params = pobj()
@@ -45,11 +42,8 @@ params.theta = 1.0
 params.itmax = 1 # number of iterations/walks per timestep
 
 # try running it
-from particle_track import Particle
 
 test = Particle(params)
-
-test.init_iteration()
 
 # do iterations
 for i in range(0,50):
