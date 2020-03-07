@@ -159,7 +159,7 @@ class Particle():
 
 
 
-    def init_water_iteration(self):
+    def init_iteration(self):
 
         self.qxn = np.zeros(np.shape(self.stage))
         self.qyn = np.zeros(np.shape(self.stage))
@@ -177,7 +177,7 @@ class Particle():
 
 
 
-    def run_water_iteration(self,start_xindices=None,start_yindices=None):
+    def run_iteration(self,start_xindices=None,start_yindices=None):
 
         iter = 0 # set iteration counter to 0
         if start_xindices == None:
@@ -266,10 +266,10 @@ class Particle():
     def get_weight(self, ind):
         # pad stage array with 1's around it
         stage_ind = self.pad_stage[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        # define weights as least 0 or a greater value
+        # define water surface gradient weight component (minimum of 0)
         weight_sfc = np.maximum(0,
                      (self.stage[ind] - stage_ind) / self.distances)
-        # define weight integers as at least 0 or greater value
+        # define flow inertial weighting component (minimum of 0)
         weight_int = np.maximum(0, (self.qx[ind] * self.jvec +
                                     self.qy[ind] * self.ivec) / self.distances)
 
@@ -295,7 +295,7 @@ class Particle():
         if np.nansum(weight_int) > 0:
             weight_int = weight_int / np.nansum(weight_int)
 
-        # define actual weight by using gamma, and the defined weights
+        # define actual weight by using gamma, and the defined weight components
         self.weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
         # modify the weight by the depth and theta weighting parameter
         self.weight = depth_ind ** self.theta * self.weight
