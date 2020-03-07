@@ -14,11 +14,14 @@ import time
 
 
 class Particle():
-
+    # class initialization, automatically run when class is defined
+    # takes in attributes from a params object passed to it\
+    # e.g. testparticle = Particle(params)
     def __init__(self, params):
         '''
         Methods require a set of parameters to be assigned
         Try to assign each value from the parameter file, otherwise raise error
+        or default values are assigned when possible
         '''
 
         ########## REQUIRED PARAMETERS ##########
@@ -78,7 +81,7 @@ class Particle():
 
 
         ########## OPTIONAL PARAMETERS (Have default values) ##########
-        ### Number of iterations for parcel routing
+        ### Number of iterations for parcel routing when run_iteration is called
         try:
             self.itmax = params.itmax
         except:
@@ -93,13 +96,17 @@ class Particle():
             self.dry_depth = 0.1
 
         ### Gamma parameter
+        # sets weight ratio:
+                            # either water surface slope (depth based)
+                            # or
+                            # inertial force (discharge based)
         try:
             self.gamma = params.gamma
         except:
             print("parameter gamma not specified - using 0.05")
             self.gamma = 0.05
 
-        ### Cell types
+        ### Cell types: 2 = land, 1 = channel, 0 = ocean, -1 = edge
         try:
             self.cell_type = params.cell_type
         except:
@@ -157,29 +164,30 @@ class Particle():
                                    [0, 0, 0],
                                    [1, 1, 1]])
 
-
-
-    def init_iteration(self):
-
+        # establish some zero matrices that are filled in when iteration is run
         self.qxn = np.zeros(np.shape(self.stage))
         self.qyn = np.zeros(np.shape(self.stage))
-        self.free_surf_flag = np.zeros((self.Np_tracer,), dtype=np.int)
-        self.indices = np.zeros((self.Np_tracer, int(self.itmax)), dtype = np.int)
-
         self.sfc_visit = np.zeros(np.shape(self.stage))
         self.sfc_sum = np.zeros(np.shape(self.stage))
 
+        # pad stage and depth arrays to identify edges
         self.pad_stage = np.pad(self.stage, 1, 'edge')
-
         self.pad_depth = np.pad(self.depth, 1, 'edge')
-
         self.pad_cell_type = np.pad(self.cell_type, 1, 'constant', constant_values = -1)
 
 
-
+    # run an iteration where particles are moved
+    # have option of specifying the particle start locations
+    # otherwise they are randomly placed within x and y seed locations
     def run_iteration(self,start_xindices=None,start_yindices=None):
+        '''
+        Runs an iteration of the particle routing
+        Returns the original particle locations and their final locations
+        '''
 
         iter = 0 # set iteration counter to 0
+
+        # if start locations not defined, then randomly assign them
         if start_xindices == None:
             start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
                                         range(self.Np_tracer)) # set starting x-index for all tracers
@@ -193,17 +201,13 @@ class Particle():
         # merge x and y indices into list of [x,y] pairs
         start_pairs = [[start_xindices[i],start_yindices[i]] for i in range(0,len(start_xindices))]
 
-        # self.indices[:,0] = start_indices # save the start index for the parcel
-        current_inds = start_pairs # list of the start location indices
-        # for i in range(0,len(current_inds)):
-        #     plt.scatter(current_inds[i][1],current_inds[i][0],c='b',s=7)
+        # copy list of start location indices so start_pairs can be kept unchanged
+        current_inds = start_pairs
 
-        # print('current inds: ' + str(current_inds))
-
+        # loop until iterations are completed
         while (np.sum(current_inds) > 0) & (iter < self.itmax):
 
             iter += 1 # add +1 to the iter counter
-            print('iter: ' + str(iter))
 
             inds = current_inds #np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
             inds_tuple = [(inds[i][0], inds[i][1]) for i in range(len(inds))] # split the indices into tuples
@@ -221,24 +225,10 @@ class Particle():
             new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
             new_inds[np.array(dist) == 0] = 0
 
-            # self.indices[:,iter] = new_inds # assign the new index to indices array
-
             new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
 
             # update current inds to the new ones
             current_inds = new_inds.tolist()
-
-            # if np.mod(iter,30) == 0:
-            #     print('new inds: ' + str(new_inds))
-            #     for i in range(0,len(new_inds)):
-            #         plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=2)
-
-        # for i in range(0,len(new_inds)):
-        #     plt.scatter(new_inds[i][1],new_inds[i][0],c='r',s=7)
-
-            # self.indices[:,iter] = current_inds # assign indices as the current_inds list
-
-            # current_inds[self.free_surf_flag > 0] = 0 # check this free surface flag ???
 
         return start_pairs, new_inds
 
