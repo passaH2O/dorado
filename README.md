@@ -22,7 +22,7 @@ Initial particle locations indicated by blue dots, final particle locations show
 
 ### Example 1
 <div class="nav3" style="height:705px;">
-    <img src="imgs/test.gif" alt="Example" width="47%"></a>
+    <img src="imgs/test.gif" alt="Example" width="95%"></a>
 </div>
 
 ### Example 2
