@@ -29,7 +29,7 @@ Initial particle locations indicated by blue dots, final particle locations show
 ![Example image](imgs/test_inchannel_01.png)
 
 ## Documentation
-To be added. Code is thoroughly commented at this time. The weighting scheme for the random walk follows the method used in [1] for reduced complexity modeling of Lagrangian hydrodynamics. 
+To be added. Code is thoroughly commented at this time. The weighting scheme for the random walk follows the method described in [1] & [2] for reduced complexity modeling of Lagrangian hydrodynamics. 
 
 ## References
 [1] Liang, M., Vaughan R. Voller, and Chris Paola. "A reduced-complexity model for river delta formation-Part 1: Modeling deltas with channel dynamics." Earth Surface Dynamics 3.1 (2015).
