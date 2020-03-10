@@ -73,6 +73,11 @@ class Particle():
         except:
             raise ValueError("y-components of discharge values not specified")
 
+        ### Define velocity field (for travel time calculation)
+        self.velocity = np.sqrt(self.qx**2+self.qy**2)/self.depth
+        # cannot have 0 values - leads to infinite travel times
+        self.velocity[self.velocity==0] = 1e-10
+
         ### Define the theta used to weight the random walk
         try:
             self.theta = params.theta
@@ -179,7 +184,7 @@ class Particle():
     # run an iteration where particles are moved
     # have option of specifying the particle start locations
     # otherwise they are randomly placed within x and y seed locations
-    def run_iteration(self,start_xindices=None,start_yindices=None):
+    def run_iteration(self,start_xindices=None,start_yindices=None,start_times=None):
         '''
         Runs an iteration of the particle routing
         Returns the original particle locations and their final locations
@@ -204,6 +209,12 @@ class Particle():
         # copy list of start location indices so start_pairs can be kept unchanged
         current_inds = start_pairs
 
+        # initialize travel times list
+        if start_times == None:
+            travel_times = np.zeros(len(current_inds))
+        else:
+            travel_times = start_times
+
         # loop until iterations are completed
         while (np.sum(current_inds) > 0) & (iter < self.itmax):
 
@@ -218,7 +229,6 @@ class Particle():
             new_inds = map(lambda x,y: self.calculate_new_ind(x,y)
                             if y != 4 else 0, inds_tuple, new_cells) # for each particle get the new index
 
-
             dist = map(lambda x,y,z: self.step_update(x,y,z) if x > 0
                        else 0, current_inds, new_inds, new_cells) # move each particle to the new index
 
@@ -227,10 +237,16 @@ class Particle():
 
             new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
 
+            # add the travel times
+            temp_travel = map(lambda x,y: self.calc_travel_times(x,y) if x > 0
+                                else 0, current_inds, new_inds)
+            travel_times = [travel_times[i] + temp_travel[i] for i in range(0,len(travel_times))] # add to existing times
+            travel_times = list(travel_times)
+
             # update current inds to the new ones
             current_inds = new_inds.tolist()
 
-        return start_pairs, new_inds
+        return start_pairs, new_inds, travel_times
 
 
 
@@ -334,6 +350,20 @@ class Particle():
 
         return dist
 
+
+
+    ### calculate travel time using avg of velocity and old and new index
+    def calc_travel_times(self, ind, new_ind):
+        # get old position velocity value
+        old_vel = self.velocity.flat[ind]
+        # new position velocity value
+        new_vel = self.velocity.flat[new_ind]
+        # avg velocity
+        avg_vel = np.mean([old_vel,new_vel])
+        # travel time based on cell size and mean velocity
+        trav_time = 1/avg_vel * self.dx
+
+        return trav_time
 
 
     ### bndy check
