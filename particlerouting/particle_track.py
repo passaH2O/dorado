@@ -75,8 +75,9 @@ class Particle():
 
         ### Define velocity field (for travel time calculation)
         self.velocity = np.sqrt(self.qx**2+self.qy**2)/self.depth
-        # cannot have 0 values - leads to infinite travel times
+        # cannot have 0/nans - leads to infinite/nantravel times
         self.velocity[self.velocity==0] = 1e-10
+        self.velocity[np.isnan(self.velocity)] = 1e-10
 
         ### Define the theta used to weight the random walk
         try:
