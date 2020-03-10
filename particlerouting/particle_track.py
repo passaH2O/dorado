@@ -74,7 +74,12 @@ class Particle():
             raise ValueError("y-components of discharge values not specified")
 
         ### Define velocity field (for travel time calculation)
-        self.velocity = np.sqrt(self.qx**2+self.qy**2)/self.depth
+        # create modified depth array without 0s or nan values for division
+        mod_depth = self.depth.copy()
+        mod_depth[mod_depth==0] = 1e-10
+        mod_depth[np.isnan(mod_depth)] = 1e-10
+        # back out velocity field from discharge and depths
+        self.velocity = np.sqrt(self.qx**2+self.qy**2)/mod_depth
         # cannot have 0/nans - leads to infinite/nantravel times
         self.velocity[self.velocity==0] = 1e-10
         self.velocity[np.isnan(self.velocity)] = 1e-10
@@ -356,9 +361,9 @@ class Particle():
     ### calculate travel time using avg of velocity and old and new index
     def calc_travel_times(self, ind, new_ind):
         # get old position velocity value
-        old_vel = self.velocity.flat[ind]
+        old_vel = self.velocity[ind[0],ind[1]]
         # new position velocity value
-        new_vel = self.velocity.flat[new_ind]
+        new_vel = self.velocity[new_ind[0],new_ind[1]]
         # avg velocity
         avg_vel = np.mean([old_vel,new_vel])
         # travel time based on cell size and mean velocity
