@@ -1,6 +1,6 @@
 # ParticleRouting
 
-v1.0
+v1.01
 
 Lagrangian particle routing via weighted random walks.
 
