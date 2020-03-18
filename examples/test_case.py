@@ -48,13 +48,13 @@ test = Particle(params)
 # do iterations
 for i in range(0,50):
     if i == 0:
-        start_inds, end_inds = test.run_iteration()
+        start_inds, end_inds, travel_times = test.run_iteration()
         xinds=[];yinds=[];
         for j in range(0,len(end_inds)):
             xinds.append(end_inds[j][0])
             yinds.append(end_inds[j][1])
     else:
-        beg_ind, end_inds = test.run_iteration(start_xindices=xinds,start_yindices=yinds)
+        beg_ind, end_inds, travel_times = test.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
         xinds = []; yinds = [];
         for j in range(0,len(end_inds)):
             xinds.append(end_inds[j][0])

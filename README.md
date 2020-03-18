@@ -1,6 +1,6 @@
 # ParticleRouting
 
-v1.0
+v1.01
 
 Lagrangian particle routing via weighted random walks.
 
@@ -11,8 +11,10 @@ Lagrangian particle routing via weighted random walks.
 - scipy
 - netcdf4
 ### Installation:
+(tested on Ubuntu)
 - Clone the repository
-- From the cloned folder, run `pip install particlerouting` to install the package
+- From the cloned folder, run `python setup.py install` to install most of package (will run into error related to Python2.7 retirement)
+- Then run `pip install particlerouting` to finish installing the package
 
 ### Example Use:
 See either the example [jupyter notebook](examples/deltarcm_particles.ipynb) or the example [python script](examples/test_case.py).
