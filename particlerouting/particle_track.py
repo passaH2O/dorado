@@ -22,7 +22,7 @@ from .particle_tools import Tools
 
 class Particle(Tools):
     # class initialization, automatically run when class is defined
-    # takes in attributes from a params object passed to it\
+    # takes in attributes from a params object passed to it
     # e.g. testparticle = Particle(params)
     def __init__(self, params):
         '''

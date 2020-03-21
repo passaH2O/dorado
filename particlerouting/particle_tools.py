@@ -52,7 +52,6 @@ class Tools():
                                     self.qy[ind] * self.ivec) / self.distances)
 
         # if the value of the first index coord is 0, make weights 0
-        # might prevent travel up/out of domain???
         if ind[0] == 0:
             weight_sfc[0,:] = 0
             weight_int[0,:] = 0
@@ -66,10 +65,10 @@ class Tools():
         weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
         weight_int[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
 
-        # if sum of weights is above 0 normalize by sum?
+        # if sum of weights is above 0 normalize by sum of weights
         if np.nansum(weight_sfc) > 0:
             weight_sfc = weight_sfc / np.nansum(weight_sfc)
-        # if sum of weight is above 0 normalize by sum?
+        # if sum of weight is above 0 normalize by sum of weights
         if np.nansum(weight_int) > 0:
             weight_int = weight_int / np.nansum(weight_int)
 
