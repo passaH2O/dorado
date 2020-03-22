@@ -42,8 +42,10 @@ class Tools():
 
     ### pull weights
     def get_weight(self, ind):
-        # pad stage array with 1's around it
+        # pull surrounding cell values from pad stage array
+        ### Need to confirm or check if original formulation here is right
         stage_ind = self.pad_stage[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
+        # stage_ind = self.pad_stage[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2] # potential new version?
         # define water surface gradient weight component (minimum of 0)
         weight_sfc = np.maximum(0,
                      (self.stage[ind] - stage_ind) / self.distances)
@@ -56,14 +58,18 @@ class Tools():
             weight_sfc[0,:] = 0
             weight_int[0,:] = 0
 
-        # add 1 value of padding around
+        # pull surrounding cell values from padded depth and cell type arrays
+        # old code was uneven/biased? need to figure out
         depth_ind = self.pad_depth[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
         ct_ind = self.pad_cell_type[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
+        # potential new code to get 3x3 cells around the index location - 2 lines below
+        # depth_ind = self.pad_depth[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
+        # ct_ind = self.pad_cell_type[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
         # if the depth is below minimum depth for cell to be weight or it is a cell
-        # type of 'land' which is the walls, then make it impossible for the parcel
+        # type that is not water, then make it impossible for the parcel
         # to travel there by setting associated weight to 0
-        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-        weight_int[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
+        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind < 0)] = 0
+        weight_int[(depth_ind <= self.dry_depth) | (ct_ind < 0)] = 0
 
         # if sum of weights is above 0 normalize by sum of weights
         if np.nansum(weight_sfc) > 0:
