@@ -26,9 +26,11 @@ class Particle(Tools):
     # e.g. testparticle = Particle(params)
     def __init__(self, params):
         '''
-        Methods require a set of parameters to be assigned
+        Methods require a class of parameters (params) to be passed to the
+        Particles class i.e. particle = Particles(params)
+
         Try to assign each value from the parameter file, otherwise raise error
-        or default values are assigned when possible
+        or default values are assigned when possible/sensible
         '''
 
         ########## REQUIRED PARAMETERS ##########
@@ -91,14 +93,15 @@ class Particle(Tools):
         self.velocity[self.velocity==0] = 1e-10
         self.velocity[np.isnan(self.velocity)] = 1e-10
 
+
+        ########## OPTIONAL PARAMETERS (Have default values) ##########
         ### Define the theta used to weight the random walk
         try:
             self.theta = params.theta
         except:
-            raise ValueError("Theta weight not defined")
+            print('Theta not specified - using 1.0')
+            self.theta = 1.0 # if unspecified use 1
 
-
-        ########## OPTIONAL PARAMETERS (Have default values) ##########
         ### Number of iterations for parcel routing when run_iteration is called
         try:
             self.itmax = params.itmax
@@ -199,8 +202,34 @@ class Particle(Tools):
     # otherwise they are randomly placed within x and y seed locations
     def run_iteration(self,start_xindices=None,start_yindices=None,start_times=None):
         '''
-        Runs an iteration of the particle routing
-        Returns the original particle locations and their final locations
+        Runs an iteration of the particle routing.
+        Returns the original particle locations and their final locations.
+
+        Inputs :
+                    start_xindices : list of x locations to seed the particles
+                                     [x1, x2, x3, ..., xn]
+                                     if undefined, uses starting locations as
+                                     given by the Particles class (seed_xloc)
+
+                    start_yindices : list of y locations to seed the particles
+                                     [y1, y2, y3, ..., yn]
+                                     if undefined, uses starting locations as
+                                     given by the Particles class (seed_yloc)
+
+                    start_times : list of particle travel times
+                                  [t1, t2, t3, ..., tn]
+                                  if undefined, assumes no particles have
+                                  travelled yet, so assigns zeros
+
+        Outputs :
+                    start_pairs : list [], of [x,y] pairs of the particle
+                                  locations at the beginning of the iteration
+
+                    new_inds : list [], of the new [x,y] locations for all of
+                               the particles at the end of the iteration
+
+                    travel_times : list [], of the travel times for each
+                                   particle at the end of the timestep 
         '''
 
         iter = 0 # set iteration counter to 0
