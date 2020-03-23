@@ -134,6 +134,20 @@ class Particle(Tools):
             print("Cell Types not specified - using zeros")
             self.cell_type = np.zeros(np.shape(self.stage))
 
+        ### Steepest descent toggle - turns off randomness and uses highest
+        # weighted value instead of doing weighted random walk
+        # note: chooses randomly in event of ties
+        try:
+            if params.steepest_descent == True:
+                print("Using steepest descent")
+                self.steepest_descent = True
+            else:
+                print("Using weighted random walk")
+                self.steepest_descent = False
+        except:
+            print("Using weighted random walk")
+            self.steepest_descent = False
+
 
         ########## DEFAULT PARAMETERS (Can be defined otherwise) ##########
 
@@ -229,7 +243,7 @@ class Particle(Tools):
                                the particles at the end of the iteration
 
                     travel_times : list [], of the travel times for each
-                                   particle at the end of the timestep 
+                                   particle at the end of the timestep
         '''
 
         iter = 0 # set iteration counter to 0

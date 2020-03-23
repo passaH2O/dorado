@@ -119,7 +119,10 @@ class Tools():
         self.weight[depth_ind <= self.dry_depth] = np.nan
         # randomly pick the new cell for the particle to move to using the
         # random_pick function and the set of weights just defined
-        new_cell = self.random_pick(self.weight)
+        if self.steepest_descent != True:
+            new_cell = self.random_pick(self.weight)
+        elif self.steepest_descent == True:
+            new_cell = self.steep_descent(self.weight)
 
         return new_cell
 
@@ -231,7 +234,7 @@ class Tools():
                     new_inds : list [] of tuples (x,y) of new indices where any
                                proposed indices outside of the domain have been
                                replaced by the old indices so those particles
-                               will not travel this iteration 
+                               will not travel this iteration
         '''
 
         # check if the new indices are on edges (type==-1)
@@ -261,7 +264,6 @@ class Tools():
         Outputs :
                     idx : 1-8 value chosen randomly based on the weighted
                           probabilities
-
         '''
 
         # check for the number of nans in the length 8 array of locations around the location
@@ -274,6 +276,38 @@ class Tools():
         probs[np.isnan(probs)] = 0 # any nans are assigned as 0
         cutoffs = np.cumsum(probs) # cumulative sum of all probabilities
         # randomly pick indices from cutoffs based on uniform distribution
+        idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
+
+        return idx
+
+
+
+    ### steepest descent - pick the highest probability, no randomness
+    def steep_descent(self, probs):
+        '''
+        Pick the array value with the greatest probability, no longer a stochastic
+        process, instead just choosing the steepest descent
+
+        Inputs :
+                    probs : 8 values indicating probability (weight) associated
+                            with the surrounding cells
+
+        Outputs :
+                    idx : 1-8 value chosen by greatest probs
+        '''
+
+        max_val = np.nanmax(probs)
+        # remove location 1,1 from consideration
+        probs[1,1] = 0
+        # remove any locations from consideration beneath max value
+        probs[probs<max_val] = 0
+        # any nans become ignored too
+        probs[np.isnan(probs)] = 0
+
+        # will pick either the index corresponding to the max value if there
+        # is just 1, or it will randomly choose between values in the event
+        # of a tie
+        cutoffs = np.cumsum(probs) # cumulative sum of all probabilities
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
 
         return idx
