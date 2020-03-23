@@ -19,16 +19,42 @@ import logging
 import time
 
 class Tools():
+    '''
+    Class to hold the internal functions:
+        random_pick_seed : random draw for initial particle location given a set
+                           of potential locations or a region to seed particles
+        get_weight : pull the weights for the random walk for surrounding cells
+                     and choose the new cell location
+        calculate_new_ind : calculate the new particle index locations
+        step_update : checking that the new indices are in fact some distance
+                      away from the previous particle location
+        calc_travel_times : calculate the particle travel time to make the step
+                            from the previous location to the new one by using
+                            the inverse of the average velocity (averaged between
+                            the previous and new cell locations)
+        check_for_boundary : function to check and disallow particle to travel
+                             outside of the domain
+        random_pick : function to do the weighted random draw for the walk
 
+    Tools class is inherited by the Particle class which contains the broader
+    functions initializing the particle parameters (__init__) and to do a single
+    iteration of the particle traveling (run_iteration)
+    '''
 
 
     ### random pick seeding location
     def random_pick_seed(self, choices, probs = None):
         '''
-        Randomly pick a number from array choices weighted by array probs
-        Values in choices are column indices
-        Return a tuple of the randomly picked index for row 0
+        Randomly pick a number from array of choices.
+
+        Inputs :
+                    choices : array of possible values to draw from
+                    probs : optional, can add weighted probabilities to draw
+
+        Outputs :
+                    choices[idx] : the randomly chosen value
         '''
+
         # randomly pick tracer drop cell to use given a list of potential spots
         if not probs:
             probs = np.array([1 for i in range(len(choices))])
@@ -42,10 +68,19 @@ class Tools():
 
     ### pull weights
     def get_weight(self, ind):
+        '''
+        Function to assign weights to the surrounding 8 cells around the current
+        index and randomly choose one of those cells.
+
+        Inputs :
+                    ind : tuple (x,y) with the current location indices
+
+        Outputs :
+                    new_cell : new location given as 1-8 value
+        '''
+
         # pull surrounding cell values from pad stage array
-        ### Need to confirm or check if original formulation here is right
         stage_ind = self.pad_stage[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        # stage_ind = self.pad_stage[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2] # potential new version?
         # define water surface gradient weight component (minimum of 0)
         weight_sfc = np.maximum(0,
                      (self.stage[ind] - stage_ind) / self.distances)
@@ -59,12 +94,9 @@ class Tools():
             weight_int[0,:] = 0
 
         # pull surrounding cell values from padded depth and cell type arrays
-        # old code was uneven/biased? need to figure out
         depth_ind = self.pad_depth[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
         ct_ind = self.pad_cell_type[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        # potential new code to get 3x3 cells around the index location - 2 lines below
-        # depth_ind = self.pad_depth[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
-        # ct_ind = self.pad_cell_type[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
+
         # if the depth is below minimum depth for cell to be weight or it is a cell
         # type that is not water, then make it impossible for the parcel
         # to travel there by setting associated weight to 0
@@ -87,7 +119,10 @@ class Tools():
         self.weight[depth_ind <= self.dry_depth] = np.nan
         # randomly pick the new cell for the particle to move to using the
         # random_pick function and the set of weights just defined
-        new_cell = self.random_pick(self.weight)
+        if self.steepest_descent != True:
+            new_cell = self.random_pick(self.weight)
+        elif self.steepest_descent == True:
+            new_cell = self.steep_descent(self.weight)
 
         return new_cell
 
@@ -95,6 +130,18 @@ class Tools():
 
     ### calculate new index
     def calculate_new_ind(self, ind, new_cell):
+        '''
+        Adds new cell location (1-8 value) to the previous index.
+
+        Inputs :
+                    ind : tuple (x,y) of old particle location
+                    new_cell : integer 1-8 indicating new cell location relative
+                               to the old one in a D-8 sense
+
+        Outputs :
+                    new_ind : tuple (x,y) of the new particle location
+        '''
+
         # add the index and the flattened x and y walk component
         # x,y walk component is related to the next cell chosen as a 1-8 location
         new_ind = (ind[0] + self.jwalk.flat[new_cell], ind[1] +
@@ -108,6 +155,19 @@ class Tools():
 
     ### update step
     def step_update(self, ind, new_ind, new_cell):
+        '''
+        Function to check new location is some distance away from old one,
+        also provides way to track the travel distance of the particles
+
+        Inputs :
+                    ind : tuple (x,y) of current location
+                    new_ind : tuple (x,y) of new location
+                    new_cell : integer 1-8 indicating new location in D-8 way
+
+        Outputs :
+                    dist : distance between current (old) and new particle location
+        '''
+
         # assign x-step by pulling 1-8 value from x-component walk 1-8 directions
         istep = self.iwalk.flat[new_cell]
         # assign y-step by pulling 1-8 value from y-component walk 1-8 directions
@@ -131,6 +191,22 @@ class Tools():
 
     ### calculate travel time using avg of velocity and old and new index
     def calc_travel_times(self, ind, new_ind):
+        '''
+        Function to calculate the travel time for the particle to get from the
+        current location to the new location. Calculated by taking the inverse
+        of the velocity at the old and new locations.
+
+        Inputs :
+                    ind : tuple (x,y) of the current location
+                    new_ind : tuple (x,y) of the new location
+
+        Outputs :
+                    trav_time : travel time it takes the particle to get from
+                                the current location to the new proposed
+                                location using the inverse of the average
+                                velocity
+        '''
+
         # get old position velocity value
         old_vel = self.velocity[ind[0],ind[1]]
         # new position velocity value
@@ -146,6 +222,21 @@ class Tools():
 
     ### bndy check
     def check_for_boundary(self, new_inds, current_inds):
+        '''
+        Function to make sure particle is not exiting the boundary with the
+        proposed new location.
+
+        Inputs :
+                    new_inds : list [] of tuples (x,y) of new indices
+                    current_inds : list [] of tuples (x,y) of old indices
+
+        Outputs :
+                    new_inds : list [] of tuples (x,y) of new indices where any
+                               proposed indices outside of the domain have been
+                               replaced by the old indices so those particles
+                               will not travel this iteration
+        '''
+
         # check if the new indices are on edges (type==-1)
         # if so then don't let parcel go there
         for i in range(0,len(new_inds)):
@@ -164,7 +255,17 @@ class Tools():
         '''
         Randomly pick a number weighted by array probs (len 8)
         Return the index of the selected weight in array probs
+
+        Inputs :
+                    probs : 8 values indicating the probability (weight)
+                            associated with the surrounding cells for the
+                            random walk
+
+        Outputs :
+                    idx : 1-8 value chosen randomly based on the weighted
+                          probabilities
         '''
+
         # check for the number of nans in the length 8 array of locations around the location
         num_nans = sum(np.isnan(probs))
         # if there are no nans, then everywhere there is no nan in the probs list is assigned a 1
@@ -175,6 +276,38 @@ class Tools():
         probs[np.isnan(probs)] = 0 # any nans are assigned as 0
         cutoffs = np.cumsum(probs) # cumulative sum of all probabilities
         # randomly pick indices from cutoffs based on uniform distribution
+        idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
+
+        return idx
+
+
+
+    ### steepest descent - pick the highest probability, no randomness
+    def steep_descent(self, probs):
+        '''
+        Pick the array value with the greatest probability, no longer a stochastic
+        process, instead just choosing the steepest descent
+
+        Inputs :
+                    probs : 8 values indicating probability (weight) associated
+                            with the surrounding cells
+
+        Outputs :
+                    idx : 1-8 value chosen by greatest probs
+        '''
+
+        max_val = np.nanmax(probs)
+        # remove location 1,1 from consideration
+        probs[1,1] = 0
+        # remove any locations from consideration beneath max value
+        probs[probs<max_val] = 0
+        # any nans become ignored too
+        probs[np.isnan(probs)] = 0
+
+        # will pick either the index corresponding to the max value if there
+        # is just 1, or it will randomly choose between values in the event
+        # of a tie
+        cutoffs = np.cumsum(probs) # cumulative sum of all probabilities
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
 
         return idx
