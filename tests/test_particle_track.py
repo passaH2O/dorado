@@ -20,6 +20,7 @@ params.qy = np.ones((3,3))
 params.theta = 1
 particle = particle_track.Particle(params)
 
+# testing of the Particle __init__ functionality
 def test_xseed():
     assert particle.seed_xloc == params.seed_xloc
 
@@ -98,3 +99,43 @@ def test_pad_depth():
 
 def test_pad_cell_type():
     assert np.all(particle.pad_cell_type) == np.all(np.pad(np.zeros_like(params.stage), 1, 'constant', constant_values = -1))
+
+def test_steep():
+    assert particle.steepest_descent == False
+
+def test_steep_true():
+    params.steepest_descent = True
+    particle = particle_track.Particle(params)
+    assert particle.steepest_descent == True
+
+def test_steep_other():
+    params.steepest_descent = 'other'
+    particle = particle_track.Particle(params)
+    assert particle.steepest_descent == False
+
+
+
+# testing of the run_iteration function
+def test_start_pairs_X():
+    start_pairs, new_inds, travel_times = particle.run_iteration()
+    assert start_pairs[0][0] == params.seed_xloc[0]
+
+def test_start_pairs_Y():
+    start_pairs, new_inds, travel_times = particle.run_iteration()
+    assert start_pairs[0][1] == params.seed_yloc[0]
+
+def test_start_pairs_X2():
+    start_pairs, new_inds, travel_times = particle.run_iteration(start_xindices=params.seed_xloc)
+    assert start_pairs[0][0] == params.seed_xloc[0]
+
+def test_start_pairs_Y2():
+    start_pairs, new_inds, travel_times = particle.run_iteration(start_yindices=params.seed_yloc)
+    assert start_pairs[0][1] == params.seed_yloc[0]
+
+def test_travel_time():
+    start_pairs, new_inds, travel_times = particle.run_iteration()
+    assert travel_times[0] == 1.0
+
+def test_travel_time_given():
+    start_pairs, new_inds, travel_times = particle.run_iteration(start_times=[0.0])
+    assert travel_times[0] == 1.0
