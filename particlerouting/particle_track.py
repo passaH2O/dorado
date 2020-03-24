@@ -21,9 +21,9 @@ import time
 from .particle_tools import Tools
 
 class Particle(Tools):
-    # class initialization, automatically run when class is defined
-    # takes in attributes from a params object passed to it
-    # e.g. testparticle = Particle(params)
+    '''
+    Class for the particle or set of particles that is going to be routed
+    '''
     def __init__(self, params):
         '''
         Methods require a class of parameters (params) to be passed to the
@@ -70,15 +70,27 @@ class Particle(Tools):
             print("Stage values not specified - using depth values")
             self.stage = self.depth
 
+        ### check if hydrodynamic model input has been specified
+        if hasattr(params, 'model'):
+            pass
+        else:
+            params.model = []
+
         ### Define x-component of discharge for all cells in domain
         try:
-            self.qx = params.qx
+            if params.model == 'DeltaRCM':
+                self.qx = params.qx
+            else:
+                self.qx = -1*params.qy
         except:
             raise ValueError("x-components of discharge values not specified")
 
         ### Define y-component of discharge for all cells in domain
         try:
-            self.qy = params.qy
+            if params.model == 'DeltaRCM':
+                self.qy = params.qy
+            else:
+                self.qy = params.qx
         except:
             raise ValueError("y-components of discharge values not specified")
 

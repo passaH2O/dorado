@@ -24,8 +24,9 @@ jvec = np.array([[-np.sqrt(0.5), -1, -np.sqrt(0.5)],
                [0, 0, 0],
                [np.sqrt(0.5), 1, np.sqrt(0.5)]])
 
-# defining the unit tests, one per function in the particle_tools.py
 
+
+# defining the unit tests, one per function in the particle_tools.py
 def test_random_pick_seed():
     '''
     Test for function random_pick_seed within Tools class
@@ -42,28 +43,56 @@ def test_get_weight():
     '''
     Test for function get_weight within Tools class
     '''
-    # tools = Tools()
-    # # define a bunch of expected values
-    # tools.stage = np.ones((5,5))
-    # tools.pad_stage = tools.stage.copy()
-    # tools.qy = tools.stage.copy()
-    # tools.qx = np.zeros((5,5))
-    # tools.pad_cell_type = tools.stage.copy()
-    # tools.ivec = ivec
-    # tools.jvec = jvec
-    # tools.distances = distances
-    # tools.dry_depth = 0.1
-    # tools.gamma = 0.02
-    # tools.theta = 1
-    # # make the padded depth control where weight is allowed to be
-    # # to force test to be deterministic (aka remove randomness)
-    # tools.pad_depth = np.zeros_like(tools.stage)
-    # tools.pad_depth[0:2,2] = 1
-    # # set the current index
-    # ind = (2,2)
-    # # then the expected new cell pick should be
-    # assert tools.get_weight(ind) == 0
-    pass
+    tools = Tools()
+    # define a bunch of expected values
+    tools.stage = np.ones((5,5))
+    tools.pad_stage = tools.stage.copy()
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5,5))
+    tools.pad_cell_type = tools.stage.copy()
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    # make the padded depth control where weight is allowed to be
+    # to force test to be deterministic (aka remove randomness)
+    tools.pad_depth = tools.stage.copy()
+    # set the current index
+    ind = (1,1)
+    # then the expected new cell pick should be
+    assert tools.get_weight(ind) == 5
+
+
+
+def test_get_weight_nan():
+    '''
+    Test for function get_weight within Tools class
+    '''
+    tools = Tools()
+    # define a bunch of expected values
+    tools.stage = np.ones((5,5))
+    tools.pad_stage = tools.stage.copy()
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5,5))
+    tools.pad_cell_type = tools.stage.copy()
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    # make the padded depth control where weight is allowed to be
+    # to force test to be deterministic (aka remove randomness)
+    tools.pad_depth = tools.stage.copy()
+    tools.pad_depth[0,0] = np.nan
+    # set the current index
+    ind = (1,1)
+    # then the expected new cell pick should be
+    assert tools.get_weight(ind) == 5
 
 
 
@@ -81,7 +110,6 @@ def test_calculate_new_ind():
     new_cell = 0
     # expect new cell to be in location (0,0)
     assert tools.calculate_new_ind(old_ind,new_cell) == (0,0)
-
 
 
 
