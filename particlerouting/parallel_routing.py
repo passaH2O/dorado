@@ -42,14 +42,14 @@ def run_iter(params):
     # do iterations
     for i in range(0,params.num_iter):
         if i == 0:
-            start_inds, end_inds, travel_times = test.run_iteration()
+            start_inds, end_inds, travel_times = particle.run_iteration()
             beg_inds = start_inds # keep names consistent
             xinds=[];yinds=[];
             for j in range(0,len(end_inds)):
                 xinds.append(end_inds[j][0])
                 yinds.append(end_inds[j][1])
         else:
-            beg_inds, end_inds, travel_times = test.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
+            beg_inds, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
             xinds = []; yinds = [];
             for j in range(0,len(end_inds)):
                 xinds.append(end_inds[j][0])
@@ -113,8 +113,9 @@ def parallel_routing(params,num_iter,num_cores):
                 num_cores : number of processors/cores to use for parallel part
 
     Outputs :
-                result : single dictionary with beg/end indices and travel
-                         times for all the particles
+                par_result : list of length(num_cores) with a dictionary of the
+                             beg/end indices and travel times for each particle
+                             computed by that process/core
     '''
 
     # assign number of iterations to the params class
@@ -125,11 +126,8 @@ def parallel_routing(params,num_iter,num_cores):
     params_list = params_list * num_cores
 
     # create the parallel pool and run the process
-    if __name__ == '__main__':
-        p = Pool(processes=num_cores)
-        par_result = p.map(run_iter, params_list)
-        p.terminate()
+    p = Pool(processes=num_cores)
+    par_result = p.map(run_iter, params_list)
+    p.terminate()
 
-    result = combine_result(par_result)
-
-    return result
+    return par_result

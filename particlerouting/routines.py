@@ -21,7 +21,7 @@ import time
 
 
 
-def steady_plots(params,num_iter):
+def steady_plots(params,num_iter,folder_name):
     '''
     Function to automate plotting of particle movement over a set of steady
     fields (time-invariant)
@@ -29,9 +29,10 @@ def steady_plots(params,num_iter):
     Inputs :
                 params : class of parameter values for the particles
                 num_iter : number of iterations to move particles over
+                folder_name : string of folder name to put outputs in
 
     Outputs :
-                Script saves result of each iteration to a /results folder
+                Script saves result of each iteration to a folder
                 with both the figure for each iteration as a png and the data
                 with the particle start and end locations
     '''
@@ -40,9 +41,12 @@ def steady_plots(params,num_iter):
     particle = Particle(params)
 
     # make directory to save the data
-    os.makedirs(os.getcwd() + '/results')
-    os.makedirs(os.getcwd() + '/results/figs')
-    os.makedirs(os.getcwd() + '/results/data')
+    try:
+        os.makedirs(os.getcwd() + '/' + folder_name)
+        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
+        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
+    except:
+        print('Directories already exist')
 
     # iterate and save results
     for i in range(0,num_iter):
@@ -69,12 +73,12 @@ def steady_plots(params,num_iter):
         plt.imshow(params.depth)
         plt.title('Depth')
         plt.colorbar()
-        plt.savefig(os.getcwd() + '/results/figs/output'+str(i)+'.png')
+        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
         plt.close()
 
         # save data
         np.savez(
-                os.getcwd() + '/results/data/data'+str(i)+'.npz',
+                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
                 beg_inds=beg_inds,
                 end_inds=end_inds,
                 travel_times=travel_times
@@ -84,7 +88,8 @@ def steady_plots(params,num_iter):
 
 def unsteady_plots(params, avg_timestep,
                    output_base, output_type,
-                   first_output, last_output):
+                   first_output, last_output,
+                   folder_name):
     '''
     Function to automate plotting of particle movement in an unsteady flow
     field (time-varying).
@@ -98,17 +103,21 @@ def unsteady_plots(params, avg_timestep,
                               (limited built-in support, may require modification)
                 first_output : number to append to output_base for first file
                 last_output : number to append to output_base for last file
+                folder_name : string of the desired output folder name
 
     Outputs :
-                Script saves result of each iteration to a /results folder
+                Script saves result of each iteration to a folder
                 with both the figure for each iteration as a png and the data
                 with the particle start and end locations
     '''
 
     # make directory to save the data
-    os.makedirs(os.getcwd() + '/results')
-    os.makedirs(os.getcwd() + '/results/figs')
-    os.makedirs(os.getcwd() + '/results/data')
+    try:
+        os.makedirs(os.getcwd() + '/' + folder_name)
+        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
+        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
+    except:
+        print('Directories already exist')
 
     for i in range(first_output,last_output+1):
         # load depth, qx, qy for this timestep
@@ -158,15 +167,18 @@ def unsteady_plots(params, avg_timestep,
         for k in range(0,len(start_inds)):
             plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
             plt.scatter(end_inds[k][1],end_inds[k][0],c='r',s=0.75)
+        cbar = plt.colorbar()
+        cbar.set_label('Particle Travel Times [s]')
         plt.imshow(params.depth)
         plt.title('Depth')
-        plt.colorbar()
-        plt.savefig(os.getcwd() + '/results/figs/output'+str(i)+'.png')
+        cbar2 = plt.colorbar(orientation='horizontal')
+        cbar2.set_label('Water Depth [m]')
+        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
         plt.close()
 
         # save data
         np.savez(
-                os.getcwd() + '/results/data/data'+str(i)+'.npz',
+                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
                 beg_inds=beg_inds,
                 end_inds=end_inds,
                 travel_times=travel_times
@@ -174,7 +186,7 @@ def unsteady_plots(params, avg_timestep,
 
 
 
-def time_plots(params,num_iter):
+def time_plots(params,num_iter,folder_name):
     '''
     Make plots with each particle's travel time visualized.
     Routine assumes a steady flow field, but could be expanded to an unsteady case.
@@ -182,6 +194,7 @@ def time_plots(params,num_iter):
     Inputs :
                 params : parameters for the particle
                 num_iter : number of iterations to move particles
+                folder_name : string of desired output folder name
 
     Outputs :
                 Saves plots and data for each iteration
@@ -191,9 +204,12 @@ def time_plots(params,num_iter):
     particle = Particle(params)
 
     # make directory to save the data
-    os.makedirs(os.getcwd() + '/results')
-    os.makedirs(os.getcwd() + '/results/figs')
-    os.makedirs(os.getcwd() + '/results/data')
+    try:
+        os.makedirs(os.getcwd() + '/' + folder_name)
+        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
+        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
+    except:
+        print('Directories already exist')
 
     # iterate and save results
     for i in range(0,num_iter):
@@ -218,15 +234,18 @@ def time_plots(params,num_iter):
         for k in range(0,len(start_inds)):
             plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
             plt.scatter(end_inds[k][1],end_inds[k][0],c=travel_times[k],s=0.75,cmap='coolwarm',norm=cm)
+        cbar = plt.colorbar()
+        cbar.set_label('Particle Travel Times [s]')
         plt.imshow(params.depth)
         plt.title('Depth')
-        plt.colorbar()
-        plt.savefig(os.getcwd() + '/results/figs/output'+str(i)+'.png')
+        cbar2 = plt.colorbar(orientation='horizontal')
+        cbar2.set_label('Water Depth [m]')
+        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
         plt.close()
 
         # save data
         np.savez(
-                os.getcwd() + '/results/data/data'+str(i)+'.npz',
+                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
                 beg_inds=beg_inds,
                 end_inds=end_inds,
                 travel_times=travel_times
@@ -237,19 +256,22 @@ def time_plots(params,num_iter):
 ### Function to automate animation of the png outputs
 # requires installation of the animation writer 'ffmpeg' which is not part of the
 # default PartingRouting installation set of packages
-def animate_plots(results_folder,start_val,end_val):
+def animate_plots(start_val,end_val,folder_name):
     '''
     Routine to make mp4 animation of the particle routing from png outputs
     of the previous plotting routines.
 
     Inputs :
-                results_folder : location of the results
                 start_val : number of first plot to use
                 end_val : number of last plot to use
+                folder_name : name of output folder to get results from
 
     Outputs :
                 Saves an mp4 animation to the results folder
     '''
+
+    from matplotlib import animation
+    import matplotlib.image as mgimg
 
     #set up the figure
     fig = plt.figure()
@@ -263,7 +285,7 @@ def animate_plots(results_folder,start_val,end_val):
 
     def animate(i):
         ## Read in picture
-        fname = os.getcwd() + '/results/figs/output%d.png' %i
+        fname = os.getcwd() + '/' + folder_name + '/figs/output%d.png' %i
 
         ## [-1::-1], to invert the array
         # Otherwise it plots up-side down
@@ -284,12 +306,10 @@ def animate_plots(results_folder,start_val,end_val):
                                    frames=range(start_val,end_val), interval=250,
                                    blit=True, repeat_delay=1000)
 
-    plt.show()
-
     # Set up formatting for the movie files
     Writer = animation.writers['ffmpeg']
     # fps previously 10 for the longer runs
     writer = Writer(fps=5, codec="libx264", extra_args=['-pix_fmt', 'yuv420p'],
                     metadata=dict(artist='Me'), bitrate=-1)
 
-    anim.save(os.getcwd()+'/results/animation.mp4', writer=writer, dpi=300)
+    anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer, dpi=300)
