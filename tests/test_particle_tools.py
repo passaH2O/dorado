@@ -64,7 +64,8 @@ def test_get_weight():
     ind = (1,1)
     # then the expected new cell pick should be
     assert tools.get_weight(ind) == 5
-    pass
+
+
 
 def test_get_weight_nan():
     '''
@@ -92,7 +93,8 @@ def test_get_weight_nan():
     ind = (1,1)
     # then the expected new cell pick should be
     assert tools.get_weight(ind) == 5
-    pass
+
+
 
 def test_calculate_new_ind():
     '''
