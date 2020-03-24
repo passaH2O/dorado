@@ -18,6 +18,7 @@ params.stage = np.ones((3,3))
 params.qx = np.zeros((3,3))
 params.qy = np.ones((3,3))
 params.theta = 1
+params.model = 'DeltaRCM'
 particle = particle_track.Particle(params)
 
 # testing of the Particle __init__ functionality
