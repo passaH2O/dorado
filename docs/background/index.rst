@@ -3,3 +3,9 @@
 ==========
 Background
 ==========
+
+Motivation
+----------
+
+Theory
+------

@@ -1,4 +1,4 @@
-Welcome to particlerouting's documentation!
+ParticleRouting's Documentation
 ===========================================
 
 Documentation Outline
