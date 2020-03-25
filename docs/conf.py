@@ -20,8 +20,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = u'particlerouting'
-copyright = u'2020, J. Hariharan'
-author = u'J. Hariharan'
+copyright = u'2020, J. Hariharan, K. Wright, P. Passalacqua'
+author = u'J. Hariharan, K. Wright, P. Passalacqua'
 
 # The short X.Y version
 version = u''
