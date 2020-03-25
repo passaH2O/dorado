@@ -10,6 +10,8 @@ Lagrangian particle routing via weighted random walks.
 - matplotlib
 - scipy
 - netcdf4
+- (optional) requires the 'ffmpeg' writer to use the animate_plots routine
+
 ### Installation:
 (tested on Ubuntu)
 - Clone the repository
@@ -17,23 +19,20 @@ Lagrangian particle routing via weighted random walks.
 - Then run `pip install particlerouting` to finish installing the package
 
 ### Example Use:
-See either the example [jupyter notebook](examples/deltarcm_particles.ipynb) or the example [python script](examples/test_case.py).
+See the python scripts provided in the examples folder.
 
-## Example Results
-Initial particle locations indicated by blue dots, final particle locations shown as red dots. Particles plotted on depth grid from a DeltaRCM simulation (example output provided in examples folder)
+## Example Results:
+Initial particle locations indicated by blue dots, active/evolving particle locations shown as red dots.
 
-### Example 1
+### Particles on a DeltaRCM Simulated Delta
 <div class="nav3" style="height:705px;">
-    <img src="imgs/test.gif" alt="Example" width="95%"></a>
+    <img src="docs/examples/images/steady_deltarcm.gif" alt="Example" width="75%"></a>
 </div>
 
-### Example 2
-![Example image](imgs/test_inchannel_01.png)
+### Particles on a ANUGA Hydro generated flow field
+<div class="nav3" style="height:705px;">
+    <img src="docs/examples/images/steady_anuga.gif" alt="Example" width="75%"></a>
+</div>
 
 ## Documentation
-To be added. Code is thoroughly commented at this time. The weighting scheme for the random walk follows the method described in [1] and [2] for reduced complexity modeling of Lagrangian hydrodynamics. 
-
-## References
-[1] Liang, M., Vaughan R. Voller, and Chris Paola. "A reduced-complexity model for river delta formation-Part 1: Modeling deltas with channel dynamics." Earth Surface Dynamics 3.1 (2015).
-
-[2] Liang, M., et al. "A reduced-complexity model for river delta formation-Part 2: Assessment of the flow routing scheme." Earth Surface Dynamics 3.1 (2015): 87.
+For more thorough documentation, see (add link to compiled docs github page)
