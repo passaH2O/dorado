@@ -1,5 +1,8 @@
 import pytest
 
+import sys, os
+sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+
 from particlerouting import particle_track
 import numpy as np
 
