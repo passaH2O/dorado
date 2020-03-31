@@ -311,3 +311,50 @@ class Tools():
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
 
         return idx
+
+
+
+    ### single iteration of particle movement
+    def single_iteration(self, current_inds, travel_times):
+        '''
+        Function to calculate a single iteration of particle movement
+
+        Inputs :
+                    current_inds : list of tuples of the current particle (x,y)
+                                   locations in space
+
+                    travel_times : list of initial travel times for the particles
+
+        Outputs :
+                    new_inds : list of the new particle locations after the
+                               single iteration
+
+                    travel_times : list of the travel times associated with the
+                                   particle movements
+        '''
+
+        inds = current_inds #np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
+        inds_tuple = [(inds[i][0], inds[i][1]) for i in range(len(inds))] # split the indices into tuples
+
+        new_cells = map(lambda x: self.get_weight(x)
+                        if x != (0,0) else 4, inds_tuple) # for each particle index get the weights
+
+        new_inds = map(lambda x,y: self.calculate_new_ind(x,y)
+                        if y != 4 else 0, inds_tuple, new_cells) # for each particle get the new index
+
+        dist = map(lambda x,y,z: self.step_update(x,y,z) if x > 0
+                   else 0, current_inds, new_inds, new_cells) # move each particle to the new index
+
+        new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
+        new_inds[np.array(dist) == 0] = 0
+
+        new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
+        new_inds = new_inds.tolist() # transform from np array to list 
+
+        # add the travel times
+        temp_travel = map(lambda x,y: self.calc_travel_times(x,y) if x > 0
+                            else 0, current_inds, new_inds)
+        travel_times = [travel_times[i] + temp_travel[i] for i in range(0,len(travel_times))] # add to existing times
+        travel_times = list(travel_times)
+
+        return new_inds, travel_times

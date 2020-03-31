@@ -56,9 +56,6 @@ def test_velocity():
 def test_theta():
     assert particle.theta == params.theta
 
-def test_itmax():
-    assert particle.itmax == 1
-
 def test_dry_depth():
     assert particle.dry_depth == 0.1
 
