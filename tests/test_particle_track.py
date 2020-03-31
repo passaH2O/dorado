@@ -1,5 +1,8 @@
 import pytest
 
+import sys, os
+sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+
 from particlerouting import particle_track
 import numpy as np
 
@@ -52,9 +55,6 @@ def test_velocity():
 
 def test_theta():
     assert particle.theta == params.theta
-
-def test_itmax():
-    assert particle.itmax == 1
 
 def test_dry_depth():
     assert particle.dry_depth == 0.1

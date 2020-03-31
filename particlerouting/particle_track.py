@@ -17,6 +17,7 @@ from netCDF4 import Dataset
 import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
+import copy
 import time
 from .particle_tools import Tools
 
@@ -113,13 +114,6 @@ class Particle(Tools):
         except:
             print('Theta not specified - using 1.0')
             self.theta = 1.0 # if unspecified use 1
-
-        ### Number of iterations for parcel routing when run_iteration is called
-        try:
-            self.itmax = params.itmax
-        except:
-            print('Max iterations not specified - using 1')
-            self.itmax = 1 # max number of iterations is 1 if undefined
 
         ### Minimum depth for cell to be considered wet
         try:
@@ -226,7 +220,7 @@ class Particle(Tools):
     # run an iteration where particles are moved
     # have option of specifying the particle start locations
     # otherwise they are randomly placed within x and y seed locations
-    def run_iteration(self,start_xindices=None,start_yindices=None,start_times=None):
+    def run_iteration(self,start_xindices=None,start_yindices=None,start_times=None,time_step=None):
         '''
         Runs an iteration of the particle routing.
         Returns the original particle locations and their final locations.
@@ -247,6 +241,12 @@ class Particle(Tools):
                                   if undefined, assumes no particles have
                                   travelled yet, so assigns zeros
 
+                    time_step : model timestep (seconds), or the travel time
+                                each particle should have at end of iteration,
+                                if left undefined, then just one iteration is
+                                run and the particles will be out of sync
+                                (time-wise)
+
         Outputs :
                     start_pairs : list [], of [x,y] pairs of the particle
                                   locations at the beginning of the iteration
@@ -257,8 +257,6 @@ class Particle(Tools):
                     travel_times : list [], of the travel times for each
                                    particle at the end of the timestep
         '''
-
-        iter = 0 # set iteration counter to 0
 
         # if start locations not defined, then randomly assign them
         if start_xindices == None:
@@ -283,35 +281,33 @@ class Particle(Tools):
         else:
             travel_times = start_times
 
-        # loop until iterations are completed
-        while (np.sum(current_inds) > 0) & (iter < self.itmax):
+        # do the particle movement
+        if time_step == None:
+            # run a single iteration
+            new_inds, travel_times = self.single_iteration(current_inds, travel_times)
 
-            iter += 1 # add +1 to the iter counter
+        else:
+            # define end time for particles as average of their current time
+            # plus the defined timestep duration
+            end_time = np.mean(travel_times) + time_step
 
-            inds = current_inds #np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
-            inds_tuple = [(inds[i][0], inds[i][1]) for i in range(len(inds))] # split the indices into tuples
+            # run a single particle iteration
+            temp_inds, temp_times = self.single_iteration(current_inds, travel_times)
 
-            new_cells = map(lambda x: self.get_weight(x)
-                            if x != (0,0) else 4, inds_tuple) # for each particle index get the weights
+            # copy results from first iteration into final lists
+            new_inds = copy.copy(temp_inds)
+            travel_times = copy.copy(temp_times)
 
-            new_inds = map(lambda x,y: self.calculate_new_ind(x,y)
-                            if y != 4 else 0, inds_tuple, new_cells) # for each particle get the new index
+            # iterate more as long as smalles of the travel times is below
+            # 90% of the end time
+            while np.min(temp_times) < 0.9*end_time:
+                temp_inds, temp_times = self.single_iteration(temp_inds, temp_times)
+                # check each particle time
+                for i in range(0,len(temp_times)):
+                    # if the particle time is close to end time then save it
+                    if temp_times[i] > 0.9*end_time:
+                        new_inds[i] = temp_inds[i]
+                        travel_times[i] = temp_times[i]
 
-            dist = map(lambda x,y,z: self.step_update(x,y,z) if x > 0
-                       else 0, current_inds, new_inds, new_cells) # move each particle to the new index
-
-            new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
-            new_inds[np.array(dist) == 0] = 0
-
-            new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
-
-            # add the travel times
-            temp_travel = map(lambda x,y: self.calc_travel_times(x,y) if x > 0
-                                else 0, current_inds, new_inds)
-            travel_times = [travel_times[i] + temp_travel[i] for i in range(0,len(travel_times))] # add to existing times
-            travel_times = list(travel_times)
-
-            # update current inds to the new ones
-            current_inds = new_inds.tolist()
 
         return start_pairs, new_inds, travel_times
