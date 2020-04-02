@@ -85,14 +85,114 @@ def steady_plots(params,num_iter,folder_name):
                 )
 
 
-
-def unsteady_plots(params, avg_timestep,
-                   output_base, output_type,
-                   first_output, last_output,
-                   folder_name):
+def unsteady_plots(params, num_steps, timestep,
+                       output_base, output_type,
+                       first_output, last_output,
+                       folder_name):
     '''
     Function to automate plotting of particle movement in an unsteady flow
-    field (time-varying).
+    field (time-varying). Each particle travels for the length of the timestep
+    before the next output is loaded and the flow field is updated.
+
+    Inputs :
+                params : class of particle parameter values
+                num_steps : number of model timesteps being covered
+                timestep : model timestep duration (seconds)
+                output_base : filepath where hydrodynamic outputs are
+                output_type : convention output files have been saved as
+                              (limited built-in support, may require modification)
+                first_output : number to append to output_base for first file
+                last_output : number to append to output_base for last file
+                folder_name : string of the desired output folder name
+
+    Outputs :
+                Script saves result of each iteration to a folder
+                with both the figure for each iteration as a png and the data
+                with the particle start and end locations
+    '''
+
+    # make directory to save the data
+    try:
+        os.makedirs(os.getcwd() + '/' + folder_name)
+        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
+        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
+    except:
+        print('Directories already exist')
+
+    for i in range(first_output,last_output+1):
+        # load depth, qx, qy for this timestep
+        # making assumption that other variables are constant between output files !!!!
+        if output_type == 'csv':
+            depth = np.loadtxt(output_base+'/depth'+str(i)+'.csv', delimiter=',')
+            qx = np.loadtxt(output_base+'/qx'+str(i)+'.csv', delimiter=',')
+            qy = np.loadtxt(output_base+'/qy'+str(i)+'.csv', delimiter=',')
+        elif output_type == 'npy':
+            depth = np.load(output_base+'/depth'+str(i)+'.npy')
+            qx = np.load(output_base+'/qx'+str(i)+'.npy')
+            qy = np.load(output_base+'/qy'+str(i)+'.npy')
+        elif output_type == 'npz':
+            data = np.load(output_base+'/data'+str(i)+'.npz')
+            depth = data['depth']
+            qx = data['qx']
+            qy = data['qy']
+        else:
+            raise ValueError('Output datatype/structure unsupported, modify the output reading portion of the code')
+
+        # then define the particle class and continue
+        particle = Particle(params)
+
+        # reset time
+        t = 0.0
+        while t < timestep*num_steps:
+            if i == first_output and t == 0.0:
+                t_old = 0.0
+                start_inds, end_inds, travel_times = particle.run_iteration(time_step=timestep)
+                xinds=[];yinds=[];
+                for j in range(0,len(end_inds)):
+                    xinds.append(end_inds[j][0])
+                    yinds.append(end_inds[j][1])
+            else:
+                t_old = np.mean(travel_times)
+                beg_ind, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times,time_step=timestep)
+                xinds = []; yinds = [];
+                for j in range(0,len(end_inds)):
+                    xinds.append(end_inds[j][0])
+                    yinds.append(end_inds[j][1])
+
+            print('mean travel time: ' + str(np.mean(travel_times)-t_old))
+            t = np.mean(travel_times) - t_old
+
+        # make and save plots and data
+        plt.figure(figsize=(4,4),dpi=200)
+        for k in range(0,len(start_inds)):
+            plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
+            plt.scatter(end_inds[k][1],end_inds[k][0],c='r',s=0.75)
+        cbar = plt.colorbar()
+        cbar.set_label('Particle Travel Times [s]')
+        plt.imshow(params.depth)
+        plt.title('Depth')
+        cbar2 = plt.colorbar(orientation='horizontal')
+        cbar2.set_label('Water Depth [m]')
+        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
+        plt.close()
+
+        # save data
+        np.savez(
+                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
+                beg_inds=beg_inds,
+                end_inds=end_inds,
+                travel_times=travel_times
+                )
+
+
+def unsteady_avg_plots(params, avg_timestep,
+                       output_base, output_type,
+                       first_output, last_output,
+                       folder_name):
+    '''
+    Function to automate plotting of particle movement in an unsteady flow
+    field (time-varying). Steps through time as an average of the particle
+    travel times.
 
     Inputs :
                 params : class of particle parameter values

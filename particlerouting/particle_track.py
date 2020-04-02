@@ -304,10 +304,12 @@ class Particle(Tools):
                 temp_inds, temp_times = self.single_iteration(temp_inds, temp_times)
                 # check each particle time
                 for i in range(0,len(temp_times)):
-                    # if the particle time is close to end time then save it
+                    # if the particle time is above target time then consider saving it 
                     if temp_times[i] > 0.9*end_time:
-                        new_inds[i] = temp_inds[i]
-                        travel_times[i] = temp_times[i]
+                        # compare against stored time, if it is closer then use new time
+                        if np.abs(temp_times[i]-end_time) < np.abs(travel_times[i]-end_time):
+                            new_inds[i] = temp_inds[i]
+                            travel_times[i] = temp_times[i]
 
 
         return start_pairs, new_inds, travel_times
