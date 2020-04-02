@@ -24,7 +24,7 @@ The routing direction F* is the estimate of the local downstream of the flow [5]
    :nowrap:
 
    \begin{eqnarray}
-      F* = \gamma F_{sfc} + (1-\gamma) F_{int}
+      F^{*} = \gamma F_{sfc} + (1-\gamma) F_{int}
    \end{eqnarray}
 
 In this way, the :math:`{\gamma}` parameter controls the proportional dependence of water surface slope and water discharge on the downstream direction. A :math:`{\gamma}` of 0 means that the water slope is ignored when determining the downstream flow direction, and a :math:`{\gamma}`: of 1 means that the discharge values (the flow field) is ignored.

@@ -29,14 +29,20 @@ params.qy = qy
 params.seed_xloc = list(range(20,30))
 params.seed_yloc = list(range(48,53))
 params.Np_tracer = 50
-params.dx = 50.
+# smaller cell size than the other examples to tighten the range of
+# travel time values that are obtained (aka increase travel time resolution)
+params.dx = 10.
 params.theta = 1.0
 params.model = 'Anuga'
 
 ### Apply the parameters to run the particle routing model
 particle = pt.Particle(params)
 # run model until all particles have travelled for about 1.5 hours
-start_inds, end_inds, travel_times = particle.run_iteration(time_step=5400)
+start_inds, end_inds, travel_times = particle.run_iteration(time_step=2100)
+
+# print target travel time and list of the particle travel times
+print('Prescribed target travel time: 2100 seconds')
+print('List of particle travel times for final particle locations: ' + str(np.round(travel_times)))
 
 # make plot of initial and final particle locations
 plt.figure(figsize=(4,4),dpi=200)
