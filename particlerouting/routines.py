@@ -23,8 +23,9 @@ import time
 
 def steady_plots(params,num_iter,folder_name):
     '''
-    Function to automate plotting of particle movement over a set of steady
-    fields (time-invariant)
+    Function to automate plotting of particle movement over a steady flow
+    fields. Particles all have same number of iterations and are allowed to 
+	have different travel times.
 
     Inputs :
                 params : class of parameter values for the particles
@@ -33,8 +34,8 @@ def steady_plots(params,num_iter,folder_name):
 
     Outputs :
                 Script saves result of each iteration to a folder
-                with both the figure for each iteration as a png and the data
-                with the particle start and end locations
+                with the figure for each iteration as a png and the data
+                with the particle locations and travel times
     '''
 
     # define the particle
@@ -48,61 +49,51 @@ def steady_plots(params,num_iter,folder_name):
     except:
         print('Directories already exist')
 
-    # iterate and save results
+    all_walk_data = None # Initialize list for function call
+    # Iterate and save results
     for i in range(0,num_iter):
-        # do particle iteration
-        if i == 0:
-            start_inds, end_inds, travel_times = particle.run_iteration()
-            beg_inds = start_inds # for 1st timestep
-            xinds=[];yinds=[];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
-        else:
-            beg_inds, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
-            xinds = []; yinds = [];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
+        # Do particle iterations
+        all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
-        # do plot and saving
         plt.figure(figsize=(4,4),dpi=200)
-        for k in range(0,len(start_inds)):
-            plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
-            plt.scatter(end_inds[k][1],end_inds[k][0],c='r',s=0.75)
+        for k in range(0,params.Np_tracer):
+            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],c='b',s=0.75)
+            plt.scatter(all_walk_data[1][k][-1],all_walk_data[0][k][-1],c='r',s=0.75)
         plt.imshow(params.depth)
-        plt.title('Depth')
-        plt.colorbar()
-        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
+        plt.title('Depth - Particle Iteration ' + str(i))
+        cbar = plt.colorbar()
+        cbar.set_label('Water Depth [m]')
+        plt.axis('scaled')
+        plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-        # save data
-        np.savez(
-                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
-                beg_inds=beg_inds,
-                end_inds=end_inds,
-                travel_times=travel_times
-                )
+    # save data
+    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
+             all_walk_data = all_walk_data)
 
 
 def unsteady_plots(params, num_steps, timestep,
                        output_base, output_type,
-                       first_output, last_output,
                        folder_name):
-    '''
+    ''' 
     Function to automate plotting of particle movement in an unsteady flow
-    field (time-varying). Each particle travels for the length of the timestep
-    before the next output is loaded and the flow field is updated.
+    field (time-varying). Particles all have the same travel time at the end 
+    of each timestep and are allowed to have a different number of iterations.
+    Flow field variables (qx, qy, depth) are updated after each timestep. 
+    Because this function makes very specific assumptions about your model 
+    output files, feel free to use this it as a template and change 
+    the section that updates the flow field. 
 
     Inputs :
                 params : class of particle parameter values
                 num_steps : number of model timesteps being covered
                 timestep : model timestep duration (seconds)
-                output_base : filepath where hydrodynamic outputs are
-                output_type : convention output files have been saved as
-                              (limited built-in support, may require modification)
-                first_output : number to append to output_base for first file
-                last_output : number to append to output_base for last file
+                output_base : filepath string locating hydrodynamic output files
+                output_type : filetype string of the output files. Currently 
+				              accepts 'csv', 'npy', and 'npz'. Assumes filenames
+				              begin with either 'depth', 'stage', 'qx', 'qy', or 
+				              'data', followed by timestep information
+				              (limited built-in support, may require modification)
                 folder_name : string of the desired output folder name
 
     Outputs :
@@ -119,171 +110,64 @@ def unsteady_plots(params, num_steps, timestep,
     except:
         print('Directories already exist')
 
-    for i in range(first_output,last_output+1):
-        # load depth, qx, qy for this timestep
-        # making assumption that other variables are constant between output files !!!!
+    # Create lists of depth, qx, qy files in the specified output_base folder
+    depthlist = [x for x in os.listdir(output_base) if x.startswith('depth')]
+    stagelist = [x for x in os.listdir(output_base) if x.startswith('stage')]
+    qxlist = [x for x in os.listdir(output_base) if x.startswith('qx')]
+    qylist = [x for x in os.listdir(output_base) if x.startswith('qy')]
+    datalist = [x for x in os.listdir(output_base) if x.startswith('data')]
+    if num_steps > max(len(depthlist),len(datalist)):
+        print('Warning: num_steps exceeds number of model outputs in output_base')
+        print('Setting num_steps to equal number of model outputs')
+        num_steps = max(len(depthlist),len(datalist))
+
+    # Create vector of target times
+    target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
+    all_walk_data = None
+    # Iterate through model timesteps
+    for i in range(0, num_steps+1):
+        # load depth, stage, qx, qy for this timestep
+        # Making assumption that other variables are constant between output files !!!!
         if output_type == 'csv':
-            depth = np.loadtxt(output_base+'/depth'+str(i)+'.csv', delimiter=',')
-            qx = np.loadtxt(output_base+'/qx'+str(i)+'.csv', delimiter=',')
-            qy = np.loadtxt(output_base+'/qy'+str(i)+'.csv', delimiter=',')
+            params.depth = np.loadtxt(depthlist[i], delimiter=',')
+            params.stage = np.loadtxt(stagelist[i], delimiter=',')
+            params.qx = np.loadtxt(qxlist[i], delimiter=',')
+            params.qy = np.loadtxt(qylist[i], delimiter=',')
         elif output_type == 'npy':
-            depth = np.load(output_base+'/depth'+str(i)+'.npy')
-            qx = np.load(output_base+'/qx'+str(i)+'.npy')
-            qy = np.load(output_base+'/qy'+str(i)+'.npy')
+            params.depth = np.load(depthlist[i])
+            params.stage = np.loadtxt(stagelist[i])
+            params.qx = np.load(qxlist[i])
+            params.qy = np.load(qylist[i])
         elif output_type == 'npz':
-            data = np.load(output_base+'/data'+str(i)+'.npz')
-            depth = data['depth']
-            qx = data['qx']
-            qy = data['qy']
+            data = np.load(datalist[i])
+            params.depth = data['depth']
+            params.stage = data['stage']
+            params.qx = data['qx']
+            params.qy = data['qy']
         else:
             raise ValueError('Output datatype/structure unsupported, modify the output reading portion of the code')
 
         # then define the particle class and continue
         particle = Particle(params)
 
-        # reset time
-        t = 0.0
-        while t < timestep*num_steps:
-            if i == first_output and t == 0.0:
-                t_old = 0.0
-                start_inds, end_inds, travel_times = particle.run_iteration(time_step=timestep)
-                xinds=[];yinds=[];
-                for j in range(0,len(end_inds)):
-                    xinds.append(end_inds[j][0])
-                    yinds.append(end_inds[j][1])
-            else:
-                t_old = np.mean(travel_times)
-                beg_ind, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times,time_step=timestep)
-                xinds = []; yinds = [];
-                for j in range(0,len(end_inds)):
-                    xinds.append(end_inds[j][0])
-                    yinds.append(end_inds[j][1])
-
-            print('mean travel time: ' + str(np.mean(travel_times)-t_old))
-            t = np.mean(travel_times) - t_old
+        all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data, target_time=target_times[i])
 
         # make and save plots and data
         plt.figure(figsize=(4,4),dpi=200)
-        for k in range(0,len(start_inds)):
-            plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
-            plt.scatter(end_inds[k][1],end_inds[k][0],c='r',s=0.75)
-        cbar = plt.colorbar()
-        cbar.set_label('Particle Travel Times [s]')
+        for k in range(0,params.Np_tracer):
+            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],c='b',s=0.75)
+            plt.scatter(all_walk_data[1][k][-1],all_walk_data[0][k][-1],c='r',s=0.75)
         plt.imshow(params.depth)
-        plt.title('Depth')
-        cbar2 = plt.colorbar(orientation='horizontal')
-        cbar2.set_label('Water Depth [m]')
+        plt.axis('scaled')
+        plt.title('Depth at Time ' + str(target_times[i]))
+        cbar = plt.colorbar()
+        cbar.set_label('Water Depth [m]')
         plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
         plt.close()
 
-        # save data
-        np.savez(
-                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
-                beg_inds=beg_inds,
-                end_inds=end_inds,
-                travel_times=travel_times
-                )
-
-
-def unsteady_avg_plots(params, avg_timestep,
-                       output_base, output_type,
-                       first_output, last_output,
-                       folder_name):
-    '''
-    Function to automate plotting of particle movement in an unsteady flow
-    field (time-varying). Steps through time as an average of the particle
-    travel times.
-
-    Inputs :
-                params : class of particle parameter values
-                avg_timestep : average timestep duration (estimated using the
-                                average particle travel times)
-                output_base : filepath where hydrodynamic outputs are
-                output_type : convention output files have been saved as
-                              (limited built-in support, may require modification)
-                first_output : number to append to output_base for first file
-                last_output : number to append to output_base for last file
-                folder_name : string of the desired output folder name
-
-    Outputs :
-                Script saves result of each iteration to a folder
-                with both the figure for each iteration as a png and the data
-                with the particle start and end locations
-    '''
-
-    # make directory to save the data
-    try:
-        os.makedirs(os.getcwd() + '/' + folder_name)
-        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
-        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
-    except:
-        print('Directories already exist')
-
-    for i in range(first_output,last_output+1):
-        # load depth, qx, qy for this timestep
-        # making assumption that other variables are constant between output files !!!!
-        if output_type == 'csv':
-            depth = np.loadtxt(output_base+'/depth'+str(i)+'.csv', delimiter=',')
-            qx = np.loadtxt(output_base+'/qx'+str(i)+'.csv', delimiter=',')
-            qy = np.loadtxt(output_base+'/qy'+str(i)+'.csv', delimiter=',')
-        elif output_type == 'npy':
-            depth = np.load(output_base+'/depth'+str(i)+'.npy')
-            qx = np.load(output_base+'/qx'+str(i)+'.npy')
-            qy = np.load(output_base+'/qy'+str(i)+'.npy')
-        elif output_type == 'npz':
-            data = np.load(output_base+'/data'+str(i)+'.npz')
-            depth = data['depth']
-            qx = data['qx']
-            qy = data['qy']
-        else:
-            raise ValueError('Output datatype/structure unsupported, modify the output reading portion of the code')
-
-        # then define the particle class and continue
-        particle = Particle(params)
-
-        # reset time
-        t = 0.0
-        while t < avg_timestep:
-            if i == first_output and t == 0.0:
-                t_old = 0.0
-                start_inds, end_inds, travel_times = particle.run_iteration()
-                xinds=[];yinds=[];
-                for j in range(0,len(end_inds)):
-                    xinds.append(end_inds[j][0])
-                    yinds.append(end_inds[j][1])
-            else:
-                t_old = np.mean(travel_times)
-                beg_ind, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
-                xinds = []; yinds = [];
-                for j in range(0,len(end_inds)):
-                    xinds.append(end_inds[j][0])
-                    yinds.append(end_inds[j][1])
-
-            print('mean travel time: ' + str(np.mean(travel_times)-t_old))
-            t = np.mean(travel_times) - t_old
-
-        # make and save plots and data
-        plt.figure(figsize=(4,4),dpi=200)
-        for k in range(0,len(start_inds)):
-            plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
-            plt.scatter(end_inds[k][1],end_inds[k][0],c='r',s=0.75)
-        cbar = plt.colorbar()
-        cbar.set_label('Particle Travel Times [s]')
-        plt.imshow(params.depth)
-        plt.title('Depth')
-        cbar2 = plt.colorbar(orientation='horizontal')
-        cbar2.set_label('Water Depth [m]')
-        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
-        plt.close()
-
-        # save data
-        np.savez(
-                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
-                beg_inds=beg_inds,
-                end_inds=end_inds,
-                travel_times=travel_times
-                )
-
+    # save data
+    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
+             all_walk_data = all_walk_data)
 
 
 def time_plots(params,num_iter,folder_name):
@@ -310,47 +194,33 @@ def time_plots(params,num_iter,folder_name):
         os.makedirs(os.getcwd() + '/' + folder_name + '/data')
     except:
         print('Directories already exist')
-
-    # iterate and save results
+		
+    all_walk_data = None # Initialize list for function call
+    # Iterate and save results
     for i in range(0,num_iter):
-        # do particle iteration
-        if i == 0:
-            start_inds, end_inds, travel_times = particle.run_iteration()
-            beg_inds = start_inds # for 1st timestep
-            xinds=[];yinds=[];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
-        else:
-            beg_inds, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
-            xinds = []; yinds = [];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
-
-        # do plot and saving
+        # Do particle iterations
+        all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
+	
+        cm = matplotlib.cm.colors.Normalize(vmax=np.max(all_walk_data[2][0:][-1]), 
+                                            vmin=np.min(all_walk_data[2][0:][-1]))
         plt.figure(figsize=(4,4),dpi=200)
-        cm = matplotlib.cm.colors.Normalize(vmax=np.max(travel_times), vmin=np.min(travel_times))
-        for k in range(0,len(start_inds)):
-            plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
-            plt.scatter(end_inds[k][1],end_inds[k][0],c=travel_times[k],s=0.75,cmap='coolwarm',norm=cm)
+        for k in range(0,params.Np_tracer):
+            plt.scatter(all_walk_data[1][k][0], all_walk_data[0][k][0], c='b', s=0.75)
+            plt.scatter(all_walk_data[1][k][-1], all_walk_data[0][k][-1],
+                        c=all_walk_data[2][k][-1],s=0.75, cmap='coolwarm', norm=cm)
         cbar = plt.colorbar()
         cbar.set_label('Particle Travel Times [s]')
         plt.imshow(params.depth)
-        plt.title('Depth')
+        plt.title('Depth - Particle Iteration ' + str(i))
         cbar2 = plt.colorbar(orientation='horizontal')
         cbar2.set_label('Water Depth [m]')
-        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
+        plt.axis('scaled')
+        plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-        # save data
-        np.savez(
-                os.getcwd() + '/' + folder_name + '/data/data'+str(i)+'.npz',
-                beg_inds=beg_inds,
-                end_inds=end_inds,
-                travel_times=travel_times
-                )
-
+    # save data
+    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
+             all_walk_data = all_walk_data)
 
 
 ### Function to automate animation of the png outputs

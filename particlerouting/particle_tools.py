@@ -149,7 +149,7 @@ class Tools():
         # using the new_ind value re-ravel the index into a properly shaped array
         #new_ind_flat = np.ravel_multi_index(new_ind, self.depth.shape)
 
-        return new_ind#new_ind_flat
+        return new_ind
 
 
 
@@ -214,7 +214,7 @@ class Tools():
         # avg velocity
         avg_vel = np.mean([old_vel,new_vel])
         # travel time based on cell size and mean velocity
-        trav_time = 1/avg_vel * self.dx
+        trav_time = self.dx/avg_vel
 
         return trav_time
 
@@ -268,8 +268,8 @@ class Tools():
 
         # check for the number of nans in the length 8 array of locations around the location
         num_nans = sum(np.isnan(probs))
-        # if there are no nans, then everywhere there is no nan in the probs list is assigned a 1
-        if np.nansum(probs) == 0:
+        # if all probs are somehow nans, 0, or negative, then assign ones everywhere
+        if np.nansum(probs) <= 0:
             probs[~np.isnan(probs)] = 1
             probs[1,1] = 0 # except location 1,1 which is assigned a 0
 
