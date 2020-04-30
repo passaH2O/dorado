@@ -118,25 +118,25 @@ def test_steep_other():
 
 # testing of the run_iteration function
 def test_start_pairs_X():
-    start_pairs, new_inds, travel_times = particle.run_iteration()
-    assert start_pairs[0][0] == params.seed_xloc[0]
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data[0][0][0] == params.seed_xloc[0]
 
 def test_start_pairs_Y():
-    start_pairs, new_inds, travel_times = particle.run_iteration()
-    assert start_pairs[0][1] == params.seed_yloc[0]
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data[1][0][0] == params.seed_yloc[0]
 
 def test_start_pairs_X2():
-    start_pairs, new_inds, travel_times = particle.run_iteration(start_xindices=params.seed_xloc)
-    assert start_pairs[0][0] == params.seed_xloc[0]
+    all_walk_data = particle.run_iteration(start_xindices=params.seed_xloc)
+    assert all_walk_data[0][0][0] == params.seed_xloc[0]
 
 def test_start_pairs_Y2():
-    start_pairs, new_inds, travel_times = particle.run_iteration(start_yindices=params.seed_yloc)
-    assert start_pairs[0][1] == params.seed_yloc[0]
+    all_walk_data = particle.run_iteration(start_yindices=params.seed_yloc)
+    assert all_walk_data[1][0][0] == params.seed_yloc[0]
 
 def test_travel_time():
-    start_pairs, new_inds, travel_times = particle.run_iteration()
-    assert travel_times[0] == 1.0
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data[2][0][1] == 1.0
 
 def test_travel_time_given():
-    start_pairs, new_inds, travel_times = particle.run_iteration(start_times=[0.0])
-    assert travel_times[0] == 1.0
+    all_walk_data = particle.run_iteration(start_times=[0.0])
+    assert all_walk_data[2][0][1] == 1.0

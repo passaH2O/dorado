@@ -24,14 +24,18 @@ from .particle_tools import Tools
 class Particle(Tools):
     '''
     Class for the particle or set of particles that is going to be routed
+
     '''
+
     def __init__(self, params):
         '''
         Methods require a class of parameters (params) to be passed to the
-        Particles class i.e. particle = Particles(params)
+        Particles class. e.g. particle = Particles(params)
 
-        Try to assign each value from the parameter file, otherwise raise error
-        or default values are assigned when possible/sensible
+        This initialization tries to assign each value from the parameter class,
+        otherwise an error is raised or default values are assigned when
+        possible/sensible
+
         '''
 
         ########## REQUIRED PARAMETERS ##########
@@ -68,8 +72,7 @@ class Particle(Tools):
         try:
             self.stage = params.stage
         except:
-            print("Stage values not specified - using depth values")
-            self.stage = self.depth
+            raise ValueError("Stage array not specified")
 
         ### check if hydrodynamic model input has been specified
         if hasattr(params, 'model'):
@@ -98,13 +101,14 @@ class Particle(Tools):
         ### Define velocity field (for travel time calculation)
         # create modified depth array without 0s or nan values for division
         mod_depth = self.depth.copy()
-        mod_depth[mod_depth==0] = 1e-10
-        mod_depth[np.isnan(mod_depth)] = 1e-10
+        mod_depth[mod_depth==0] = 1e-6
+        mod_depth[np.isnan(mod_depth)] = 1e-6
         # back out velocity field from discharge and depths
+        # self.velocity = np.sqrt(self.qx**2+self.qy**2)*mod_depth/(mod_depth**2 + 1e-6)
         self.velocity = np.sqrt(self.qx**2+self.qy**2)/mod_depth
         # cannot have 0/nans - leads to infinite/nantravel times
-        self.velocity[self.velocity==0] = 1e-10
-        self.velocity[np.isnan(self.velocity)] = 1e-10
+        self.velocity[self.velocity==0] = 1e-6
+        self.velocity[np.isnan(self.velocity)] = 1e-6
 
 
         ########## OPTIONAL PARAMETERS (Have default values) ##########
@@ -220,96 +224,122 @@ class Particle(Tools):
     # run an iteration where particles are moved
     # have option of specifying the particle start locations
     # otherwise they are randomly placed within x and y seed locations
-    def run_iteration(self,start_xindices=None,start_yindices=None,start_times=None,time_step=None):
+    def run_iteration(self,
+                      start_xindices=None,
+                      start_yindices=None,
+                      start_times=None,
+                      previous_walk_data=None,
+                      target_time=None):
         '''
         Runs an iteration of the particle routing.
-        Returns the original particle locations and their final locations.
+        Returns at each step the particle's locations and travel times.
 
-        Inputs :
-                    start_xindices : list of x locations to seed the particles
-                                     [x1, x2, x3, ..., xn]
-                                     if undefined, uses starting locations as
-                                     given by the Particles class (seed_xloc)
+        **Inputs** :
 
-                    start_yindices : list of y locations to seed the particles
-                                     [y1, y2, y3, ..., yn]
-                                     if undefined, uses starting locations as
-                                     given by the Particles class (seed_yloc)
+            start_xindices : `list`
+                List of x locations to seed the particles [x1, x2, x3, ..., xn]
+                if undefined, uses starting locations as given by the Particles
+                class (seed_xloc)
 
-                    start_times : list of particle travel times
-                                  [t1, t2, t3, ..., tn]
-                                  if undefined, assumes no particles have
-                                  travelled yet, so assigns zeros
+            start_yindices : `list`
+                List of y locations to seed the particles [y1, y2, y3, ..., yn]
+                if undefined, uses starting locations as given by the Particles
+                class (seed_yloc)
 
-                    time_step : model timestep (seconds), or the travel time
-                                each particle should have at end of iteration,
-                                if left undefined, then just one iteration is
-                                run and the particles will be out of sync
-                                (time-wise)
+            start_times : `list`
+                List of particle travel times [t1, t2, t3, ..., tn] if
+                undefined, assumes no particles have travelled yet, so assigns
+                zeros
 
-        Outputs :
-                    start_pairs : list [], of [x,y] pairs of the particle
-                                  locations at the beginning of the iteration
+            previous_walk_data : `list`
+                Nested list of all prior x locations, y locations, and travel
+                times (in that order). Order of indices is
+                previous_walk_data[field][particle][iter], where e.g.
+                [2][5][10] is the travel time of the 5th particle at the 10th
+                iteration
 
-                    new_inds : list [], of the new [x,y] locations for all of
-                               the particles at the end of the iteration
+            target_time : `float`
+                The travel time (seconds) each particle should aim to have at
+                end of this iteration. If left undefined, then just one
+                iteration is run and the particles will be out of sync in time
 
-                    travel_times : list [], of the travel times for each
-                                   particle at the end of the timestep
+        **Outputs** :
+
+            all_walk_data : `list`
+                Nested list of all x and y locations and travel times, with
+                details same as input previous_walk_data
+
         '''
 
-        # if start locations not defined, then randomly assign them
-        if start_xindices == None:
-            start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
-                                        range(self.Np_tracer)) # set starting x-index for all tracers
-        if start_yindices == None:
-            start_yindices = map(lambda x: self.random_pick_seed(self.seed_yloc),
-                                        range(self.Np_tracer)) # set starting y-index for all tracers
+        if(previous_walk_data is not None):
+            # If particle tracking has been run before, feed previous output array back into input
+            # If this array exists, it overrides any starting indices given in function call
+            all_xinds = previous_walk_data[0] # all previous locations
+            start_xindices = [all_xinds[i][-1] for i in range(self.Np_tracer)] # most recent locations
+            all_yinds = previous_walk_data[1]
+            start_yindices = [all_yinds[i][-1] for i in range(self.Np_tracer)]
+            all_times = previous_walk_data[2]
+            start_times = [all_times[i][-1] for i in range(self.Np_tracer)]
+        else:
+            # if start locations not defined, then randomly assign them
+            if start_xindices == None:
+                start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
+                                            range(self.Np_tracer)) # set starting x-index for all tracers
+            if start_yindices == None:
+                start_yindices = map(lambda x: self.random_pick_seed(self.seed_yloc),
+                                            range(self.Np_tracer)) # set starting y-index for all tracers
+            # initialize travel times list
+            if start_times == None:
+                start_times = [0.]*self.Np_tracer
+            # Now initialize vectors that will create the structured list
+            all_xinds = [[start_xindices[i]] for i in range(self.Np_tracer)]
+            all_yinds = [[start_yindices[i]] for i in range(self.Np_tracer)]
+            all_times = [[start_times[i]] for i in range(self.Np_tracer)]
 
-        self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
-        self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
+		# If particles were placed near inlet and are having trouble starting motion, uncomment this:
+        # self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
+        # self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
 
         # merge x and y indices into list of [x,y] pairs
-        start_pairs = [[start_xindices[i],start_yindices[i]] for i in range(0,len(start_xindices))]
+        start_pairs = [[start_xindices[i], start_yindices[i]] for i in range(self.Np_tracer)]
 
-        # copy list of start location indices so start_pairs can be kept unchanged
-        current_inds = start_pairs
+        # Do the particle movement
+        if target_time == None:
+            # If we're not aiming for a specific time, run a single iteration
+            new_inds, travel_times = self.single_iteration(start_pairs, start_times)
 
-        # initialize travel times list
-        if start_times == None:
-            travel_times = np.zeros(len(current_inds))
-        else:
-            travel_times = start_times
+            for ii in range(self.Np_tracer):
+                all_xinds[ii].append(new_inds[ii][0]) # Append new information
+                all_yinds[ii].append(new_inds[ii][1])
+                all_times[ii].append(travel_times[ii])
 
-        # do the particle movement
-        if time_step == None:
-            # run a single iteration
-            new_inds, travel_times = self.single_iteration(current_inds, travel_times)
+            all_walk_data = [all_xinds, all_yinds, all_times] # Store travel information
 
-        else:
-            # define end time for particles as average of their current time
-            # plus the defined timestep duration
-            end_time = np.mean(travel_times) + time_step
+        else: # If we ARE aiming for a specific time, iterate each particle until we get there
+            # Loop through all particles
+            for ii in range(self.Np_tracer):
+                if(previous_walk_data is not None):
+                    est_next_dt = all_times[ii][-1] - all_times[ii][-2]
+                else:
+                    est_next_dt = 0.1 # Initialize a guess for the next iteration's timestep
+                count = 1
 
-            # run a single particle iteration
-            temp_inds, temp_times = self.single_iteration(current_inds, travel_times)
+                # Loop until |target time - current time| < |target time - estimated next time|
+                while abs(all_times[ii][-1] - target_time) >= abs(all_times[ii][-1] + est_next_dt - target_time):
+                    # for particle ii, take a step from most recent index/time
+                    new_inds, travel_times = self.single_iteration([[all_xinds[ii][-1], all_yinds[ii][-1]]],
+                                                                   [all_times[ii][-1]])
+                    all_xinds[ii].append(new_inds[0][0])
+                    all_yinds[ii].append(new_inds[0][1])
+                    all_times[ii].append(travel_times[0])
 
-            # copy results from first iteration into final lists
-            new_inds = copy.copy(temp_inds)
-            travel_times = copy.copy(temp_times)
+                    # Use that timestep to estimate how long the next one will take
+                    est_next_dt = max(0.1, all_times[ii][-1] - all_times[ii][-2])
+                    count += 1
+                    if count > 1e4:
+                        print('Warning: Particle iterations exceeded limit before reaching target time. Try smaller time-step')
+                        break
 
-            # iterate more as long as smalles of the travel times is below
-            # 90% of the end time
-            while np.min(temp_times) < 0.9*end_time:
-                temp_inds, temp_times = self.single_iteration(temp_inds, temp_times)
-                # check each particle time
-                for i in range(0,len(temp_times)):
-                    # if the particle time is above target time then consider saving it 
-                    if temp_times[i] > 0.9*end_time:
-                        # compare against stored time, if it is closer then use new time
-                        if np.abs(temp_times[i]-end_time) < np.abs(travel_times[i]-end_time):
-                            new_inds[i] = temp_inds[i]
-                            travel_times[i] = temp_times[i]
+            all_walk_data = [all_xinds, all_yinds, all_times]
 
-
-        return start_pairs, new_inds, travel_times
+        return all_walk_data
