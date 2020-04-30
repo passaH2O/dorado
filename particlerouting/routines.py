@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Scrips to simplify process of routing and visualizing tracer particles.
+Scripts to simplify process of routing and visualizing tracer particles.
 
 Project Homepage: https://github.com/
 """
@@ -24,18 +24,26 @@ import time
 def steady_plots(params,num_iter,folder_name):
     '''
     Function to automate plotting of particle movement over a steady flow
-    fields. Particles all have same number of iterations and are allowed to 
+    fields. Particles all have same number of iterations and are allowed to
 	have different travel times.
 
-    Inputs :
-                params : class of parameter values for the particles
-                num_iter : number of iterations to move particles over
-                folder_name : string of folder name to put outputs in
+    **Inputs** :
 
-    Outputs :
-                Script saves result of each iteration to a folder
-                with the figure for each iteration as a png and the data
-                with the particle locations and travel times
+        params : `obj`
+            Class of parameter values for the particles
+
+        num_iter : `int`
+            Number of iterations to move particles over
+
+        folder_name : `str`
+            String of folder name to put outputs in
+
+    **Outputs** :
+
+        Script saves result of each iteration to a folder with the figure for
+        each iteration as a png and the data with the particle locations and
+        travel times
+
     '''
 
     # define the particle
@@ -75,31 +83,44 @@ def steady_plots(params,num_iter,folder_name):
 def unsteady_plots(params, num_steps, timestep,
                        output_base, output_type,
                        folder_name):
-    ''' 
+    '''
     Function to automate plotting of particle movement in an unsteady flow
-    field (time-varying). Particles all have the same travel time at the end 
+    field (time-varying). Particles all have the same travel time at the end
     of each timestep and are allowed to have a different number of iterations.
-    Flow field variables (qx, qy, depth) are updated after each timestep. 
-    Because this function makes very specific assumptions about your model 
-    output files, feel free to use this it as a template and change 
-    the section that updates the flow field. 
+    Flow field variables (qx, qy, depth) are updated after each timestep.
+    Because this function makes very specific assumptions about your model
+    output files, feel free to use this it as a template and change
+    the section that updates the flow field.
 
-    Inputs :
-                params : class of particle parameter values
-                num_steps : number of model timesteps being covered
-                timestep : model timestep duration (seconds)
-                output_base : filepath string locating hydrodynamic output files
-                output_type : filetype string of the output files. Currently 
-				              accepts 'csv', 'npy', and 'npz'. Assumes filenames
-				              begin with either 'depth', 'stage', 'qx', 'qy', or 
-				              'data', followed by timestep information
-				              (limited built-in support, may require modification)
-                folder_name : string of the desired output folder name
+    **Inputs** :
 
-    Outputs :
-                Script saves result of each iteration to a folder
-                with both the figure for each iteration as a png and the data
-                with the particle start and end locations
+        params : `obj`
+            Class of particle parameter values
+
+        num_steps : `int`
+            Number of model timesteps being covered
+
+        timestep : `float`
+            Model timestep duration (seconds)
+
+        output_base : `str`
+            Filepath string locating hydrodynamic output files
+
+        output_type : `str`
+            Filetype string of the output files. Currently accepts 'csv',
+            'npy', and 'npz'. Assumes filenames begin with either 'depth',
+            'stage', 'qx', 'qy', or 'data', followed by timestep information
+		    (limited built-in support, may require modification)
+
+        folder_name : `str`
+            String of the desired output folder name
+
+    **Outputs** :
+
+        Script saves result of each iteration to a folder with both the figure
+        for each iteration as a png and the data with the particle start and
+        end locations
+
     '''
 
     # make directory to save the data
@@ -173,15 +194,24 @@ def unsteady_plots(params, num_steps, timestep,
 def time_plots(params,num_iter,folder_name):
     '''
     Make plots with each particle's travel time visualized.
-    Routine assumes a steady flow field, but could be expanded to an unsteady case.
+    Routine assumes a steady flow field, but could be expanded to an unsteady
+    case.
 
-    Inputs :
-                params : parameters for the particle
-                num_iter : number of iterations to move particles
-                folder_name : string of desired output folder name
+    **Inputs** :
 
-    Outputs :
-                Saves plots and data for each iteration
+        params : `obj`
+            Parameters for the particle
+
+        num_iter : `int`
+            Number of iterations to move particles
+
+        folder_name : `str`
+            String of desired output folder name
+
+    **Outputs** :
+
+        Saves plots and data for each iteration
+
     '''
 
     # define the particle
@@ -194,14 +224,14 @@ def time_plots(params,num_iter,folder_name):
         os.makedirs(os.getcwd() + '/' + folder_name + '/data')
     except:
         print('Directories already exist')
-		
+
     all_walk_data = None # Initialize list for function call
     # Iterate and save results
     for i in range(0,num_iter):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
-	
-        cm = matplotlib.cm.colors.Normalize(vmax=np.max(all_walk_data[2][0:][-1]), 
+
+        cm = matplotlib.cm.colors.Normalize(vmax=np.max(all_walk_data[2][0:][-1]),
                                             vmin=np.min(all_walk_data[2][0:][-1]))
         plt.figure(figsize=(4,4),dpi=200)
         for k in range(0,params.Np_tracer):
@@ -231,13 +261,21 @@ def animate_plots(start_val,end_val,folder_name):
     Routine to make mp4 animation of the particle routing from png outputs
     of the previous plotting routines.
 
-    Inputs :
-                start_val : number of first plot to use
-                end_val : number of last plot to use
-                folder_name : name of output folder to get results from
+    **Inputs** :
 
-    Outputs :
-                Saves an mp4 animation to the results folder
+        start_val : `int`
+            Number of first plot to use
+
+        end_val : `int`
+            Number of last plot to use
+
+        folder_name : `str`
+            Name of output folder to get results from
+
+    **Outputs** :
+
+        Saves an mp4 animation to the results folder
+
     '''
 
     from matplotlib import animation

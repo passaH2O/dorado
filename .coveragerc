@@ -1,0 +1,6 @@
+[run]
+source = particlerouting
+
+omit =
+    particlerouting/parallel_routing.py
+    particlerouting/routines.py
