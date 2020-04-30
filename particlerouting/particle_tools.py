@@ -21,24 +21,39 @@ import time
 class Tools():
     '''
     Class to hold the internal functions:
-        random_pick_seed : random draw for initial particle location given a set
-                           of potential locations or a region to seed particles
-        get_weight : pull the weights for the random walk for surrounding cells
-                     and choose the new cell location
-        calculate_new_ind : calculate the new particle index locations
-        step_update : checking that the new indices are in fact some distance
-                      away from the previous particle location
-        calc_travel_times : calculate the particle travel time to make the step
-                            from the previous location to the new one by using
-                            the inverse of the average velocity (averaged between
-                            the previous and new cell locations)
-        check_for_boundary : function to check and disallow particle to travel
-                             outside of the domain
-        random_pick : function to do the weighted random draw for the walk
 
-    Tools class is inherited by the Particle class which contains the broader
-    functions initializing the particle parameters (__init__) and to do a single
-    iteration of the particle traveling (run_iteration)
+        **random_pick_seed** :
+            Random draw for initial particle location given a set of potential
+            locations or a region to seed particles
+
+        **get_weight** :
+            Pull the weights for the random walk for surrounding cells and
+            choose the new cell location
+
+        **calculate_new_ind** :
+            Calculate the new particle index locations
+
+        **step_update** :
+            Checking that the new indices are in fact some distance away from
+            the previous particle location
+
+        **calc_travel_times** :
+            Calculate the particle travel time to make the step from the
+            previous location to the new one by using the inverse of the
+            average velocity (averaged between the previous and new cell
+            locations)
+
+        **check_for_boundary** :
+            Function to check and disallow particle to travel outside of the
+            domain
+
+        **random_pick** :
+            Function to do the weighted random draw for the walk
+
+    The *Tools* class is inherited by the *Particle* class which contains the
+    broader functions initializing the particle parameters (*__init__*) and to
+    do a single iteration of the particle transport (**run_iteration**)
+
     '''
 
 
@@ -47,12 +62,19 @@ class Tools():
         '''
         Randomly pick a number from array of choices.
 
-        Inputs :
-                    choices : array of possible values to draw from
-                    probs : optional, can add weighted probabilities to draw
+        **Inputs** :
 
-        Outputs :
-                    choices[idx] : the randomly chosen value
+            choices : `ndarray`
+                Array of possible values to draw from
+
+            probs : `ndarray`
+                *Optional*, can add weighted probabilities to draw
+
+        **Outputs** :
+
+            choices[idx] : `int`
+                The randomly chosen value
+
         '''
 
         # randomly pick tracer drop cell to use given a list of potential spots
@@ -72,11 +94,16 @@ class Tools():
         Function to assign weights to the surrounding 8 cells around the current
         index and randomly choose one of those cells.
 
-        Inputs :
-                    ind : tuple (x,y) with the current location indices
+        **Inputs** :
 
-        Outputs :
-                    new_cell : new location given as 1-8 value
+            ind : `tuple`
+                Tuple (x,y) with the current location indices
+
+        **Outputs** :
+
+            new_cell : `int`
+                New location given as a value between 1 and 8 (inclusive)
+
         '''
 
         # pull surrounding cell values from pad stage array
@@ -133,13 +160,20 @@ class Tools():
         '''
         Adds new cell location (1-8 value) to the previous index.
 
-        Inputs :
-                    ind : tuple (x,y) of old particle location
-                    new_cell : integer 1-8 indicating new cell location relative
-                               to the old one in a D-8 sense
+        **Inputs** :
 
-        Outputs :
-                    new_ind : tuple (x,y) of the new particle location
+            ind : `tuple`
+                Tuple (x,y) of old particle location
+
+            new_cell : `int`
+                Integer 1-8 indicating new cell location relative to the old
+                one in a D-8 sense
+
+        **Outputs** :
+
+            new_ind : `tuple`
+                tuple (x,y) of the new particle location
+
         '''
 
         # add the index and the flattened x and y walk component
@@ -159,13 +193,22 @@ class Tools():
         Function to check new location is some distance away from old one,
         also provides way to track the travel distance of the particles
 
-        Inputs :
-                    ind : tuple (x,y) of current location
-                    new_ind : tuple (x,y) of new location
-                    new_cell : integer 1-8 indicating new location in D-8 way
+        **Inputs** :
 
-        Outputs :
-                    dist : distance between current (old) and new particle location
+            ind : `tuple`
+                Tuple (x,y) of current location
+
+            new_ind : `tuple`
+                Tuple (x,y) of new location
+
+            new_cell : `int`
+                Integer 1-8 indicating new location in D-8 way
+
+        **Outputs** :
+
+            dist : `float`
+                Distance between current (old) and new particle location
+
         '''
 
         # assign x-step by pulling 1-8 value from x-component walk 1-8 directions
@@ -196,15 +239,21 @@ class Tools():
         current location to the new location. Calculated by taking the inverse
         of the velocity at the old and new locations.
 
-        Inputs :
-                    ind : tuple (x,y) of the current location
-                    new_ind : tuple (x,y) of the new location
+        **Inputs** :
 
-        Outputs :
-                    trav_time : travel time it takes the particle to get from
-                                the current location to the new proposed
-                                location using the inverse of the average
-                                velocity
+            ind : `tuple`
+                Tuple (x,y) of the current location
+
+            new_ind : `tuple`
+                Tuple (x,y) of the new location
+
+        **Outputs** :
+
+            trav_time : `float`
+                Travel time it takes the particle to get from the current
+                location to the new proposed location using the inverse of the
+                average velocity
+
         '''
 
         # get old position velocity value
@@ -226,15 +275,21 @@ class Tools():
         Function to make sure particle is not exiting the boundary with the
         proposed new location.
 
-        Inputs :
-                    new_inds : list [] of tuples (x,y) of new indices
-                    current_inds : list [] of tuples (x,y) of old indices
+        **Inputs** :
 
-        Outputs :
-                    new_inds : list [] of tuples (x,y) of new indices where any
-                               proposed indices outside of the domain have been
-                               replaced by the old indices so those particles
-                               will not travel this iteration
+            new_inds : `list`
+                List [] of tuples (x,y) of new indices
+
+            current_inds : `list`
+                List [] of tuples (x,y) of old indices
+
+        **Outputs** :
+
+            new_inds : `list`
+                list [] of tuples (x,y) of new indices where any proposed
+                indices outside of the domain have been replaced by the old
+                indices so those particles will not travel this iteration
+
         '''
 
         # check if the new indices are on edges (type==-1)
@@ -256,14 +311,16 @@ class Tools():
         Randomly pick a number weighted by array probs (len 8)
         Return the index of the selected weight in array probs
 
-        Inputs :
-                    probs : 8 values indicating the probability (weight)
-                            associated with the surrounding cells for the
-                            random walk
+        **Inputs** :
 
-        Outputs :
-                    idx : 1-8 value chosen randomly based on the weighted
-                          probabilities
+            probs : `list`
+                8 values indicating the probability (weight) associated with the surrounding cells for the random walk
+
+        **Outputs** :
+
+            idx : `int`
+                1-8 value chosen randomly based on the weighted probabilities
+
         '''
 
         # check for the number of nans in the length 8 array of locations around the location
@@ -285,15 +342,20 @@ class Tools():
     ### steepest descent - pick the highest probability, no randomness
     def steep_descent(self, probs):
         '''
-        Pick the array value with the greatest probability, no longer a stochastic
-        process, instead just choosing the steepest descent
+        Pick the array value with the greatest probability, no longer a
+        stochastic process, instead just choosing the steepest descent
 
-        Inputs :
-                    probs : 8 values indicating probability (weight) associated
-                            with the surrounding cells
+        **Inputs** :
 
-        Outputs :
-                    idx : 1-8 value chosen by greatest probs
+            probs : `float`
+                8 values indicating probability (weight) associated with the
+                surrounding cells
+
+        **Outputs** :
+
+            idx : `int`
+                1-8 value chosen by greatest probs
+
         '''
 
         max_val = np.nanmax(probs)
@@ -319,18 +381,22 @@ class Tools():
         '''
         Function to calculate a single iteration of particle movement
 
-        Inputs :
-                    current_inds : list of tuples of the current particle (x,y)
-                                   locations in space
+        **Inputs** :
 
-                    travel_times : list of initial travel times for the particles
+            current_inds : `list`
+                List of tuples of the current particle (x,y) locations in space
 
-        Outputs :
-                    new_inds : list of the new particle locations after the
-                               single iteration
+            travel_times : `list`
+                List of initial travel times for the particles
 
-                    travel_times : list of the travel times associated with the
-                                   particle movements
+        **Outputs** :
+
+            new_inds : `list`
+                List of the new particle locations after the single iteration
+
+            travel_times : `list`
+                List of the travel times associated with the particle movements
+
         '''
 
         inds = current_inds #np.unravel_index(current_inds, self.depth.shape) # get indices as coordinates in the domain
@@ -349,7 +415,7 @@ class Tools():
         new_inds[np.array(dist) == 0] = 0
 
         new_inds = self.check_for_boundary(new_inds,inds) # see if the indices are at boundaries
-        new_inds = new_inds.tolist() # transform from np array to list 
+        new_inds = new_inds.tolist() # transform from np array to list
 
         # add the travel times
         temp_travel = map(lambda x,y: self.calc_travel_times(x,y) if x > 0

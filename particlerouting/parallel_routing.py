@@ -26,16 +26,21 @@ from multiprocessing import Pool
 # convert run script into a function that returns a single dictionary 'data'
 def run_iter(params):
     '''
-    Uses params class to define a Particle and does iterations of the particle.
-    Requires a new params variable : params.num_iter to define the number of
-    iterations to route the particles for
+    Uses params class to define a *Particle* and does iterations of the
+    particle. Requires a new params variable : *params.num_iter* to define the
+    number of iterations to route the particles for.
 
-    Inputs :
-                params : class with all the parameters for the particle routing
+    **Inputs** :
 
-    Outputs :
-                data : dictionary with beginning/end indices for particles and
-                       their associated travel times
+        params : `obj`
+            Class with all the parameters for the particle routing
+
+    **Outputs** :
+
+        data : `dict`
+            Dictionary with beginning/end indices for particles and their
+            associated travel times
+
     '''
     data = dict()
     particle = Particle(params)
@@ -69,14 +74,18 @@ def combine_result(par_result):
     dictionary with the beginning/end indices and travel times for all particles
     is returned as opposed to a list with one dictionary per parallel process
 
-    Inputs :
-                par_result : list of length(num_cores) with a dictionary of the
-                             beg/end indices and travel times for each particle
-                             computed by that process/core
+    **Inputs** :
 
-    Outputs :
-                single_result : single dictionary with beg/end indices and
-                                travel times for all the particles
+        par_result : `list`
+            List of length(num_cores) with a dictionary of the beg/end indices
+            and travel times for each particle computed by that process/core
+
+    **Outputs** :
+
+        single_result : `dict`
+            Single dictionary with beg/end indices and travel times for all the
+            particles
+
     '''
 
     # initiate final results dictionary
@@ -105,17 +114,25 @@ def combine_result(par_result):
 def parallel_routing(params,num_iter,num_cores):
     '''
     Function to do parallel routing of particles. Does this by duplicating the
-    call to Particle.run_iteration() across different processes.
+    call to *Particle.run_iteration()* across different processes.
 
-    Inputs :
-                params : normal parameters for the particles in a class
-                num_iter : number of iterations to route particles for
-                num_cores : number of processors/cores to use for parallel part
+    **Inputs** :
 
-    Outputs :
-                par_result : list of length(num_cores) with a dictionary of the
-                             beg/end indices and travel times for each particle
-                             computed by that process/core
+        params : `obj`
+            Normal parameters for the particles in a class
+
+        num_iter : `int`
+            Number of iterations to route particles for
+
+        num_cores : `int`
+            Number of processors/cores to use for parallel part
+
+    **Outputs** :
+
+        par_result : `list`
+            List of length(num_cores) with a dictionary of the beg/end indices
+            and travel times for each particle computed by that process/core
+
     '''
 
     # assign number of iterations to the params class
