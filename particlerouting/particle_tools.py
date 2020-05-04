@@ -112,8 +112,12 @@ class Tools():
         weight_sfc = np.maximum(0,
                      (self.stage[ind] - stage_ind) / self.distances)
         # define flow inertial weighting component (minimum of 0)
-        weight_int = np.maximum(0, (self.qx[ind] * self.jvec +
-                                    self.qy[ind] * self.ivec) / self.distances)
+        # flip any nan values in the discharge arrays into 0s
+        # otherwise they can prevent routing based on water depth
+        w_qx = self.qx; w_qx[np.isnan(w_qx)] = 0 # make any nans 0
+        w_qy = self.qy; w_qy[np.isnan(w_qy)] = 0 # maky any nans 0
+        weight_int = np.maximum(0, (w_qx[ind] * self.jvec +
+                                    w_qy[ind] * self.ivec) / self.distances)
 
         # if the value of the first index coord is 0, make weights 0
         if ind[0] == 0:
@@ -327,7 +331,7 @@ class Tools():
         num_nans = sum(np.isnan(probs))
         # if all probs are somehow nans, 0, or negative, then assign ones everywhere
         if np.nansum(probs) <= 0:
-            probs[~np.isnan(probs)] = 1
+            probs[np.isnan(probs)] = 1 # assigns ones everywhere
             probs[1,1] = 0 # except location 1,1 which is assigned a 0
 
         probs[np.isnan(probs)] = 0 # any nans are assigned as 0
