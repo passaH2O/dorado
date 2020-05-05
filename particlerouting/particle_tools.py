@@ -17,6 +17,7 @@ import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
+import warnings
 
 class Tools():
     '''
@@ -111,11 +112,15 @@ class Tools():
         # define water surface gradient weight component (minimum of 0)
         weight_sfc = np.maximum(0,
                      (self.stage[ind] - stage_ind) / self.distances)
-        # define flow inertial weighting component (minimum of 0)
+
+        # raise warning if nans exist in the discharge arrays
+        if np.any(self.qx)==np.nan or np.any(self.qy)==np.nan:
+            warnings.warn('NaN values detected in discharge arrays.')
         # flip any nan values in the discharge arrays into 0s
         # otherwise they can prevent routing based on water depth
         w_qx = self.qx; w_qx[np.isnan(w_qx)] = 0 # make any nans 0
         w_qy = self.qy; w_qy[np.isnan(w_qy)] = 0 # maky any nans 0
+        # define flow inertial weighting component (minimum of 0)
         weight_int = np.maximum(0, (w_qx[ind] * self.jvec +
                                     w_qy[ind] * self.ivec) / self.distances)
 
