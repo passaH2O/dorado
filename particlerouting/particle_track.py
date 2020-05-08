@@ -84,8 +84,10 @@ class Particle(Tools):
         try:
             if params.model == 'DeltaRCM':
                 self.qx = params.qx
+                self.qx[np.isnan(self.qx)] = 0
             else:
                 self.qx = -1*params.qy
+                self.qx[np.isnan(self.qx)] = 0
         except:
             raise ValueError("x-components of discharge values not specified")
 
@@ -93,8 +95,10 @@ class Particle(Tools):
         try:
             if params.model == 'DeltaRCM':
                 self.qy = params.qy
+                self.qy[np.isnan(self.qy)] = 0
             else:
                 self.qy = params.qx
+                self.qy[np.isnan(self.qy)] = 0
         except:
             raise ValueError("y-components of discharge values not specified")
 
