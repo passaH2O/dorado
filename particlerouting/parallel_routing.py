@@ -19,7 +19,7 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
 
-from particlerouting.particle_track import Particle
+from .particle_track import Particle
 from multiprocessing import Pool
 
 
@@ -37,34 +37,21 @@ def run_iter(params):
 
     **Outputs** :
 
-        data : `dict`
-            Dictionary with beginning/end indices for particles and their
-            associated travel times
+        all_walk_data : `list`
+            Nested list of all x and y locations and travel times, with
+            details same as input previous_walk_data
 
     '''
-    data = dict()
     particle = Particle(params)
     # do iterations
     for i in range(0,params.num_iter):
         if i == 0:
-            start_inds, end_inds, travel_times = particle.run_iteration()
-            beg_inds = start_inds # keep names consistent
-            xinds=[];yinds=[];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
+            all_walk_data = particle.run_iteration()
+
         else:
-            beg_inds, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
-            xinds = []; yinds = [];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
+            all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
-    data['beg_inds'] = beg_inds
-    data['end_inds'] = end_inds
-    data['travel_times'] = travel_times
-
-    return data
+    return all_walk_data
 
 
 
@@ -82,32 +69,45 @@ def combine_result(par_result):
 
     **Outputs** :
 
-        single_result : `dict`
-            Single dictionary with beg/end indices and travel times for all the
-            particles
+        single_result : `list`
+            Nested list that matches 'all_walk_data'
 
     '''
 
-    # initiate final results dictionary
-    single_result = dict()
-    single_result['beg_inds'] = []
-    single_result['end_inds'] = []
-    single_result['travel_times'] = []
+    ## list version
+    # initiate final results list [[xinds],[yinds],[times]]
+    single_result = [[],[],[]]
 
     # populate the dictionary
+    # loop through results for each core
     for i in range(0,len(par_result)):
-        if i == 0:
-            single_result['beg_inds'] = par_result[i]['beg_inds']
-            for j in range(0,len(par_result)):
-                single_result['end_inds'].append(list(par_result[i]['end_inds'][j]))
-            single_result['travel_times'] = par_result[i]['travel_times']
-        else:
-            for j in range(0,len(result[i]['beg_inds'])):
-                single_result['beg_inds'].append([par_result[i]['beg_inds'][j][0],par_result[i]['beg_inds'][j][1]])
-                single_result['end_inds'].append([par_result[i]['end_inds'][j][0],par_result[i]['end_inds'][j][1]])
-            single_result['travel_times'] = single_result['travel_times'] + par_result[i]['travel_times']
+        # append results for each category
+        for j in range(0,len(par_result[i][0])):
+            single_result[0].append(par_result[i][0][j])
+            single_result[1].append(par_result[i][1][j])
+            single_result[2].append(par_result[i][2][j])
+
 
     return single_result
+
+    ### dictionary version
+    # # initiate final results dictionary
+    # single_result = dict()
+    # single_result['x_inds'] = []
+    # single_result['y_inds'] = []
+    # single_result['travel_times'] = []
+    #
+    # # populate the dictionary
+    # # loop through results for each core
+    # for i in range(0,len(par_result)):
+    #     # append results for each category
+    #     for j in range(0,len(par_result[i][0])):
+    #         single_result['x_inds'].append(par_result[i][0][j])
+    #         single_result['y_inds'].append(par_result[i][1][j])
+    #         single_result['travel_times'].append(par_result[i][2][j])
+    #
+    #
+    # return single_result
 
 
 
