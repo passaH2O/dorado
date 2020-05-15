@@ -11,14 +11,13 @@ import numpy as np
 from random import shuffle
 import matplotlib
 from matplotlib import pyplot as plt
+import scipy
 from scipy import ndimage
+from scipy.sparse import lil_matrix, csc_matrix, hstack
 import sys, os, re, string
 from netCDF4 import Dataset
 import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
-import time
-
 
 
 def steady_plots(params,num_iter,folder_name):
@@ -373,7 +372,7 @@ def exposure_time(all_walk_data,
         Saves plots of the cumulative and differential forms of the ETD
     '''
     # Initialize arrays to record exposure time of each particle
-	Np_tracer = len(all_walk_data[0]) # Number of particles
+    Np_tracer = len(all_walk_data[0]) # Number of particles
     exposure_timer = np.zeros([Np_tracer], dtype='float') # Array to be populated
     end_time = np.zeros([Np_tracer)], dtype='float') # Array to record final travel times
     nbins = 100 # Number of bins to use later for differential ETD. Using fewer bins smooths out curves
