@@ -343,9 +343,9 @@ def exposure_time(all_walk_data,
                   foldername):
     '''
     Routine to measure the exposure time distribution (ETD) of particles to 
-	the specified region. For steady flows, the ETD is exactly equivalent to
-	the residence time distribution. For unsteady flows, if particles make
-	multiple excursions into the region, all of those times are counted. 
+    the specified region. For steady flows, the ETD is exactly equivalent to
+    the residence time distribution. For unsteady flows, if particles make
+    multiple excursions into the region, all of those times are counted. 
 
     **Inputs** :
 
