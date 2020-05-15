@@ -146,6 +146,10 @@ class Tools():
         # if the depth is below the minimum depth then location is not considered
         # therefore set the associated weight to nan
         self.weight[depth_ind <= self.dry_depth] = np.nan
+        # if it's a dead end with only nans and 0's, choose deepest cell
+        if np.nansum(self.weight) <= 0:
+            self.weight = np.zeros_like(self.weight)
+            self.weight[depth_ind==np.max(depth_ind)] = 1.0
         # randomly pick the new cell for the particle to move to using the
         # random_pick function and the set of weights just defined
         if self.steepest_descent != True:
@@ -326,11 +330,11 @@ class Tools():
         '''
 
         # check for the number of nans in the length 8 array of locations around the location
-        num_nans = sum(np.isnan(probs))
+        # num_nans = sum(np.isnan(probs))
         # if all probs are somehow nans, 0, or negative, then assign ones everywhere
-        if np.nansum(probs) <= 0:
-            probs[np.isnan(probs)] = 1 # assigns ones everywhere
-            probs[1,1] = 0 # except location 1,1 which is assigned a 0
+        # if np.nansum(probs) <= 0:
+            # probs[np.isnan(probs)] = 1 # assigns ones everywhere
+            # probs[1,1] = 0 # except location 1,1 which is assigned a 0
 
         probs[np.isnan(probs)] = 0 # any nans are assigned as 0
         cutoffs = np.cumsum(probs) # cumulative sum of all probabilities
