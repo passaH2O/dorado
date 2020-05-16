@@ -78,10 +78,11 @@ def steady_plots(params,num_iter,folder_name):
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-    return all_walk_data
     # save data
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
              all_walk_data = all_walk_data)
+
+    return all_walk_data
 
 
 def unsteady_plots(params, num_steps, timestep,
@@ -194,10 +195,11 @@ def unsteady_plots(params, num_steps, timestep,
         plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
         plt.close()
 
-    return all_walk_data
     # save data
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
              all_walk_data = all_walk_data)
+
+    return all_walk_data
 
 
 def time_plots(params,num_iter,folder_name):
@@ -261,10 +263,11 @@ def time_plots(params,num_iter,folder_name):
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-    return all_walk_data
     # save data
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
              all_walk_data = all_walk_data)
+
+    return all_walk_data
 
 
 ### Function to automate animation of the png outputs
@@ -335,6 +338,7 @@ def animate_plots(start_val,end_val,folder_name):
                     metadata=dict(artist='Me'), bitrate=-1)
 
     anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer, dpi=300)
+
 
 def exposure_time(all_walk_data,
                   region_of_interest,
