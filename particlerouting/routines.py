@@ -336,16 +336,16 @@ def animate_plots(start_val,end_val,folder_name):
 
     anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer, dpi=300)
 
-def exposure_time(all_walk_data, 
-                  region_of_interest, 
+def exposure_time(all_walk_data,
+                  region_of_interest,
                   timedelta=1,
                   nbins=100,
-                  foldername):
+                  foldername='test'):
     '''
-    Routine to measure the exposure time distribution (ETD) of particles to 
+    Routine to measure the exposure time distribution (ETD) of particles to
     the specified region. For steady flows, the ETD is exactly equivalent to
     the residence time distribution. For unsteady flows, if particles make
-    multiple excursions into the region, all of those times are counted. 
+    multiple excursions into the region, all of those times are counted.
 
     **Inputs** :
 
@@ -354,15 +354,15 @@ def exposure_time(all_walk_data,
 
         region_of_interest : `int array`
             Binary array the same size as input arrays in params class
-			with 1's everywhere inside the region in which we want to 
-			measure exposure time, and 0's everywhere else. 
+			with 1's everywhere inside the region in which we want to
+			measure exposure time, and 0's everywhere else.
 
         timedelta : `int or float`
-            Unit of time for time-axis of ETD plots, specified as time 
+            Unit of time for time-axis of ETD plots, specified as time
 			in seconds (e.g. an input of 60 plots things by minute)
 
         nbins : `int`
-            Number of bins to use as the time axis for differential ETD. 
+            Number of bins to use as the time axis for differential ETD.
             Using fewer bins smooths out curves
 
         folder_name : `str`
@@ -371,7 +371,7 @@ def exposure_time(all_walk_data,
     **Outputs** :
 
         exposure_times : `list`
-            List of exposure times to region of interest, listed 
+            List of exposure times to region of interest, listed
 			in order of particle ID
 
         Saves plots of the cumulative and differential forms of the ETD
@@ -379,7 +379,7 @@ def exposure_time(all_walk_data,
     # Initialize arrays to record exposure time of each particle
     Np_tracer = len(all_walk_data[0]) # Number of particles
     exposure_times = np.zeros([Np_tracer], dtype='float') # Array to be populated
-    end_time = np.zeros([Np_tracer)], dtype='float') # Array to record final travel times
+    end_time = np.zeros([Np_tracer], dtype='float') # Array to record final travel times
 
     # Handle the timedelta
     if timedelta == 1:
@@ -394,22 +394,22 @@ def exposure_time(all_walk_data,
         timeunit = '[' + str(timedelta) + ' s]'
 
     # Loop through particles to measure exposure time
-    for ii in range(0, Np_tracer)):
+    for ii in range(0, Np_tracer):
         # Determine the starting region for particle ii
-        previous_reg = region_of_interest[all_walk_data[0][ii][0], all_walk_data[1][ii][0]]
+        previous_reg = region_of_interest[int(all_walk_data[0][ii][0]), int(all_walk_data[1][ii][0])]
         end_time[ii] = all_walk_data[2][ii][-1] # Length of runtime for particle ii
 
         # Loop through iterations
         for jj in range(1, len(all_walk_data[2][ii])):
             # Determine the new region and compare to previous region
-            current_reg = region_of_interest[all_walk_data[0][ii][jj], all_walk_data[1][ii][jj]]
+            current_reg = region_of_interest[int(all_walk_data[0][ii][jj]), int(all_walk_data[1][ii][jj])]
 
             # Check to see if whole step was inside ROI
             if (current_reg + previous_reg) == 2: # If so, travel time of the whole step added to ET
-                exposure_timer[ii] += (all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
+                exposure_times[ii] += (all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
             # Check to see if half of the step was inside ROI (either entering or exiting)
             elif (current_reg + previous_reg) == 1: # If so, travel time of half of the step added to ET
-                exposure_timer[ii] += 0.5*(all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
+                exposure_times[ii] += 0.5*(all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
 
             # Update previous region
             previous_reg = current_reg
@@ -444,7 +444,7 @@ def exposure_time(all_walk_data,
     plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Exact_CETD.png')
     plt.close()
 
-    # Smooth out the CDF by making it regular in time. 
+    # Smooth out the CDF by making it regular in time.
     # Here we use 'previous' interpolation to be maximally accurate in time
     create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect, frac_exited, kind = 'previous')
     smooth_time_vect = np.linspace(0, end_time, nbins)
@@ -460,7 +460,7 @@ def exposure_time(all_walk_data,
     plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Smooth_CETD.png')
     plt.close
 
-    # Derive differential ETD from the CDF. Here we use 'linear' interpolation, because 'previous' 
+    # Derive differential ETD from the CDF. Here we use 'linear' interpolation, because 'previous'
     # produces a choppy derivative if there aren't enough particles
     create_linear_CDF = scipy.interpolate.interp1d(full_time_vect, frac_exited, kind = 'linear')
     linear_CDF = create_linear_CDF(smooth_time_vect)
