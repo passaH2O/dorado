@@ -338,9 +338,9 @@ def animate_plots(start_val,end_val,folder_name):
 
 def exposure_time(all_walk_data,
                   region_of_interest,
+		  foldername,
                   timedelta=1,
-                  nbins=100,
-                  foldername='test'):
+                  nbins=100):
     '''
     Routine to measure the exposure time distribution (ETD) of particles to
     the specified region. For steady flows, the ETD is exactly equivalent to
@@ -357,16 +357,16 @@ def exposure_time(all_walk_data,
 			with 1's everywhere inside the region in which we want to
 			measure exposure time, and 0's everywhere else.
 
+        folder_name : `str`
+            Name of output folder to get results from
+
         timedelta : `int or float`
             Unit of time for time-axis of ETD plots, specified as time
 			in seconds (e.g. an input of 60 plots things by minute)
 
         nbins : `int`
             Number of bins to use as the time axis for differential ETD.
-            Using fewer bins smooths out curves
-
-        folder_name : `str`
-            Name of output folder to get results from
+			Using fewer bins smooths out curves
 
     **Outputs** :
 
@@ -423,14 +423,14 @@ def exposure_time(all_walk_data,
     # Set end of ETD as the mininimum travel time of particles
     # Exposure times after that are unreliable because not all particles have traveled for that long
     end_time = min(end_time)
-    return exposure_times
 
+    plotting_times = exposure_times.copy()
     # Ignore particles that never entered ROI for plotting
-    exposure_times = exposure_times[exposure_times > 1e-6] # Those particles will have had an ET of 0
-    num_particles_included = len(exposure_times) # Number of particles that spent at least some time in ROI
+    plotting_times = plotting_times[plotting_times > 1e-6] # Those particles will have had an ET of 0
+    num_particles_included = len(plotting_times) # Number of particles that spent at least some time in ROI
 
     # Full time vector (x-values) of CDF
-    full_time_vect = np.append([0], np.sort(exposure_times)) # Add origin for plot
+    full_time_vect = np.append([0], np.sort(plotting_times)) # Add origin for plot
     # Y-values of CDF, normalized
     frac_exited = np.arange(0, num_particles_included + 1, dtype = 'float')/Np_tracer
 
@@ -476,3 +476,5 @@ def exposure_time(all_walk_data,
     plt.xlim([0, end_time/timedelta])
     plt.savefig(os.getcwd()+'/'+folder_name+'/figs/ETD.png')
     plt.close
+
+    return exposure_times
