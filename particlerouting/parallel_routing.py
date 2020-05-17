@@ -43,13 +43,10 @@ def run_iter(params):
 
     '''
     particle = Particle(params)
+    all_walk_data = None
     # do iterations
     for i in range(0,params.num_iter):
-        if i == 0:
-            all_walk_data = particle.run_iteration()
-
-        else:
-            all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
+        all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
     return all_walk_data
 

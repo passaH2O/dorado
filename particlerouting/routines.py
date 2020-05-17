@@ -11,14 +11,13 @@ import numpy as np
 from random import shuffle
 import matplotlib
 from matplotlib import pyplot as plt
+import scipy
 from scipy import ndimage
+from scipy.sparse import lil_matrix, csc_matrix, hstack
 import sys, os, re, string
 from netCDF4 import Dataset
 import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
-import time
-
 
 
 def steady_plots(params,num_iter,folder_name):
@@ -39,6 +38,10 @@ def steady_plots(params,num_iter,folder_name):
             String of folder name to put outputs in
 
     **Outputs** :
+
+        all_walk_data : `list`
+            Nested list of all x and y locations and travel times, with
+            details same as input previous_walk_data
 
         Script saves result of each iteration to a folder with the figure for
         each iteration as a png and the data with the particle locations and
@@ -79,6 +82,8 @@ def steady_plots(params,num_iter,folder_name):
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
              all_walk_data = all_walk_data)
 
+    return all_walk_data
+
 
 def unsteady_plots(params, num_steps, timestep,
                        output_base, output_type,
@@ -89,7 +94,7 @@ def unsteady_plots(params, num_steps, timestep,
     of each timestep and are allowed to have a different number of iterations.
     Flow field variables (qx, qy, depth) are updated after each timestep.
     Because this function makes very specific assumptions about your model
-    output files, feel free to use this it as a template and change
+    output files, feel free to use this as a template and change
     the section that updates the flow field.
 
     **Inputs** :
@@ -116,6 +121,10 @@ def unsteady_plots(params, num_steps, timestep,
             String of the desired output folder name
 
     **Outputs** :
+
+        all_walk_data : `list`
+            Nested list of all x and y locations and travel times, with
+            details same as input previous_walk_data
 
         Script saves result of each iteration to a folder with both the figure
         for each iteration as a png and the data with the particle start and
@@ -190,6 +199,8 @@ def unsteady_plots(params, num_steps, timestep,
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
              all_walk_data = all_walk_data)
 
+    return all_walk_data
+
 
 def time_plots(params,num_iter,folder_name):
     '''
@@ -209,6 +220,10 @@ def time_plots(params,num_iter,folder_name):
             String of desired output folder name
 
     **Outputs** :
+
+        all_walk_data : `list`
+            Nested list of all x and y locations and travel times, with
+            details same as input previous_walk_data
 
         Saves plots and data for each iteration
 
@@ -251,6 +266,8 @@ def time_plots(params,num_iter,folder_name):
     # save data
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
              all_walk_data = all_walk_data)
+
+    return all_walk_data
 
 
 ### Function to automate animation of the png outputs
@@ -321,3 +338,150 @@ def animate_plots(start_val,end_val,folder_name):
                     metadata=dict(artist='Me'), bitrate=-1)
 
     anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer, dpi=300)
+
+
+def exposure_time(all_walk_data,
+                  region_of_interest,
+                  folder_name,
+                  timedelta=1,
+                  nbins=100):
+    '''
+    Routine to measure the exposure time distribution (ETD) of particles to
+    the specified region. For steady flows, the ETD is exactly equivalent to
+    the residence time distribution. For unsteady flows, if particles make
+    multiple excursions into the region, all of those times are counted.
+
+    **Inputs** :
+
+        all_walk_data : `list`
+            Output of a previous function call to run_iteration
+
+        region_of_interest : `int array`
+            Binary array the same size as input arrays in params class
+            with 1's everywhere inside the region in which we want to
+            measure exposure time, and 0's everywhere else.
+
+        folder_name : `str`
+            Name of output folder to get results from
+
+        timedelta : `int or float`
+            Unit of time for time-axis of ETD plots, specified as time
+            in seconds (e.g. an input of 60 plots things by minute)
+
+        nbins : `int`
+            Number of bins to use as the time axis for differential ETD.
+            Using fewer bins smooths out curves
+
+    **Outputs** :
+
+        exposure_times : `list`
+            List of exposure times to region of interest, listed
+            in order of particle ID
+
+        Saves plots of the cumulative and differential forms of the ETD
+    '''
+    # Initialize arrays to record exposure time of each particle
+    Np_tracer = len(all_walk_data[0]) # Number of particles
+    exposure_times = np.zeros([Np_tracer], dtype='float') # Array to be populated
+    end_time = np.zeros([Np_tracer], dtype='float') # Array to record final travel times
+
+    # Handle the timedelta
+    if timedelta == 1:
+        timeunit = '[s]'
+    elif timedelta == 60:
+        timeunit = '[m]'
+    elif timedelta == 3600:
+        timeunit = '[hr]'
+    elif timedelta == 86400:
+        timeunit == '[day]'
+    else:
+        timeunit = '[' + str(timedelta) + ' s]'
+
+    # Loop through particles to measure exposure time
+    for ii in range(0, Np_tracer):
+        # Determine the starting region for particle ii
+        previous_reg = region_of_interest[int(all_walk_data[0][ii][0]), int(all_walk_data[1][ii][0])]
+        end_time[ii] = all_walk_data[2][ii][-1] # Length of runtime for particle ii
+
+        # Loop through iterations
+        for jj in range(1, len(all_walk_data[2][ii])):
+            # Determine the new region and compare to previous region
+            current_reg = region_of_interest[int(all_walk_data[0][ii][jj]), int(all_walk_data[1][ii][jj])]
+
+            # Check to see if whole step was inside ROI
+            if (current_reg + previous_reg) == 2: # If so, travel time of the whole step added to ET
+                exposure_times[ii] += (all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
+            # Check to see if half of the step was inside ROI (either entering or exiting)
+            elif (current_reg + previous_reg) == 1: # If so, travel time of half of the step added to ET
+                exposure_times[ii] += 0.5*(all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
+
+            # Update previous region
+            previous_reg = current_reg
+
+            # Check if particle is still stuck in ROI at the end of the run, which can bias result
+            if jj == len(all_walk_data[2][ii])-1:
+                if current_reg == 1:
+                    print('Warning: Particle ' + str(ii) + ' is still within ROI at final timestep. \n' + \
+                           'Run more iterations to get tail of ETD')
+
+    # Set end of ETD as the minimum travel time of particles
+    # Exposure times after that are unreliable because not all particles have traveled for that long
+    end_time = min(end_time)
+
+    # Ignore particles that never entered ROI for plotting
+    plotting_times = exposure_times[exposure_times > 1e-6] # Those particles will have had an ET of 0
+    num_particles_included = len(plotting_times) # Number of particles that spent at least some time in ROI
+
+    # Full time vector (x-values) of CDF
+    full_time_vect = np.append([0], np.sort(plotting_times)) # Add origin for plot
+    full_time_vect = np.append(full_time_vect, [end_time])
+    # Y-values of CDF, normalized
+    frac_exited = np.arange(0, num_particles_included + 1, dtype = 'float')/Np_tracer
+    frac_exited = np.append(frac_exited, [float(num_particles_included)/float(Np_tracer)])
+
+    # Plot the cumulative ETD in its exact form
+    plt.figure(figsize=(5,3), dpi=150)
+    plt.step(full_time_vect/timedelta, frac_exited, where='post')
+    plt.title('Cumulative Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('F(t) [-]')
+    plt.xlim([0, end_time/timedelta])
+    plt.ylim([0, 1])
+    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Exact_CETD.png')
+    plt.close()
+
+    # Smooth out the CDF by making it regular in time.
+    # Here we use 'previous' interpolation to be maximally accurate in time
+    create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect, frac_exited, kind = 'previous')
+    smooth_time_vect = np.linspace(0, end_time, nbins)
+    smooth_CDF = create_smooth_CDF(smooth_time_vect)
+
+    # Plot the cumulative ETD in its smooth form
+    plt.figure(figsize=(5,3), dpi=150)
+    plt.plot(smooth_time_vect/timedelta, smooth_CDF)
+    plt.title('Cumulative Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('F(t) [-]')
+    plt.xlim([0, end_time/timedelta])
+    plt.ylim([0, 1])
+    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Smooth_CETD.png')
+    plt.close
+
+    # Derive differential ETD from the CDF. Here we use 'linear' interpolation, because 'previous'
+    # produces a choppy derivative if there aren't enough particles
+    create_linear_CDF = scipy.interpolate.interp1d(full_time_vect, frac_exited, kind = 'linear')
+    linear_CDF = create_linear_CDF(smooth_time_vect)
+
+    timestep = smooth_time_vect[1] - smooth_time_vect[0]
+    RTD = np.gradient(linear_CDF, timestep)
+
+    plt.figure(figsize=(5,4), dpi=150)
+    plt.plot(smooth_time_vect/timedelta, RTD*timedelta)
+    plt.title('Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('E(t) ' + timeunit[0:-1] + '$^{-1}$]')
+    plt.xlim([0, end_time/timedelta])
+    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/ETD.png')
+    plt.close
+
+    return exposure_times
