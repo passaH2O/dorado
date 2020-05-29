@@ -405,7 +405,7 @@ class Tools():
                         if x != (0,0) else 4 for x in inds_tuple] # for each particle index get the weights
 
         new_inds = list(map(lambda x,y: self.calculate_new_ind(x,y)
-                        if y != 4 else 0, inds_tuple, new_cells)) # for each particle get the new index
+                        if y != 4 else x, inds_tuple, new_cells)) # for each particle get the new index
 
         dist = list(map(lambda x,y,z: self.step_update(x,y,z), current_inds, new_inds, new_cells)) # move each particle to the new index
 

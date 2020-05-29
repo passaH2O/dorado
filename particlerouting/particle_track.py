@@ -301,7 +301,7 @@ class Particle(Tools):
             # If we're not aiming for a specific time, run a single iteration
             new_inds, travel_times = self.single_iteration(start_pairs, start_times)
 
-            for ii in range(self.Np_tracer):
+            for ii in list(range(self.Np_tracer)):
                 all_xinds[ii].append(new_inds[ii][0]) # Append new information
                 all_yinds[ii].append(new_inds[ii][1])
                 all_times[ii].append(travel_times[ii])
