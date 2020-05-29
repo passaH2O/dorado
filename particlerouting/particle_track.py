@@ -66,88 +66,114 @@ class Particle(Tools):
         ### Define the water depth array
         try:
             self.depth = params.depth
+            self.depth[np.isnan(self.depth)] = 0
         except:
-            raise ValueError("Depth array not specified")
+            try:
+                self.depth = params.stage - params.topography
+                self.depth[self.depth < 0] = 0
+                self.depth[np.isnan(self.depth)] = 0
+            except:
+                raise ValueError("Insufficient information: Specify depth")
 
         ### Define the water stage array
         try:
             self.stage = params.stage
+            self.stage[self.depth == 0] = np.nan
         except:
-            raise ValueError("Stage array not specified")
+            try:
+                self.stage = params.topography + params.depth
+                self.stage[self.depth == 0] = np.nan
+            except:
+                raise ValueError("Insufficient information: Specify stage")
 
         ### check if hydrodynamic model input has been specified
-        if hasattr(params, 'model'):
+		# FIXME: this can be removed if we initialize params class with attributes
+        if getattr(params, 'model', None) != None:
             pass
         else:
             params.model = []
 
-        ### Define x-component of discharge for all cells in domain
-        try:
-            if params.model == 'DeltaRCM':
+        ### Define discharge and velocities for all cells in domain
+        if params.model == 'DeltaRCM':
+            try:
                 self.qx = params.qx
                 self.qx[np.isnan(self.qx)] = 0
-            else:
-                self.qx = -1*params.qy
-                self.qx[np.isnan(self.qx)] = 0
-        except:
-            raise ValueError("x-components of discharge values not specified")
+                self.u = self.qx*self.depth/(self.depth**2 + 1e-6)
 
-        ### Define y-component of discharge for all cells in domain
-        try:
-            if params.model == 'DeltaRCM':
                 self.qy = params.qy
                 self.qy[np.isnan(self.qy)] = 0
-            else:
+                self.v = self.qy*self.depth/(self.depth**2 + 1e-6)
+            except:
+                try:
+                    self.u = params.u
+                    self.u[np.isnan(self.u)] = 0
+                    self.qx = self.u*self.depth
+
+                    self.v = params.v
+                    self.v[np.isnan(self.v)] = 0
+                    self.qy = self.v*self.depth
+                except:
+                    raise ValueError("Insufficient information: Specify velocities/discharge")
+        else:
+            try:
+                self.qx = -1*params.qy
+                self.qx[np.isnan(self.qx)] = 0
+                self.u = self.qx*self.depth/(self.depth**2 + 1e-6)
+
                 self.qy = params.qx
                 self.qy[np.isnan(self.qy)] = 0
-        except:
-            raise ValueError("y-components of discharge values not specified")
+                self.v = self.qy*self.depth/(self.depth**2 + 1e-6)
+            except:
+                try:
+                    self.u = -1*params.v
+                    self.u[np.isnan(self.u)] = 0
+                    self.qx = self.u*self.depth
 
-        ### Define velocity field (for travel time calculation)
-        # create modified depth array without 0s or nan values for division
-        mod_depth = self.depth.copy()
-        mod_depth[mod_depth==0] = 1e-6
-        mod_depth[np.isnan(mod_depth)] = 1e-6
-        # back out velocity field from discharge and depths
-        # self.velocity = np.sqrt(self.qx**2+self.qy**2)*mod_depth/(mod_depth**2 + 1e-6)
-        self.velocity = np.sqrt(self.qx**2+self.qy**2)/mod_depth
+                    self.v = params.u
+                    self.v[np.isnan(self.v)] = 0
+                    self.qy = self.v*self.depth
+                except:
+                    raise ValueError("Insufficient information: Specify velocities/discharge")
+
+        ### Define field of velocity magnitude (for travel time calculation)
+        self.velocity = np.sqrt(self.u**2+self.v**2)
         # cannot have 0/nans - leads to infinite/nantravel times
-        self.velocity[self.velocity==0] = 1e-6
-        self.velocity[np.isnan(self.velocity)] = 1e-6
+        self.velocity[self.velocity < 1e-6] = 1e-6
 
 
         ########## OPTIONAL PARAMETERS (Have default values) ##########
         ### Define the theta used to weight the random walk
+        # Higher values give higher weighting probabilities to deeper cells
         try:
             self.theta = params.theta
         except:
-            print('Theta not specified - using 1.0')
+            print("Theta parameter not specified - using 1.0")
             self.theta = 1.0 # if unspecified use 1
+
+        ### Gamma parameter used to weight the random walk
+        # Sets weight ratio (between 0 and 1):
+                            # 1 = water surface gradient only (stage based)
+                            # 0 = inertial force only (discharge based)
+        try:
+            self.gamma = params.gamma
+        except:
+            print("Gamma parameter not specified - using 0.05")
+            self.gamma = 0.05
 
         ### Minimum depth for cell to be considered wet
         try:
             self.dry_depth = params.dry_depth
         except:
-            print("minimum depth for wetness not defined - using 0.1")
+            print("minimum depth for wetness not defined - using 10 cm")
             self.dry_depth = 0.1
-
-        ### Gamma parameter
-        # sets weight ratio:
-                            # either water surface slope (depth based)
-                            # or
-                            # inertial force (discharge based)
-        try:
-            self.gamma = params.gamma
-        except:
-            print("parameter gamma not specified - using 0.05")
-            self.gamma = 0.05
 
         ### Cell types: 2 = land, 1 = channel, 0 = ocean, -1 = edge
         try:
             self.cell_type = params.cell_type
         except:
-            print("Cell Types not specified - using zeros")
-            self.cell_type = np.zeros(np.shape(self.stage))
+            print("Cell Types not specified - Estimating from depth")
+            self.cell_type = np.zeros_like(self.depth, dtype='int')
+            self.cell_type[self.depth < self.dry_depth] = 2
 
         ### Steepest descent toggle - turns off randomness and uses highest
         # weighted value instead of doing weighted random walk
