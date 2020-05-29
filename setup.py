@@ -10,6 +10,10 @@ setup(
     url = 'https://github.com/',
     packages = ['particlerouting'],
     long_description = 'See project webpage for details: https://github.com/',
-    classifiers = ['Programming Language :: Python :: 2.7'],
-    install_requires = ['numpy','matplotlib','scipy','netcdf4']
+    classifiers = ['Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 3.6',
+                   'Programming Language :: Python :: 3.7',
+                   'Programming Language :: Python :: 3.8'],
+    install_requires = ['numpy','matplotlib','scipy','netcdf4',
+                        'future','tqdm']
 )

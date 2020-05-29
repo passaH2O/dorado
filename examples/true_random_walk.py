@@ -14,6 +14,7 @@ params = pobj()
 
 # define the params variables
 params.depth = np.ones((100,100))
+params.stage = np.ones((100,100))
 params.qx = np.zeros_like(params.depth)
 params.qy = np.zeros_like(params.depth)
 
@@ -25,7 +26,6 @@ params.theta = 0.0
 params.gamma = 0.0
 params.model = 'None'
 
-### Apply the parameters to run the particle routing model
 
 # using steady (time-invariant) plotting routine
 steady_plots(params, 50, 'true_random_walk')

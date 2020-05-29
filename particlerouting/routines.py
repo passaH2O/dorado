@@ -4,7 +4,8 @@ Scripts to simplify process of routing and visualizing tracer particles.
 
 Project Homepage: https://github.com/
 """
-
+from __future__ import division, print_function, absolute_import
+from builtins import range, map
 from .particle_track import Particle
 from math import floor, sqrt, pi
 import numpy as np
@@ -18,7 +19,7 @@ import sys, os, re, string
 from netCDF4 import Dataset
 import time as time_lib
 import logging
-
+from tqdm import tqdm
 
 def steady_plots(params,num_iter,folder_name):
     '''
@@ -61,15 +62,17 @@ def steady_plots(params,num_iter,folder_name):
         print('Directories already exist')
 
     all_walk_data = None # Initialize list for function call
+
     # Iterate and save results
-    for i in range(0,num_iter):
+    for i in tqdm(list(range(0,num_iter)), ascii=True):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
-
         plt.figure(figsize=(4,4),dpi=200)
-        for k in range(0,params.Np_tracer):
-            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],c='b',s=0.75)
-            plt.scatter(all_walk_data[1][k][-1],all_walk_data[0][k][-1],c='r',s=0.75)
+        for k in list(range(0,params.Np_tracer)):
+            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],
+                        c='b',s=0.75)
+            plt.scatter(all_walk_data[1][k][-1],
+                        all_walk_data[0][k][-1],c='r',s=0.75)
         plt.imshow(params.depth)
         plt.title('Depth - Particle Iteration ' + str(i))
         cbar = plt.colorbar()
@@ -77,6 +80,7 @@ def steady_plots(params,num_iter,folder_name):
         plt.axis('scaled')
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
+
 
     # save data
     np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
@@ -155,7 +159,7 @@ def unsteady_plots(params, num_steps, timestep,
     target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
     all_walk_data = None
     # Iterate through model timesteps
-    for i in range(0, num_steps+1):
+    for i in tqdm(list(range(0, num_steps+1)), ascii=True):
         # load depth, stage, qx, qy for this timestep
         # Making assumption that other variables are constant between output files !!!!
         if output_type == 'csv':
@@ -242,7 +246,7 @@ def time_plots(params,num_iter,folder_name):
 
     all_walk_data = None # Initialize list for function call
     # Iterate and save results
-    for i in range(0,num_iter):
+    for i in tqdm(list(range(0,num_iter)), ascii=True):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
@@ -328,7 +332,7 @@ def animate_plots(start_val,end_val,folder_name):
     ax.tick_params(axis='y',left=False)
 
     anim = animation.FuncAnimation(fig, animate, init_func=init, repeat = True,
-                                   frames=range(start_val,end_val), interval=250,
+                                   frames=list(range(start_val,end_val)), interval=250,
                                    blit=True, repeat_delay=1000)
 
     # Set up formatting for the movie files
@@ -398,13 +402,13 @@ def exposure_time(all_walk_data,
         timeunit = '[' + str(timedelta) + ' s]'
 
     # Loop through particles to measure exposure time
-    for ii in range(0, Np_tracer):
+    for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
         # Determine the starting region for particle ii
         previous_reg = region_of_interest[int(all_walk_data[0][ii][0]), int(all_walk_data[1][ii][0])]
         end_time[ii] = all_walk_data[2][ii][-1] # Length of runtime for particle ii
 
         # Loop through iterations
-        for jj in range(1, len(all_walk_data[2][ii])):
+        for jj in list(range(1, len(all_walk_data[2][ii]))):
             # Determine the new region and compare to previous region
             current_reg = region_of_interest[int(all_walk_data[0][ii][jj]), int(all_walk_data[1][ii][jj])]
 
@@ -421,8 +425,8 @@ def exposure_time(all_walk_data,
             # Check if particle is still stuck in ROI at the end of the run, which can bias result
             if jj == len(all_walk_data[2][ii])-1:
                 if current_reg == 1:
-                    print('Warning: Particle ' + str(ii) + ' is still within ROI at final timestep. \n' + \
-                           'Run more iterations to get tail of ETD')
+                    print(('Warning: Particle ' + str(ii) + ' is still within ROI at final timestep. \n' + \
+                           'Run more iterations to get tail of ETD'))
 
     # Set end of ETD as the minimum travel time of particles
     # Exposure times after that are unreliable because not all particles have traveled for that long
