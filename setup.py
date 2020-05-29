@@ -14,5 +14,6 @@ setup(
                    'Programming Language :: Python :: 3.6',
                    'Programming Language :: Python :: 3.7',
                    'Programming Language :: Python :: 3.8'],
-    install_requires = ['numpy','matplotlib','scipy','netcdf4','future']
+    install_requires = ['numpy','matplotlib','scipy','netcdf4',
+                        'future','tqdm']
 )
