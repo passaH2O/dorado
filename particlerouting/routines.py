@@ -82,9 +82,9 @@ def steady_plots(params,num_iter,folder_name):
         plt.close()
 
 
-        # save data
-        np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
-                 all_walk_data = all_walk_data)
+    # save data
+    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
+             all_walk_data = all_walk_data)
 
     return all_walk_data
 
