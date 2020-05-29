@@ -22,6 +22,7 @@ qy = data['qy']
 
 # define the params variables
 params.depth = depth
+params.stage = depth # using depth as stand-in for stage in this example
 params.qx = qx
 params.qy = qy
 

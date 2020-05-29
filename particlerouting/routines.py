@@ -19,7 +19,7 @@ import sys, os, re, string
 from netCDF4 import Dataset
 import time as time_lib
 import logging
-
+from tqdm import tqdm
 
 def steady_plots(params,num_iter,folder_name):
     '''
@@ -62,15 +62,17 @@ def steady_plots(params,num_iter,folder_name):
         print('Directories already exist')
 
     all_walk_data = None # Initialize list for function call
+
     # Iterate and save results
-    for i in list(range(0,num_iter)):
+    for i in tqdm(list(range(0,num_iter)), ascii=True):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
-
         plt.figure(figsize=(4,4),dpi=200)
         for k in list(range(0,params.Np_tracer)):
-            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],c='b',s=0.75)
-            plt.scatter(all_walk_data[1][k][-1],all_walk_data[0][k][-1],c='r',s=0.75)
+            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],
+                        c='b',s=0.75)
+            plt.scatter(all_walk_data[1][k][-1],
+                        all_walk_data[0][k][-1],c='r',s=0.75)
         plt.imshow(params.depth)
         plt.title('Depth - Particle Iteration ' + str(i))
         cbar = plt.colorbar()
@@ -79,9 +81,10 @@ def steady_plots(params,num_iter,folder_name):
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-    # save data
-    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
-             all_walk_data = all_walk_data)
+
+        # save data
+        np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
+                 all_walk_data = all_walk_data)
 
     return all_walk_data
 
@@ -156,7 +159,7 @@ def unsteady_plots(params, num_steps, timestep,
     target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
     all_walk_data = None
     # Iterate through model timesteps
-    for i in list(range(0, num_steps+1)):
+    for i in tqdm(list(range(0, num_steps+1)), ascii=True):
         # load depth, stage, qx, qy for this timestep
         # Making assumption that other variables are constant between output files !!!!
         if output_type == 'csv':
@@ -243,7 +246,7 @@ def time_plots(params,num_iter,folder_name):
 
     all_walk_data = None # Initialize list for function call
     # Iterate and save results
-    for i in list(range(0,num_iter)):
+    for i in tqdm(list(range(0,num_iter)), ascii=True):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
@@ -399,7 +402,7 @@ def exposure_time(all_walk_data,
         timeunit = '[' + str(timedelta) + ' s]'
 
     # Loop through particles to measure exposure time
-    for ii in list(range(0, Np_tracer)):
+    for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
         # Determine the starting region for particle ii
         previous_reg = region_of_interest[int(all_walk_data[0][ii][0]), int(all_walk_data[1][ii][0])]
         end_time[ii] = all_walk_data[2][ii][-1] # Length of runtime for particle ii
