@@ -87,7 +87,7 @@ class Particle(Tools):
                 raise ValueError("Insufficient information: Specify stage")
 
         ### check if hydrodynamic model input has been specified
-		# FIXME: this can be removed if we initialize params class with attributes
+        # FIXME: this can be removed if we initialize params class with attributes
         if getattr(params, 'model', None) != None:
             pass
         else:
