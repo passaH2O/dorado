@@ -222,16 +222,6 @@ class Tools():
         jstep = self.jwalk.flat[new_cell]
         # compute the step distance to be taken
         dist = np.sqrt(istep**2 + jstep**2)
-        # check to ensure the step is actually traversing some distance
-        if dist > 0:
-            # identify original discharge locations in flattened arrays
-            # add the new location to the original index information
-            self.qxn.flat[ind[0]] += jstep / dist
-            self.qyn.flat[ind[1]] += istep / dist
-            # identify the new index for discharge
-            # add the distance to the new values
-            self.qxn.flat[new_ind[0]] += jstep / dist
-            self.qyn.flat[new_ind[1]] += istep / dist
 
         return dist
 
@@ -261,14 +251,18 @@ class Tools():
 
         '''
 
-        # get old position velocity value
-        old_vel = self.velocity[ind[0],ind[1]]
-        # new position velocity value
-        new_vel = self.velocity[new_ind[0],new_ind[1]]
-        # avg velocity
-        avg_vel = np.mean([old_vel,new_vel])
-        # travel time based on cell size and mean velocity
-        trav_time = self.dx/avg_vel
+        # make sure the new location is different from the current one
+        if ind != new_ind:
+            # get old position velocity value
+            old_vel = self.velocity[ind[0],ind[1]]
+            # new position velocity value
+            new_vel = self.velocity[new_ind[0],new_ind[1]]
+            # avg velocity
+            avg_vel = np.mean([old_vel,new_vel])
+            # travel time based on cell size and mean velocity
+            trav_time = self.dx/avg_vel
+        else:
+            trav_time = 0 # particle did not move
 
         return trav_time
 
@@ -413,8 +407,7 @@ class Tools():
         new_inds = list(map(lambda x,y: self.calculate_new_ind(x,y)
                         if y != 4 else 0, inds_tuple, new_cells)) # for each particle get the new index
 
-        dist = list(map(lambda x,y,z: self.step_update(x,y,z) if x != y
-                   else 0, current_inds, new_inds, new_cells)) # move each particle to the new index
+        dist = list(map(lambda x,y,z: self.step_update(x,y,z), current_inds, new_inds, new_cells)) # move each particle to the new index
 
         new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
         new_inds[np.array(dist) == 0] = 0
@@ -423,8 +416,7 @@ class Tools():
         new_inds = new_inds.tolist() # transform from np array to list
 
         # add the travel times
-        temp_travel = list(map(lambda x,y: self.calc_travel_times(x,y) if x != y
-                            else 0, current_inds, new_inds))
+        temp_travel = list(map(lambda x,y: self.calc_travel_times(x,y), current_inds, new_inds))
         travel_times = [travel_times[i] + temp_travel[i] for i in range(0,len(travel_times))] # add to existing times
         travel_times = list(travel_times)
 

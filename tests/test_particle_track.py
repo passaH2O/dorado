@@ -80,18 +80,6 @@ def test_iwalk():
 def test_jwalk():
     assert particle.jwalk[1,1] == 0
 
-def test_qxn():
-    assert np.sum(particle.qxn) == 0
-
-def test_qyn():
-    assert np.sum(particle.qyn) == 0
-
-def test_sfc_visit():
-    assert np.sum(particle.sfc_visit) == 0
-
-def test_sfc_sum():
-    assert np.sum(particle.sfc_sum) == 0
-
 def test_pad_stage():
     assert np.all(particle.pad_stage) == np.all(np.pad(params.stage, 1, 'edge'))
 

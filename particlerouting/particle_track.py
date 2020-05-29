@@ -214,12 +214,6 @@ class Particle(Tools):
                                    [0, 0, 0],
                                    [1, 1, 1]])
 
-        # establish some zero matrices that are filled in when iteration is run
-        self.qxn = np.zeros(np.shape(self.stage))
-        self.qyn = np.zeros(np.shape(self.stage))
-        self.sfc_visit = np.zeros(np.shape(self.stage))
-        self.sfc_sum = np.zeros(np.shape(self.stage))
-
         # pad stage and depth arrays to identify edges
         self.pad_stage = np.pad(self.stage, 1, 'edge')
         self.pad_depth = np.pad(self.depth, 1, 'edge')
@@ -298,10 +292,6 @@ class Particle(Tools):
             all_xinds = [[start_xindices[i]] for i in list(range(self.Np_tracer))]
             all_yinds = [[start_yindices[i]] for i in list(range(self.Np_tracer))]
             all_times = [[start_times[i]] for i in list(range(self.Np_tracer))]
-
-		# If particles were placed near inlet and are having trouble starting motion, uncomment this:
-        # self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
-        # self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
 
         # merge x and y indices into list of [x,y] pairs
         start_pairs = [[start_xindices[i], start_yindices[i]] for i in list(range(self.Np_tracer))]
