@@ -5,7 +5,8 @@ of the domain as well as iterative movement of the particles through the domain.
 
 Project Homepage: https://github.com/
 """
-
+from __future__ import division, print_function, absolute_import
+from builtins import range, map
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
@@ -279,33 +280,31 @@ class Particle(Tools):
             # If particle tracking has been run before, feed previous output array back into input
             # If this array exists, it overrides any starting indices given in function call
             all_xinds = previous_walk_data[0] # all previous locations
-            start_xindices = [all_xinds[i][-1] for i in range(self.Np_tracer)] # most recent locations
+            start_xindices = [all_xinds[i][-1] for i in list(range(self.Np_tracer))] # most recent locations
             all_yinds = previous_walk_data[1]
-            start_yindices = [all_yinds[i][-1] for i in range(self.Np_tracer)]
+            start_yindices = [all_yinds[i][-1] for i in list(range(self.Np_tracer))]
             all_times = previous_walk_data[2]
-            start_times = [all_times[i][-1] for i in range(self.Np_tracer)]
+            start_times = [all_times[i][-1] for i in list(range(self.Np_tracer))]
         else:
             # if start locations not defined, then randomly assign them
             if start_xindices == None:
-                start_xindices = map(lambda x: self.random_pick_seed(self.seed_xloc),
-                                            range(self.Np_tracer)) # set starting x-index for all tracers
+                start_xindices = [self.random_pick_seed(self.seed_xloc) for x in list(range(self.Np_tracer))] # set starting x-index for all tracers
             if start_yindices == None:
-                start_yindices = map(lambda x: self.random_pick_seed(self.seed_yloc),
-                                            range(self.Np_tracer)) # set starting y-index for all tracers
+                start_yindices = [self.random_pick_seed(self.seed_yloc) for x in list(range(self.Np_tracer))] # set starting y-index for all tracers
             # initialize travel times list
             if start_times == None:
                 start_times = [0.]*self.Np_tracer
             # Now initialize vectors that will create the structured list
-            all_xinds = [[start_xindices[i]] for i in range(self.Np_tracer)]
-            all_yinds = [[start_yindices[i]] for i in range(self.Np_tracer)]
-            all_times = [[start_times[i]] for i in range(self.Np_tracer)]
+            all_xinds = [[start_xindices[i]] for i in list(range(self.Np_tracer))]
+            all_yinds = [[start_yindices[i]] for i in list(range(self.Np_tracer))]
+            all_times = [[start_times[i]] for i in list(range(self.Np_tracer))]
 
 		# If particles were placed near inlet and are having trouble starting motion, uncomment this:
         # self.qxn.flat[start_xindices] += 1 # add 1 to x-component of discharge at the start location
         # self.qyn.flat[start_yindices] += 1 # add 1 to y-component of discharge at the start location
 
         # merge x and y indices into list of [x,y] pairs
-        start_pairs = [[start_xindices[i], start_yindices[i]] for i in range(self.Np_tracer)]
+        start_pairs = [[start_xindices[i], start_yindices[i]] for i in list(range(self.Np_tracer))]
 
         # Do the particle movement
         if target_time == None:
@@ -321,7 +320,7 @@ class Particle(Tools):
 
         else: # If we ARE aiming for a specific time, iterate each particle until we get there
             # Loop through all particles
-            for ii in range(self.Np_tracer):
+            for ii in list(range(self.Np_tracer)):
                 if(previous_walk_data is not None):
                     est_next_dt = all_times[ii][-1] - all_times[ii][-2]
                 else:

@@ -26,6 +26,7 @@ qy = data['qy']
 
 # define the params variables
 params.depth = depth
+params.stage = depth # use depth as proxy for stage in this example
 params.qx = qx
 params.qy = qy
 
@@ -39,32 +40,26 @@ params.model = 'Anuga'
 ### Apply the parameters to run the particle routing model
 
 # use 2 cores to route in parallel
+print('start parallel')
 start_par_time = time.time()
 par_result = parallel_routing(params,50,2)
 par_time = time.time() - start_par_time
+print('end parallel')
 
 # compare to a serial run
+print('start serial')
 start_serial_time = time.time()
 # do twice to match number of particles parallel is doing
-for z in range(0,2):
+for z in list(range(0,2)):
+    all_walk_data = None # initialize walk data list
     particle = Particle(params)
     # do 50 iterations to match parallel
-    for i in range(0,50):
-        if i == 0:
-            start_inds, end_inds, travel_times = particle.run_iteration()
-            beg_inds = start_inds # keep names consistent
-            xinds=[];yinds=[];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
-        else:
-            beg_inds, end_inds, travel_times = particle.run_iteration(start_xindices=xinds,start_yindices=yinds,start_times=travel_times)
-            xinds = []; yinds = [];
-            for j in range(0,len(end_inds)):
-                xinds.append(end_inds[j][0])
-                yinds.append(end_inds[j][1])
+    for i in list(range(0,50)):
+        all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
+        
 # get time
 serial_time = time.time() - start_serial_time
+print('end serial')
 
 ### print times elapsed
 print('Serial Compute Time: ' + str(serial_time))

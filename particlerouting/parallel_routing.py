@@ -5,7 +5,8 @@ For local parallelization using CPU cores.
 
 Project Homepage: https://github.com/
 """
-
+from __future__ import division, print_function, absolute_import
+from builtins import range, map
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
@@ -45,7 +46,7 @@ def run_iter(params):
     particle = Particle(params)
     all_walk_data = None
     # do iterations
-    for i in range(0,params.num_iter):
+    for i in list(range(0,params.num_iter)):
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
     return all_walk_data
@@ -77,9 +78,9 @@ def combine_result(par_result):
 
     # populate the dictionary
     # loop through results for each core
-    for i in range(0,len(par_result)):
+    for i in list(range(0,len(par_result))):
         # append results for each category
-        for j in range(0,len(par_result[i][0])):
+        for j in list(range(0,len(par_result[i][0]))):
             single_result[0].append(par_result[i][0][j])
             single_result[1].append(par_result[i][1][j])
             single_result[2].append(par_result[i][2][j])
