@@ -22,6 +22,19 @@ import copy
 import time
 from .particle_tools import Tools
 
+
+class params:
+    '''
+    Initialization of a blank parameters class, `params`, to be populated with
+    user-defined attributes of the grid the particles will be modeled on.
+
+    For a list of expected parameter values and types see "insert documentation
+    link"
+
+    '''
+    pass
+
+
 class Particle(Tools):
     '''
     Class for the particle or set of particles that is going to be routed
