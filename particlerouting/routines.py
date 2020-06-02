@@ -489,3 +489,72 @@ def exposure_time(all_walk_data,
     plt.close
 
     return exposure_times
+
+
+def draw_travel_path(depth, all_walk_data,
+                     particles_to_follow, output_file='travel_paths.png'):
+    '''
+    Make a plot with the travel path of specified particles drawn out.
+
+    **Inputs** :
+
+        depth : `numpy.ndarray`
+            Water depth array.
+
+        all_walk_data : `list`
+            Output of `steady_plots`, `unsteady_plots`, `time_plots`, as well
+            as the `particle_track.run_iteration` method.
+
+        particles_to_follow : `list`
+            List of particle numbers to draw the travel paths for.
+
+        output_file : `str`
+            Path to save the output image to.
+
+    **Outputs** :
+
+        Saves a plot of particle travel paths.
+
+    '''
+    from matplotlib import cm
+    color_index = 0
+
+    plt.figure(figsize=(7,4), dpi=300)
+    plt.imshow(depth, cmap='bone')
+    plt.title('Particle paths overlaid on water depth')
+    cbar2 = plt.colorbar(orientation='horizontal')
+    cbar2.set_label('Water Depth [m]')
+
+    for i in tqdm(particles_to_follow):
+        # set color for this particle (using a discrete colormap)
+        c = cm.Set1(color_index)
+        col = [c[0], c[1], c[2], 0.85] # make color a bit transparent
+        color_index += 1
+        # visualize this particle's travel path
+        for j in range(1,len(all_walk_data[0][0][:])):
+            # define old x-y point
+            old_x = all_walk_data[0][i][j-1]
+            old_y = all_walk_data[1][i][j-1]
+            # identify new x-y point
+            new_x = all_walk_data[0][i][j]
+            new_y = all_walk_data[1][i][j]
+            # add the line for the particle
+            if j == 1:
+                plt.plot([old_y,new_y],
+                         [old_x,new_x],
+                         color=col,
+                         linewidth=0.9,
+                         label='Particle ' + str(i))
+
+            else:
+                plt.plot([old_y,new_y],
+                         [old_x,new_x],
+                         color=col,
+                         linewidth=0.9,
+                         label='_nolegend_')
+
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.axis('scaled')
+    plt.tight_layout()
+    plt.savefig(output_file)
+    plt.close()
