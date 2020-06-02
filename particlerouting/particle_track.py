@@ -326,7 +326,7 @@ class Particle(Tools):
 
             for ii in list(range(self.Np_tracer)):
                 # Don't duplicate location if particle is standing still at a boundary
-                if new_inds != start_pairs:
+                if new_inds[ii] != start_pairs[ii]:
                     all_xinds[ii].append(new_inds[ii][0]) # Append new information
                     all_yinds[ii].append(new_inds[ii][1])
                     all_times[ii].append(travel_times[ii])
@@ -350,9 +350,14 @@ class Particle(Tools):
                         # for particle ii, take a step from most recent index/time
                         new_inds, travel_times = self.single_iteration([[all_xinds[ii][-1], all_yinds[ii][-1]]],
                                                                        [all_times[ii][-1]])
-                        all_xinds[ii].append(new_inds[0][0])
-                        all_yinds[ii].append(new_inds[0][1])
-                        all_times[ii].append(travel_times[0])
+
+                        # Don't duplicate location if particle is standing still at a boundary
+                        if new_inds[0] != [all_xinds[ii][-1], all_yinds[ii][-1]]:
+                            all_xinds[ii].append(new_inds[0][0])
+                            all_yinds[ii].append(new_inds[0][1])
+                            all_times[ii].append(travel_times[0])
+                        else:
+                            break
 
                         # Use that timestep to estimate how long the next one will take
                         est_next_dt = max(0.1, all_times[ii][-1] - all_times[ii][-2])
