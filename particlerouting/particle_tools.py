@@ -228,7 +228,7 @@ class Tools():
 
 
     ### calculate travel time using avg of velocity and old and new index
-    def calc_travel_times(self, ind, new_ind):
+    def calc_travel_times(self, ind, new_ind, dist):
         '''
         Function to calculate the travel time for the particle to get from the
         current location to the new location. Calculated by taking the inverse
@@ -241,6 +241,9 @@ class Tools():
 
             new_ind : `tuple`
                 Tuple (x,y) of the new location
+
+            dist : `float`
+                Distance between current (old) and new particle location
 
         **Outputs** :
 
@@ -259,8 +262,8 @@ class Tools():
             new_vel = self.velocity[new_ind[0],new_ind[1]]
             # avg velocity
             avg_vel = np.mean([old_vel,new_vel])
-            # travel time based on cell size and mean velocity
-            trav_time = self.dx/avg_vel
+            # travel time based on distance traveled and mean velocity
+            trav_time = dist/avg_vel
         else:
             trav_time = 0 # particle did not move
 
@@ -416,7 +419,7 @@ class Tools():
         new_inds = new_inds.tolist() # transform from np array to list
 
         # add the travel times
-        temp_travel = list(map(lambda x,y: self.calc_travel_times(x,y), current_inds, new_inds))
+        temp_travel = list(map(lambda x,y,z: self.calc_travel_times(x,y,z), current_inds, new_inds, dist))
         travel_times = [travel_times[i] + temp_travel[i] for i in range(0,len(travel_times))] # add to existing times
         travel_times = list(travel_times)
 
