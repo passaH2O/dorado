@@ -108,8 +108,8 @@ class Tools():
 
         '''
 
-        # pull surrounding cell values from pad stage array
-        stage_ind = self.pad_stage[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
+        # pull surrounding cell values from stage array
+        stage_ind = self.stage[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
         # define water surface gradient weight component (minimum of 0)
         weight_sfc = np.maximum(0,
                      (self.stage[ind] - stage_ind) / self.distances)
@@ -123,15 +123,15 @@ class Tools():
             weight_sfc[0,:] = 0
             weight_int[0,:] = 0
 
-        # pull surrounding cell values from padded depth and cell type arrays
-        depth_ind = self.pad_depth[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        ct_ind = self.pad_cell_type[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
+        # pull surrounding cell values from depth and cell type arrays
+        depth_ind = self.depth[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
+        ct_ind = self.cell_type[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
 
         # if the depth is below minimum depth for cell to be weight or it is a cell
         # type that is not water, then make it impossible for the parcel
         # to travel there by setting associated weight to 0
-        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind < 0)] = 0
-        weight_int[(depth_ind <= self.dry_depth) | (ct_ind < 0)] = 0
+        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind == 2)] = 0
+        weight_int[(depth_ind <= self.dry_depth) | (ct_ind == 2)] = 0
 
         # if sum of weights is above 0 normalize by sum of weights
         if np.nansum(weight_sfc) > 0:
@@ -146,7 +146,7 @@ class Tools():
         self.weight = depth_ind ** self.theta * self.weight
         # if the depth is below the minimum depth then location is not considered
         # therefore set the associated weight to nan
-        self.weight[depth_ind <= self.dry_depth] = np.nan
+        self.weight[(depth_ind <= self.dry_depth) | (ct_ind == 2)] = np.nan
         # if it's a dead end with only nans and 0's, choose deepest cell
         if np.nansum(self.weight) <= 0:
             self.weight = np.zeros_like(self.weight)
@@ -268,7 +268,7 @@ class Tools():
 
 
 
-    ### bndy check
+    ### Boundary check
     def check_for_boundary(self, new_inds, current_inds):
         '''
         Function to make sure particle is not exiting the boundary with the
@@ -291,14 +291,14 @@ class Tools():
 
         '''
 
-        # check if the new indices are on edges (type==-1)
-        # if so then don't let parcel go there
+        # Check if the new indices are on an edge (type==-1)
+        # If so, then stop moving particle
         for i in range(0,len(new_inds)):
-            if self.pad_cell_type[new_inds[i][0],new_inds[i][1]] == -1:
+            # If particle borders an edge, cancel out any additional steps
+            if -1 in self.cell_type[current_inds[i][0]-1:current_inds[i][0]+2,
+                                    current_inds[i][1]-1:current_inds[i][1]+2]:
                 new_inds[i][0] = current_inds[i][0]
                 new_inds[i][1] = current_inds[i][1]
-            else:
-                pass
 
         return new_inds
 
