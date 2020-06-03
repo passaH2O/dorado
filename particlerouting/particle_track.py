@@ -187,6 +187,7 @@ class Particle(Tools):
             print("Cell Types not specified - Estimating from depth")
             self.cell_type = np.zeros_like(self.depth, dtype='int')
             self.cell_type[self.depth < self.dry_depth] = 2
+            self.cell_type = np.pad(self.cell_type[1:-1,1:-1], 1, 'constant', constant_values = -1)
 
         ### Steepest descent toggle - turns off randomness and uses highest
         # weighted value instead of doing weighted random walk
@@ -253,12 +254,6 @@ class Particle(Tools):
                                    [0, 0, 0],
                                    [1, 1, 1]])
 
-        # pad stage and depth arrays to identify edges
-        self.pad_stage = np.pad(self.stage, 1, 'edge')
-        self.pad_depth = np.pad(self.depth, 1, 'edge')
-        self.pad_cell_type = np.pad(self.cell_type, 1, 'constant', constant_values = -1)
-
-
     # run an iteration where particles are moved
     # have option of specifying the particle start locations
     # otherwise they are randomly placed within x and y seed locations
@@ -299,7 +294,9 @@ class Particle(Tools):
             target_time : `float`
                 The travel time (seconds) each particle should aim to have at
                 end of this iteration. If left undefined, then just one
-                iteration is run and the particles will be out of sync in time
+                iteration is run and the particles will be out of sync in time.
+                Note that this loop will terminate before the target_time if 
+                the particle exceeds the hard-coded limit of 1e4 steps
 
         **Outputs** :
 
@@ -341,9 +338,11 @@ class Particle(Tools):
             new_inds, travel_times = self.single_iteration(start_pairs, start_times)
 
             for ii in list(range(self.Np_tracer)):
-                all_xinds[ii].append(new_inds[ii][0]) # Append new information
-                all_yinds[ii].append(new_inds[ii][1])
-                all_times[ii].append(travel_times[ii])
+                # Don't duplicate location if particle is standing still at a boundary
+                if new_inds[ii] != start_pairs[ii]:
+                    all_xinds[ii].append(new_inds[ii][0]) # Append new information
+                    all_yinds[ii].append(new_inds[ii][1])
+                    all_times[ii].append(travel_times[ii])
 
             all_walk_data = [all_xinds, all_yinds, all_times] # Store travel information
 
@@ -356,21 +355,29 @@ class Particle(Tools):
                     est_next_dt = 0.1 # Initialize a guess for the next iteration's timestep
                 count = 1
 
-                # Loop until |target time - current time| < |target time - estimated next time|
-                while abs(all_times[ii][-1] - target_time) >= abs(all_times[ii][-1] + est_next_dt - target_time):
-                    # for particle ii, take a step from most recent index/time
-                    new_inds, travel_times = self.single_iteration([[all_xinds[ii][-1], all_yinds[ii][-1]]],
-                                                                   [all_times[ii][-1]])
-                    all_xinds[ii].append(new_inds[0][0])
-                    all_yinds[ii].append(new_inds[0][1])
-                    all_times[ii].append(travel_times[0])
+                # Only iterate if this particle isn't already at a boundary:
+                if -1 not in self.cell_type[all_xinds[ii][-1]-1:all_xinds[ii][-1]+2,
+                                            all_yinds[ii][-1]-1:all_yinds[ii][-1]+2]:
+                    # Loop until |target time - current time| < |target time - estimated next time|
+                    while abs(all_times[ii][-1] - target_time) >= abs(all_times[ii][-1] + est_next_dt - target_time):
+                        # for particle ii, take a step from most recent index/time
+                        new_inds, travel_times = self.single_iteration([[all_xinds[ii][-1], all_yinds[ii][-1]]],
+                                                                       [all_times[ii][-1]])
 
-                    # Use that timestep to estimate how long the next one will take
-                    est_next_dt = max(0.1, all_times[ii][-1] - all_times[ii][-2])
-                    count += 1
-                    if count > 1e4:
-                        print('Warning: Particle iterations exceeded limit before reaching target time. Try smaller time-step')
-                        break
+                        # Don't duplicate location if particle is standing still at a boundary
+                        if new_inds[0] != [all_xinds[ii][-1], all_yinds[ii][-1]]:
+                            all_xinds[ii].append(new_inds[0][0])
+                            all_yinds[ii].append(new_inds[0][1])
+                            all_times[ii].append(travel_times[0])
+                        else:
+                            break
+
+                        # Use that timestep to estimate how long the next one will take
+                        est_next_dt = max(0.1, all_times[ii][-1] - all_times[ii][-2])
+                        count += 1
+                        if count > 1e4:
+                            print('Warning: Particle iterations exceeded limit before reaching target time. Try smaller time-step')
+                            break
 
             all_walk_data = [all_xinds, all_yinds, all_times]
 
