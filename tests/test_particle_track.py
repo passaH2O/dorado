@@ -123,8 +123,8 @@ def test_start_pairs_Y2():
 
 def test_travel_time():
     all_walk_data = particle.run_iteration()
-    assert all_walk_data[2][0][1] == 1.0
+    assert pytest.approx(all_walk_data[2][0][1] == 1.0)
 
 def test_travel_time_given():
     all_walk_data = particle.run_iteration(start_times=[0.0])
-    assert all_walk_data[2][0][1] == 1.0
+    assert pytest.approx(all_walk_data[2][0][1] == 1.0)
