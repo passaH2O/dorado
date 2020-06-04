@@ -103,7 +103,27 @@ class params:
     class attributes with `params.__dict__` or `vars(params)`
 
     '''
-    pass
+
+    def __init__(self):
+        '''
+        Creation of the expected variables for the params class.
+
+        Variables are initialized as NoneType they need to be assigned by the
+        user. Due to the wide variety of data formats produced by differeny
+        hydrodynamic models, this is process is not automated and must be
+        handled on a case-by-case basis.
+        '''
+
+        self.seed_xloc = None
+        self.seed_yloc = None
+        self.Np_tracer = None
+        self.dx = None
+        self.depth = None
+        self.stage = None
+        self.qx = None
+        self.qy = None
+        self.u = None
+        self.v = None
 
 
 class Particle(Tools):
@@ -125,53 +145,65 @@ class Particle(Tools):
 
         ########## REQUIRED PARAMETERS ##########
         ### Define the seeding locations as list of x and y locations
-        try:
+        if getattr(params,'seed_xloc',None) is None:
+            raise ValueError("No tracer seeding x-locations (params.seed_xloc)"
+                             " have been defined")
+        else:
             self.seed_xloc = params.seed_xloc
-        except:
-            raise ValueError("No tracer seeding x-locations defined")
 
-        try:
+        if getattr(params,'seed_yloc',None) is None:
+            raise ValueError("No tracer seeding y-locations (params.seed_yloc)"
+                             " have been defined")
+        else:
             self.seed_yloc = params.seed_yloc
-        except:
-            raise ValueError("No tracer seeding y-locations defined")
 
         ### Define the number of tracers to be simulated
-        try:
+        if getattr(params,'Np_tracer',None) is None:
+            raise ValueError("Number of tracer particles (params.Np_tracer)"
+                             " has not been defined")
+        else:
             self.Np_tracer = params.Np_tracer
-        except:
-            raise ValueError("Number of tracer particles not specified")
 
         ### Define the length along one cell face (assuming square cells)
-        try:
+        if getattr(params,'dx',None) is None:
+            raise ValueError("Length of cell face (params.dx) is undefined")
+        else:
             self.dx = params.dx
-        except:
-            raise ValueError("Cell size not specified")
 
         ### Define the water depth array
-        try:
-            self.depth = params.depth
-            self.depth[np.isnan(self.depth)] = 0
-        except:
+        if getattr(params,'depth',None) is not None:
+            try:
+                self.depth = params.depth
+                self.depth[np.isnan(self.depth)] = 0
+            except:
+                raise ValueError("Water depth array incorrectly defined.")
+        elif getattr(params,'stage',None) is not None and getattr(params,'topography',None) is not None:
             try:
                 self.depth = params.stage - params.topography
                 self.depth[self.depth < 0] = 0
                 self.depth[np.isnan(self.depth)] = 0
             except:
                 raise ValueError("Insufficient information: Specify depth")
+        else:
+            raise ValueError("Insufficient information: Specify depth")
 
         ### Define the water stage array
-        try:
-            self.stage = params.stage
-            self.stage[self.depth == 0] = np.nan
-        except:
+        if getattr(params,'stage',None) is not None:
+            try:
+                self.stage = params.stage
+                self.stage[self.depth == 0] = np.nan
+            except:
+                raise ValueError("Water stage array incorrectly defined.")
+        elif getattr(params,'topography',None) is not None and getattr(params,'depth',None) is not None:
             try:
                 self.stage = params.topography + params.depth
                 self.stage[self.depth == 0] = np.nan
             except:
                 raise ValueError("Insufficient information: Specify stage")
+        else:
+            raise ValueError("Insufficient information: Specify stage")
 
         ### check if hydrodynamic model input has been specified
-        # FIXME: this can be removed if we initialize params class with attributes
         if getattr(params, 'model', None) != None:
             pass
         else:
@@ -179,7 +211,7 @@ class Particle(Tools):
 
         ### Define discharge and velocities for all cells in domain
         if params.model == 'DeltaRCM':
-            try:
+            if params.qx is not None and params.qy is not None:
                 self.qx = params.qx
                 self.qx[np.isnan(self.qx)] = 0
                 self.u = self.qx*self.depth/(self.depth**2 + 1e-6)
@@ -187,19 +219,20 @@ class Particle(Tools):
                 self.qy = params.qy
                 self.qy[np.isnan(self.qy)] = 0
                 self.v = self.qy*self.depth/(self.depth**2 + 1e-6)
-            except:
-                try:
-                    self.u = params.u
-                    self.u[np.isnan(self.u)] = 0
-                    self.qx = self.u*self.depth
 
-                    self.v = params.v
-                    self.v[np.isnan(self.v)] = 0
-                    self.qy = self.v*self.depth
-                except:
-                    raise ValueError("Insufficient information: Specify velocities/discharge")
+            elif params.u is not None and params.v is not None:
+                self.u = params.u
+                self.u[np.isnan(self.u)] = 0
+                self.qx = self.u*self.depth
+
+                self.v = params.v
+                self.v[np.isnan(self.v)] = 0
+                self.qy = self.v*self.depth
+
+            else:
+                raise ValueError("Insufficient information: Specify velocities/discharge")
         else:
-            try:
+            if params.qx is not None and params.qy is not None:
                 self.qx = -1*params.qy
                 self.qx[np.isnan(self.qx)] = 0
                 self.u = self.qx*self.depth/(self.depth**2 + 1e-6)
@@ -207,17 +240,18 @@ class Particle(Tools):
                 self.qy = params.qx
                 self.qy[np.isnan(self.qy)] = 0
                 self.v = self.qy*self.depth/(self.depth**2 + 1e-6)
-            except:
-                try:
-                    self.u = -1*params.v
-                    self.u[np.isnan(self.u)] = 0
-                    self.qx = self.u*self.depth
 
-                    self.v = params.u
-                    self.v[np.isnan(self.v)] = 0
-                    self.qy = self.v*self.depth
-                except:
-                    raise ValueError("Insufficient information: Specify velocities/discharge")
+            elif params.u is not None and params.v is not None:
+                self.u = -1*params.v
+                self.u[np.isnan(self.u)] = 0
+                self.qx = self.u*self.depth
+
+                self.v = params.u
+                self.v[np.isnan(self.v)] = 0
+                self.qy = self.v*self.depth
+
+            else:
+                raise ValueError("Insufficient information: Specify velocities/discharge")
 
         ### Define field of velocity magnitude (for travel time calculation)
         self.velocity = np.sqrt(self.u**2+self.v**2)
@@ -377,7 +411,7 @@ class Particle(Tools):
 
         '''
 
-        if(previous_walk_data is not None):
+        if previous_walk_data is not None:
             # If particle tracking has been run before, feed previous output array back into input
             # If this array exists, it overrides any starting indices given in function call
             all_xinds = previous_walk_data[0] # all previous locations
@@ -420,7 +454,7 @@ class Particle(Tools):
         else: # If we ARE aiming for a specific time, iterate each particle until we get there
             # Loop through all particles
             for ii in list(range(self.Np_tracer)):
-                if(previous_walk_data is not None):
+                if previous_walk_data is not None:
                     est_next_dt = all_times[ii][-1] - all_times[ii][-2]
                 else:
                     est_next_dt = 0.1 # Initialize a guess for the next iteration's timestep

@@ -118,11 +118,6 @@ class Tools():
         weight_int = np.maximum(0, (self.qx[ind] * self.jvec +
                                     self.qy[ind] * self.ivec) / self.distances)
 
-        # if the value of the first index coord is 0, make weights 0
-        if ind[0] == 0:
-            weight_sfc[0,:] = 0
-            weight_int[0,:] = 0
-
         # pull surrounding cell values from depth and cell type arrays
         depth_ind = self.depth[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
         ct_ind = self.cell_type[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
