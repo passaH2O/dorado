@@ -49,10 +49,10 @@ def test_get_weight():
     tools = Tools()
     # define a bunch of expected values
     tools.stage = np.ones((5,5))
-    tools.pad_stage = tools.stage.copy()
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.stage = tools.stage.copy()
     tools.qy = tools.stage.copy()
     tools.qx = np.zeros((5,5))
-    tools.pad_cell_type = tools.stage.copy()
     tools.ivec = ivec
     tools.jvec = jvec
     tools.distances = distances
@@ -60,41 +60,12 @@ def test_get_weight():
     tools.gamma = 0.02
     tools.theta = 1
     tools.steepest_descent = True
-    # make the padded depth control where weight is allowed to be
-    # to force test to be deterministic (aka remove randomness)
-    tools.pad_depth = tools.stage.copy()
+    tools.depth = tools.stage.copy()
     # set the current index
     ind = (1,1)
-    # then the expected new cell pick should be
-    assert tools.get_weight(ind) == 5
-
-
-
-def test_get_weight_nan():
-    '''
-    Test for function get_weight within Tools class
-    '''
-    tools = Tools()
-    # define a bunch of expected values
-    tools.stage = np.ones((5,5))
-    tools.pad_stage = tools.stage.copy()
-    tools.qy = tools.stage.copy()
-    tools.qx = np.zeros((5,5))
-    tools.pad_cell_type = tools.stage.copy()
-    tools.ivec = ivec
-    tools.jvec = jvec
-    tools.distances = distances
-    tools.dry_depth = 0.1
-    tools.gamma = 0.02
-    tools.theta = 1
-    tools.steepest_descent = True
-    # make the padded depth control where weight is allowed to be
-    # to force test to be deterministic (aka remove randomness)
-    tools.pad_depth = tools.stage.copy()
-    tools.pad_depth[0,0] = np.nan
-    # set the current index
-    ind = (1,1)
-    # then the expected new cell pick should be
+    # set seed
+    np.random.seed(0)
+    # make assertion
     assert tools.get_weight(ind) == 5
 
 
@@ -155,7 +126,7 @@ def test_calc_travel_times():
     # define new ind
     new_ind = [0,1]
     # expect to return the value 0.5 (inverse of the avg velocity 2)
-    assert tools.calc_travel_times(old_ind,new_ind) == 0.5
+    assert tools.calc_travel_times(old_ind,new_ind,1) == 0.5
 
 
 
@@ -165,9 +136,9 @@ def test_check_for_boundary():
     '''
     tools = Tools()
     # define padded cell types for tools class
-    tools.pad_cell_type = np.ones((3,3))
+    tools.cell_type = np.ones((3,3))
     # define an edge (type==-1)
-    tools.pad_cell_type[0,0:2] = -1
+    tools.cell_type[0,0:2] = -1
     # define new ind
     new_ind = [[0,1]]
     # define current ind
@@ -187,3 +158,59 @@ def test_random_pick():
     probs[0] = 1
     # should return first index
     assert tools.random_pick(probs) == 0
+
+
+
+def test_get_weight_norm():
+    '''
+    Test for function get_weight within Tools class
+    '''
+    tools = Tools()
+    # define a bunch of expected values
+    tools.stage = np.ones((5,5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5,5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy()
+    tools.stage[1,1] = 100.0 # make stage at ind large so it is normalized
+    # set the current index
+    ind = (1,1)
+    # set seed
+    np.random.seed(0)
+    # make assertion
+    assert tools.get_weight(ind) == 5
+
+
+
+def test_get_weight_deep():
+    '''
+    Test for function get_weight within Tools class
+    '''
+    tools = Tools()
+    # define a bunch of expected values
+    tools.stage = np.ones((5,5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5,5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances*np.nan
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy()
+    tools.depth[2,2] = 10.0 # define index 8 as the deepest
+    # set the current index
+    ind = (1,1)
+    # set seed
+    np.random.seed(0)
+    # make assertion
+    assert tools.get_weight(ind) == 8
