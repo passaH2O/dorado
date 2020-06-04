@@ -25,11 +25,82 @@ from .particle_tools import Tools
 
 class params:
     '''
-    Initialization of a blank parameters class, `params`, to be populated with
-    user-defined attributes of the grid the particles will be modeled on.
+    The parameters class, `params`, which must be populated with user-defined
+    attributes of the grid the particles will be modeled on.
 
-    For a list of expected parameter values and types see "insert documentation
-    link"
+
+    Expected Parameters:
+    --------------------
+
+        seed_xloc (`list`) : List of x-coordinates over which to initially
+                             distribute the particles
+
+        seed_yloc (`list`) : List of y-coordinates over which to initially
+                             distribute the particles
+
+        Np_tracer (`int`) : Number of particles to use
+
+        dx (`float`) : Length along one square cell face
+
+        depth (`numpy.ndarray`) : Array of water depth values, if absent then
+                                  the stage and topography arrays will be used
+                                  to compute it
+
+        stage (`numpy.ndarray`) : Array of water stage values, if absent then
+                                  the depth and topography arrays will be used
+                                  to compute it
+
+        qx (`numpy.ndarray`) : Array of the x-component of flow discharge
+
+        qy (`numpy.ndarray`) : Array of the y-component of flow discharge
+
+        u (`numpy.ndarray`) : Array of the x-component of flow velocity
+
+        v (`numpy.ndarray`) : Array of the y-component of flow velocity
+
+
+    Optional Parameters:
+    --------------------
+
+        topography (`numpy.ndarray`) : Array of cell elevation values
+
+        model (`str`) : Name of the hydrodynamic model input being used
+                        (e.g. 'DeltaRCM')
+
+        theta (`float`) : First of two weighting parameters for the weighted
+                          random walk. Default value is 1.0, higher values
+                          give higher weighting probabilities to cells with
+                          greater water depths
+
+        gamma (`float`) : Second of two weighting parameters for the weighted
+                          random walk. Default value is 0.05. Gamma must be in
+                          the range [0,1]. Gamma == 0 means that the random
+                          walk weights are independent of the discharge values,
+                          and instead are based on the water surface gradient
+                          (the stage). Gamma == 1 means that the random walk
+                          weights are not dependent on the surface gradient,
+                          and instead are based on the inertial forces (the
+                          flow discharge).
+
+        dry_depth (`float`) : Minimum depth for a cell to be considered wet,
+                              default value is 0.1m
+
+        cell_type (`numpy.ndarray`) : Array of the different types of cells in
+                                      the domain where 2 = land, 1 = channel, 0
+                                      = ocean, and -1 = edge. If not explicitly
+                                      defined then the values are estimated
+                                      based on the depth array and the defined
+                                      dry_depth
+
+        steepest_descent (`bool`) : Toggle for routing based on a steepest
+                                    descent rather than the weighted random
+                                    walk. If True, then the highest weighted
+                                    cells are used to route the particles.
+                                    Default value is False.
+
+
+    This list of expected parameter values can also be obtained by querying the
+    class attributes with `params.__dict__` or `vars(params)`
 
     '''
     pass
@@ -295,7 +366,7 @@ class Particle(Tools):
                 The travel time (seconds) each particle should aim to have at
                 end of this iteration. If left undefined, then just one
                 iteration is run and the particles will be out of sync in time.
-                Note that this loop will terminate before the target_time if 
+                Note that this loop will terminate before the target_time if
                 the particle exceeds the hard-coded limit of 1e4 steps
 
         **Outputs** :
