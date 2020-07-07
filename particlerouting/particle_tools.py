@@ -6,19 +6,14 @@ Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
-from math import floor, sqrt, pi
+from math import sqrt
 import numpy as np
-from random import shuffle
-import matplotlib
-from matplotlib import pyplot as plt
-from scipy import ndimage
-import sys, os, re, string
-from netCDF4 import Dataset
-import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-import logging
+import sys
+import os
+import re
+import string
 import time
-import warnings
+
 
 class Tools():
     '''
@@ -59,8 +54,8 @@ class Tools():
     '''
 
 
-    ### random pick seeding location
-    def random_pick_seed(self, choices, probs = None):
+    # random pick seeding location
+    def random_pick_seed(self, choices, probs=None):
         '''
         Randomly pick a number from array of choices.
 
@@ -82,7 +77,7 @@ class Tools():
         # randomly pick tracer drop cell to use given a list of potential spots
         if not probs:
             probs = np.array([1 for i in list(range(len(choices)))])
-        # find the corresponding index value from the input 'choices' list of indices
+        # find the corresp. index value from input 'choices' list of indices
         cutoffs = np.cumsum(probs)
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
 
@@ -90,7 +85,7 @@ class Tools():
 
 
 
-    ### pull weights
+    # pull weights
     def get_weight(self, ind):
         '''
         Function to assign weights to the surrounding 8 cells around the current
@@ -157,7 +152,7 @@ class Tools():
 
 
 
-    ### calculate new index
+    # calculate new index
     def calculate_new_ind(self, ind, new_cell):
         '''
         Adds new cell location (1-8 value) to the previous index.
@@ -187,7 +182,7 @@ class Tools():
 
 
 
-    ### update step
+    # update step
     def step_update(self, ind, new_ind, new_cell):
         '''
         Function to check new location is some distance away from old one,
@@ -222,7 +217,7 @@ class Tools():
 
 
 
-    ### calculate travel time using avg of velocity and old and new index
+    # calculate travel time using avg of velocity and old and new index
     def calc_travel_times(self, ind, new_ind, dist):
         '''
         Function to calculate the travel time for the particle to get from the
@@ -266,7 +261,7 @@ class Tools():
 
 
 
-    ### Boundary check
+    # Boundary check
     def check_for_boundary(self, new_inds, current_inds):
         '''
         Function to make sure particle is not exiting the boundary with the
@@ -302,7 +297,7 @@ class Tools():
 
 
 
-    ### random pick from weighted array probabilities
+    # random pick from weighted array probabilities
     def random_pick(self, probs):
         '''
         Randomly pick a number weighted by array probs (len 8)
@@ -336,7 +331,7 @@ class Tools():
 
 
 
-    ### steepest descent - pick the highest probability, no randomness
+    # steepest descent - pick the highest probability, no randomness
     def steep_descent(self, probs):
         '''
         Pick the array value with the greatest probability, no longer a
@@ -373,7 +368,7 @@ class Tools():
 
 
 
-    ### single iteration of particle movement
+    # single iteration of particle movement
     def single_iteration(self, current_inds, travel_times):
         '''
         Function to calculate a single iteration of particle movement

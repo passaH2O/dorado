@@ -1,13 +1,17 @@
-# make an example of the workflow with gridded anuga output data
+"""Make an example of the workflow with gridded anuga output data."""
 
 import numpy as np
 from particlerouting.routines import steady_plots
 
-### Define the parameters that are being used
+# Define the parameters that are being used
+
 
 # define an empty class
 class pobj():
+    """Empty class for parameters."""
+    
     pass
+
 
 # create params and then assign the parameters
 params = pobj()
@@ -26,14 +30,14 @@ params.depth = depth
 params.qx = qx
 params.qy = qy
 
-params.seed_xloc = list(range(20,30))
-params.seed_yloc = list(range(48,53))
+params.seed_xloc = list(range(20, 30))
+params.seed_yloc = list(range(48, 53))
 params.Np_tracer = 50
 params.dx = 50.
 params.theta = 1.0
 params.model = 'Anuga'
 
-### Apply the parameters to run the particle routing model
-
+# Apply the parameters to run the particle routing model
+np.random.seed(0)  # fix the random seed
 # using steady (time-invariant) plotting routine
 steady_plots(params, 50, 'steady_anuga_example')
