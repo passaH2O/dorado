@@ -23,11 +23,12 @@ qy = data['qy']
 
 # define the params variables
 params.depth = depth
+params.stage = depth  # using depth as standin for stage parameter
 params.qx = qx
 params.qy = qy
 
-params.seed_xloc = list(range(20,30))
-params.seed_yloc = list(range(48,53))
+params.seed_xloc = list(range(20, 30))
+params.seed_yloc = list(range(48, 53))
 params.Np_tracer = 50
 # smaller cell size than the other examples to tighten the range of
 # travel time values that are obtained (aka increase travel time resolution)
@@ -38,17 +39,22 @@ params.model = 'Anuga'
 ### Apply the parameters to run the particle routing model
 particle = pt.Particle(params)
 # run model until all particles have travelled for about 1.5 hours
-start_inds, end_inds, travel_times = particle.run_iteration(time_step=2100)
+walk_data = particle.run_iteration(target_time=2100)
 
 # print target travel time and list of the particle travel times
 print('Prescribed target travel time: 2100 seconds')
-print('List of particle travel times for final particle locations: ' + str(np.round(travel_times)))
+# print('List of particle travel times for final particle locations: ' +
+#       str(np.round(walk_data['travel_times'])))
 
 # make plot of initial and final particle locations
-plt.figure(figsize=(4,4),dpi=200)
-for k in range(0,len(start_inds)):
-    plt.scatter(start_inds[k][1],start_inds[k][0],c='b',s=0.75)
-    plt.scatter(end_inds[k][1],end_inds[k][0],c='r',s=0.75)
+plt.figure(figsize=(4, 4), dpi=200)
+for k in range(0, len(walk_data['xinds'])):
+    plt.scatter(walk_data['yinds'][k][0],
+                walk_data['xinds'][k][0],
+                c='b', s=0.75)
+    plt.scatter(walk_data['yinds'][k][-1],
+                walk_data['xinds'][k][-1],
+                c='r', s=0.75)
 plt.imshow(params.depth)
 plt.title('Depth')
 plt.colorbar()
