@@ -9,7 +9,6 @@ Lagrangian particle routing via weighted random walks.
 - numpy
 - matplotlib
 - scipy
-- netcdf4
 - (optional) requires the 'ffmpeg' writer to use the animate_plots routine
 
 ### Installation:

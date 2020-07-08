@@ -7,19 +7,16 @@ Project Homepage: https://github.com/
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
 from .particle_track import Particle
-from math import floor, sqrt, pi
 import numpy as np
-from random import shuffle
 import matplotlib
 from matplotlib import pyplot as plt
 import scipy
-from scipy import ndimage
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-import sys, os, re, string
-from netCDF4 import Dataset
-import time as time_lib
-import logging
+import sys
+import os
+import re
+import string
 from tqdm import tqdm
+import json
 
 def steady_plots(params,num_iter,folder_name):
     '''
@@ -40,13 +37,13 @@ def steady_plots(params,num_iter,folder_name):
 
     **Outputs** :
 
-        all_walk_data : `list`
-            Nested list of all x and y locations and travel times, with
+        all_walk_data : `dict`
+            Dictionary of all x and y locations and travel times, with
             details same as input previous_walk_data
 
         Script saves result of each iteration to a folder with the figure for
         each iteration as a png and the data with the particle locations and
-        travel times
+        travel times as a json ('human-readable') text file
 
     '''
 
@@ -61,7 +58,7 @@ def steady_plots(params,num_iter,folder_name):
     except:
         print('Directories already exist')
 
-    all_walk_data = None # Initialize list for function call
+    all_walk_data = None  # Initialize object for function call
 
     # Iterate and save results
     for i in tqdm(list(range(0,num_iter)), ascii=True):
@@ -69,10 +66,14 @@ def steady_plots(params,num_iter,folder_name):
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
         plt.figure(figsize=(4,4),dpi=200)
         for k in list(range(0,params.Np_tracer)):
-            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],
-                        c='b',s=0.75)
-            plt.scatter(all_walk_data[1][k][-1],
-                        all_walk_data[0][k][-1],c='r',s=0.75)
+            plt.scatter(all_walk_data['yinds'][k][0],
+                        all_walk_data['xinds'][k][0],
+                        c='b',
+                        s=0.75)
+            plt.scatter(all_walk_data['yinds'][k][-1],
+                        all_walk_data['xinds'][k][-1],
+                        c='r',
+                        s=0.75)
         plt.imshow(params.depth)
         plt.title('Depth - Particle Iteration ' + str(i))
         cbar = plt.colorbar()
@@ -81,17 +82,19 @@ def steady_plots(params,num_iter,folder_name):
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
+    # save data as json text file - technically human readable
+    fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+    json.dump(all_walk_data, open(fpath,'w'))
 
-    # save data
-    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
-             all_walk_data = all_walk_data)
+    # example code to load the dictionary back from the output json file
+    # data = json.load(open('data.txt'))
 
     return all_walk_data
 
 
 def unsteady_plots(params, num_steps, timestep,
-                       output_base, output_type,
-                       folder_name):
+                   output_base, output_type,
+                   folder_name):
     '''
     Function to automate plotting of particle movement in an unsteady flow
     field (time-varying). Particles all have the same travel time at the end
@@ -119,20 +122,20 @@ def unsteady_plots(params, num_steps, timestep,
             Filetype string of the output files. Currently accepts 'csv',
             'npy', and 'npz'. Assumes filenames begin with either 'depth',
             'stage', 'qx', 'qy', or 'data', followed by timestep information
-		    (limited built-in support, may require modification)
+            (limited built-in support, may require modification)
 
         folder_name : `str`
             String of the desired output folder name
 
     **Outputs** :
 
-        all_walk_data : `list`
-            Nested list of all x and y locations and travel times, with
+        all_walk_data : `dict`
+            Dictionary of all x and y locations and travel times, with
             details same as input previous_walk_data
 
-        Script saves result of each iteration to a folder with both the figure
-        for each iteration as a png and the data with the particle start and
-        end locations
+        Script saves result of each iteration to a folder with the figure
+        for each iteration as a png and the data with the particle locations
+        and travel times as a json text file.
 
     '''
 
@@ -189,19 +192,28 @@ def unsteady_plots(params, num_steps, timestep,
         # make and save plots and data
         plt.figure(figsize=(4,4),dpi=200)
         for k in range(0,params.Np_tracer):
-            plt.scatter(all_walk_data[1][k][0],all_walk_data[0][k][0],c='b',s=0.75)
-            plt.scatter(all_walk_data[1][k][-1],all_walk_data[0][k][-1],c='r',s=0.75)
+            plt.scatter(all_walk_data['yinds'][k][0],
+                        all_walk_data['xinds'][k][0],
+                        c='b',
+                        s=0.75)
+            plt.scatter(all_walk_data['yinds'][k][-1],
+                        all_walk_data['xinds'][k][-1],
+                        c='r',
+                        s=0.75)
         plt.imshow(params.depth)
         plt.axis('scaled')
         plt.title('Depth at Time ' + str(target_times[i]))
         cbar = plt.colorbar()
         cbar.set_label('Water Depth [m]')
-        plt.savefig(os.getcwd() + '/' + folder_name + '/figs/output'+str(i)+'.png')
+        plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-    # save data
-    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
-             all_walk_data = all_walk_data)
+    # save data as a json text file - technically human readable
+    fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+    json.dump(all_walk_data, open(fpath, 'w'))
+
+    # example code for loading the dict back from the output json file:
+    # data = json.load(open('data.txt'))
 
     return all_walk_data
 
@@ -225,8 +237,8 @@ def time_plots(params,num_iter,folder_name):
 
     **Outputs** :
 
-        all_walk_data : `list`
-            Nested list of all x and y locations and travel times, with
+        all_walk_data : `dict`
+            Dictionary of all x and y locations and travel times, with
             details same as input previous_walk_data
 
         Saves plots and data for each iteration
@@ -244,19 +256,33 @@ def time_plots(params,num_iter,folder_name):
     except:
         print('Directories already exist')
 
-    all_walk_data = None # Initialize list for function call
+    all_walk_data = None  # Initialize list for function call
     # Iterate and save results
-    for i in tqdm(list(range(0,num_iter)), ascii=True):
+    for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
 
-        cm = matplotlib.cm.colors.Normalize(vmax=np.max(all_walk_data[2][0:][-1]),
-                                            vmin=np.min(all_walk_data[2][0:][-1]))
-        plt.figure(figsize=(4,4),dpi=200)
-        for k in range(0,params.Np_tracer):
-            plt.scatter(all_walk_data[1][k][0], all_walk_data[0][k][0], c='b', s=0.75)
-            plt.scatter(all_walk_data[1][k][-1], all_walk_data[0][k][-1],
-                        c=all_walk_data[2][k][-1],s=0.75, cmap='coolwarm', norm=cm)
+        # collect latest travel times
+        temptimes = []
+        for ii in list(range(0, particle.Np_tracer)):
+            temptimes.append(all_walk_data['travel_times'][ii][-1])
+
+        # set colorbar using 10th and 90th percentile values
+        cm = matplotlib.cm.colors.Normalize(vmax=np.percentile(temptimes, 90),
+                                            vmin=np.percentile(temptimes, 10))
+
+        plt.figure(figsize=(4, 4), dpi=200)
+        for k in range(0, params.Np_tracer):
+            plt.scatter(all_walk_data['yinds'][k][0],
+                        all_walk_data['xinds'][k][0],
+                        c='b',
+                        s=0.75)
+            plt.scatter(all_walk_data['yinds'][k][-1],
+                        all_walk_data['xinds'][k][-1],
+                        c=all_walk_data['travel_times'][k][-1],
+                        s=0.75,
+                        cmap='coolwarm',
+                        norm=cm)
         cbar = plt.colorbar()
         cbar.set_label('Particle Travel Times [s]')
         plt.imshow(params.depth)
@@ -267,17 +293,20 @@ def time_plots(params,num_iter,folder_name):
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 
-    # save data
-    np.savez(os.getcwd() + '/' + folder_name + '/data/data.npz',
-             all_walk_data = all_walk_data)
+    # save data as a json text file - technically human readable
+    fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+    json.dump(all_walk_data, open(fpath, 'w'))
+
+    # example code for loading the dict back from the output json file:
+    # data = json.load(open('data.txt'))
 
     return all_walk_data
 
 
-### Function to automate animation of the png outputs
-# requires installation of the animation writer 'ffmpeg' which is not part of the
-# default PartingRouting installation set of packages
-def animate_plots(start_val,end_val,folder_name):
+# Function to automate animation of the png outputs
+# requires installation of the animation writer 'ffmpeg' which is not part of
+# the default installation set of packages
+def animate_plots(start_val, end_val, folder_name):
     '''
     Routine to make mp4 animation of the particle routing from png outputs
     of the previous plotting routines.
@@ -302,37 +331,38 @@ def animate_plots(start_val,end_val,folder_name):
     from matplotlib import animation
     import matplotlib.image as mgimg
 
-    #set up the figure
+    # set up the figure
     fig = plt.figure()
     ax = plt.gca()
 
-    #initialization of animation, plot array of zeros
+    # initialization of animation, plot array of zeros
     def init():
         imobj.set_data(np.zeros((250, 400)))
 
-        return  imobj,
+        return imobj,
 
     def animate(i):
-        ## Read in picture
+        # Read in picture
         fname = os.getcwd() + '/' + folder_name + '/figs/output%d.png' %i
 
-        ## [-1::-1], to invert the array
+        # [-1::-1], to invert the array
         # Otherwise it plots up-side down
         img = mgimg.imread(fname)[-1::-1]
         imobj.set_data(img)
 
-        return  imobj,
+        return imobj,
 
 
-    ## create an AxesImage object
-    imobj = ax.imshow( np.zeros((250, 400)), origin='lower', alpha=1.0,
-                       zorder=1, aspect=1.5 )
-    ax.tick_params(labelbottom=False,labelleft=False)
-    ax.tick_params(axis='x',bottom=False)
-    ax.tick_params(axis='y',left=False)
+    # create an AxesImage object
+    imobj = ax.imshow(np.zeros((250, 400)), origin='lower', alpha=1.0,
+                      zorder=1, aspect=1.5)
+    ax.tick_params(labelbottom=False, labelleft=False)
+    ax.tick_params(axis='x', bottom=False)
+    ax.tick_params(axis='y', left=False)
 
-    anim = animation.FuncAnimation(fig, animate, init_func=init, repeat = True,
-                                   frames=list(range(start_val,end_val)), interval=250,
+    anim = animation.FuncAnimation(fig, animate, init_func=init, repeat=True,
+                                   frames=list(range(start_val, end_val)),
+                                   interval=250,
                                    blit=True, repeat_delay=1000)
 
     # Set up formatting for the movie files
@@ -341,7 +371,8 @@ def animate_plots(start_val,end_val,folder_name):
     writer = Writer(fps=5, codec="libx264", extra_args=['-pix_fmt', 'yuv420p'],
                     metadata=dict(artist='Me'), bitrate=-1)
 
-    anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer, dpi=300)
+    anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer,
+              dpi=300)
 
 
 def exposure_time(all_walk_data,
@@ -357,7 +388,7 @@ def exposure_time(all_walk_data,
 
     **Inputs** :
 
-        all_walk_data : `list`
+        all_walk_data : `dict`
             Output of a previous function call to run_iteration
 
         region_of_interest : `int array`
@@ -385,9 +416,9 @@ def exposure_time(all_walk_data,
         Saves plots of the cumulative and differential forms of the ETD
     '''
     # Initialize arrays to record exposure time of each particle
-    Np_tracer = len(all_walk_data[0]) # Number of particles
-    exposure_times = np.zeros([Np_tracer], dtype='float') # Array to be populated
-    end_time = np.zeros([Np_tracer], dtype='float') # Array to record final travel times
+    Np_tracer = len(all_walk_data['xinds'])  # Number of particles
+    exposure_times = np.zeros([Np_tracer], dtype='float')  # Array to be populated
+    end_time = np.zeros([Np_tracer], dtype='float')  # Array to record final travel times
 
     # Handle the timedelta
     if timedelta == 1:
@@ -404,26 +435,26 @@ def exposure_time(all_walk_data,
     # Loop through particles to measure exposure time
     for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
         # Determine the starting region for particle ii
-        previous_reg = region_of_interest[int(all_walk_data[0][ii][0]), int(all_walk_data[1][ii][0])]
-        end_time[ii] = all_walk_data[2][ii][-1] # Length of runtime for particle ii
+        previous_reg = region_of_interest[int(all_walk_data['xinds'][ii][0]), int(all_walk_data['yinds'][ii][0])]
+        end_time[ii] = all_walk_data['travel_times'][ii][-1] # Length of runtime for particle ii
 
         # Loop through iterations
-        for jj in list(range(1, len(all_walk_data[2][ii]))):
+        for jj in list(range(1, len(all_walk_data['travel_times'][ii]))):
             # Determine the new region and compare to previous region
-            current_reg = region_of_interest[int(all_walk_data[0][ii][jj]), int(all_walk_data[1][ii][jj])]
+            current_reg = region_of_interest[int(all_walk_data['xinds'][ii][jj]), int(all_walk_data['yinds'][ii][jj])]
 
             # Check to see if whole step was inside ROI
             if (current_reg + previous_reg) == 2: # If so, travel time of the whole step added to ET
-                exposure_times[ii] += (all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
+                exposure_times[ii] += (all_walk_data['travel_times'][ii][jj] - all_walk_data['travel_times'][ii][jj-1])
             # Check to see if half of the step was inside ROI (either entering or exiting)
             elif (current_reg + previous_reg) == 1: # If so, travel time of half of the step added to ET
-                exposure_times[ii] += 0.5*(all_walk_data[2][ii][jj] - all_walk_data[2][ii][jj-1])
+                exposure_times[ii] += 0.5*(all_walk_data['travel_times'][ii][jj] - all_walk_data['travel_times'][ii][jj-1])
 
             # Update previous region
             previous_reg = current_reg
 
             # Check if particle is still stuck in ROI at the end of the run, which can bias result
-            if jj == len(all_walk_data[2][ii])-1:
+            if jj == len(all_walk_data['travel_times'][ii])-1:
                 if current_reg == 1:
                     print(('Warning: Particle ' + str(ii) + ' is still within ROI at final timestep. \n' + \
                            'Run more iterations to get tail of ETD'))
@@ -501,7 +532,7 @@ def draw_travel_path(depth, all_walk_data,
         depth : `numpy.ndarray`
             Water depth array.
 
-        all_walk_data : `list`
+        all_walk_data : `dict`
             Output of `steady_plots`, `unsteady_plots`, `time_plots`, as well
             as the `particle_track.run_iteration` method.
 
@@ -531,13 +562,13 @@ def draw_travel_path(depth, all_walk_data,
         col = [c[0], c[1], c[2], 0.85] # make color a bit transparent
         color_index += 1
         # visualize this particle's travel path
-        for j in range(1,len(all_walk_data[0][0][:])):
+        for j in range(1,len(all_walk_data['xinds'][0][:])):
             # define old x-y point
-            old_x = all_walk_data[0][i][j-1]
-            old_y = all_walk_data[1][i][j-1]
+            old_x = all_walk_data['xinds'][i][j-1]
+            old_y = all_walk_data['yinds'][i][j-1]
             # identify new x-y point
-            new_x = all_walk_data[0][i][j]
-            new_y = all_walk_data[1][i][j]
+            new_x = all_walk_data['xinds'][i][j]
+            new_y = all_walk_data['yinds'][i][j]
             # add the line for the particle
             if j == 1:
                 plt.plot([old_y,new_y],

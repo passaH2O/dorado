@@ -1,3 +1,6 @@
+from __future__ import division, print_function, absolute_import
+from builtins import range, map
+from math import floor, sqrt, pi
 import pytest
 
 import sys, os
@@ -99,35 +102,36 @@ def test_steep_other():
 # testing of the run_iteration function
 def test_start_pairs_X():
     all_walk_data = particle.run_iteration()
-    assert all_walk_data[0][0][0] == params.seed_xloc[0]
+    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
 
 def test_start_pairs_Y():
     all_walk_data = particle.run_iteration()
-    assert all_walk_data[1][0][0] == params.seed_yloc[0]
+    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
 
 def test_start_pairs_X2():
     all_walk_data = particle.run_iteration(start_xindices=params.seed_xloc)
-    assert all_walk_data[0][0][0] == params.seed_xloc[0]
+    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
 
 def test_start_pairs_Y2():
     all_walk_data = particle.run_iteration(start_yindices=params.seed_yloc)
-    assert all_walk_data[1][0][0] == params.seed_yloc[0]
+    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
 
 def test_travel_time():
     # Particle doesn't travel in the 3x3 space due to the 'sticky' edge
     # conditions so check that travel time is 0 and particle hasn't moved
     np.random.seed(0)
     all_walk_data = particle.run_iteration()
-    assert all_walk_data[0][0][0] == 1
-    assert all_walk_data[1][0][0] == 1
-    assert all_walk_data[2][0][0] == 0.0
+    assert all_walk_data['xinds'][0][0] == 1
+    assert all_walk_data['yinds'][0][0] == 1
+    assert all_walk_data['travel_times'][0][0] == 0.0
+
 
 def test_travel_time_given():
     # Particle doesn't travel in the 3x3 space due to the 'sticky' edge
     # conditions so check that travel time is 0 and particle hasn't moved
     np.random.seed(0)
     all_walk_data = particle.run_iteration(start_times=[0.0])
-    assert pytest.approx(all_walk_data[2][0][0] == 0.0)
+    assert pytest.approx(all_walk_data['travel_times'][0][0] == 0.0)
 
 
 def test_init_params():
@@ -144,6 +148,18 @@ def test_init_params():
     assert params.qy is None
     assert params.u is None
     assert params.v is None
+
+
+def test_previous_walk_data():
+    # test of loading previously defined walk data
+    np.random.seed(0)
+    old_walk_data = particle.run_iteration()
+    # try to do another walk - test just makes sure code doesn't break
+    np.random.seed(0)
+    all_walk_data = particle.run_iteration(previous_walk_data=old_walk_data)
+    assert all_walk_data['xinds'][0][0] == 1
+    assert all_walk_data['yinds'][0][0] == 1
+    assert all_walk_data['travel_times'][0][0] == 0.0
 
 
 class TestValueErrors:
