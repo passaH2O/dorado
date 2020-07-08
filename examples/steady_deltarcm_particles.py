@@ -1,13 +1,17 @@
-# make an example of the workflow with deltarcm output data 
+"""Make an example of the workflow with deltarcm output data."""
 
 import numpy as np
 from particlerouting.routines import steady_plots
 
-### Define the parameters that are being used
+# Define the parameters that are being used
+
 
 # define an empty class
 class pobj():
+    """Empty class for parameter values."""
+
     pass
+
 
 # create params and then assign the parameters
 params = pobj()
@@ -23,8 +27,8 @@ depth = data['depth']
 params.stage = stage
 params.depth = depth
 
-params.seed_xloc = list(range(15,17))
-params.seed_yloc = list(range(137,140))
+params.seed_xloc = list(range(15, 17))
+params.seed_yloc = list(range(137, 140))
 params.Np_tracer = 50
 params.dx = 50.
 # don't have any discharge data so we use zeros in place of it
@@ -33,9 +37,9 @@ params.dx = 50.
 params.qx = np.zeros(np.shape(params.depth))
 params.qy = np.zeros(np.shape(params.depth))
 params.theta = 1.0
-params.model = 'DeltaRCM' # say that our inputs are from DeltaRCM
+params.model = 'DeltaRCM'  # say that our inputs are from DeltaRCM
 
-### Apply the parameters to run the particle routing model
-
+# Apply the parameters to run the particle routing model
+np.random.seed(0)  # fix the random seed
 # using steady (time-invariant) plotting routine
 steady_plots(params, 50, 'steady_deltarcm_example')

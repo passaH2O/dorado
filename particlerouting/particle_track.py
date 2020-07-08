@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Particle class for managing the definition of particle attributes and parameters
-of the domain as well as iterative movement of the particles through the domain.
+Particle class for managing the definition of particle attributes and
+parameters of the domain as well as iterative movement of the particles
+through the domain.
 
 Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
-from math import floor, sqrt, pi
+from math import sqrt
 import numpy as np
-from random import shuffle
-import matplotlib
-from matplotlib import pyplot as plt
-from scipy import ndimage
-import sys, os, re, string
-from netCDF4 import Dataset
-import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-import logging
+import sys
+import os
+import re
+import string
 import copy
 import time
 from .particle_tools import Tools
@@ -389,12 +385,12 @@ class Particle(Tools):
                 undefined, assumes no particles have travelled yet, so assigns
                 zeros
 
-            previous_walk_data : `list`
-                Nested list of all prior x locations, y locations, and travel
-                times (in that order). Order of indices is
+            previous_walk_data : `dict`
+                Dictionary of all prior x locations, y locations, and travel
+                times. Order of indices is
                 previous_walk_data[field][particle][iter], where e.g.
-                [2][5][10] is the travel time of the 5th particle at the 10th
-                iteration
+                ['travel_times'][5][10] is the travel time of the 5th particle
+                at the 10th iteration
 
             target_time : `float`
                 The travel time (seconds) each particle should aim to have at
@@ -405,20 +401,22 @@ class Particle(Tools):
 
         **Outputs** :
 
-            all_walk_data : `list`
-                Nested list of all x and y locations and travel times, with
+            all_walk_data : `dict`
+                Dictionary of all x and y locations and travel times, with
                 details same as input previous_walk_data
 
         '''
 
+        all_walk_data = dict()  # init all_walk_data dictionary
+
         if previous_walk_data is not None:
             # If particle tracking has been run before, feed previous output array back into input
             # If this array exists, it overrides any starting indices given in function call
-            all_xinds = previous_walk_data[0] # all previous locations
+            all_xinds = previous_walk_data['xinds']
             start_xindices = [all_xinds[i][-1] for i in list(range(self.Np_tracer))] # most recent locations
-            all_yinds = previous_walk_data[1]
+            all_yinds = previous_walk_data['yinds']
             start_yindices = [all_yinds[i][-1] for i in list(range(self.Np_tracer))]
-            all_times = previous_walk_data[2]
+            all_times = previous_walk_data['travel_times']
             start_times = [all_times[i][-1] for i in list(range(self.Np_tracer))]
         else:
             # if start locations not defined, then randomly assign them
@@ -449,7 +447,10 @@ class Particle(Tools):
                     all_yinds[ii].append(new_inds[ii][1])
                     all_times[ii].append(travel_times[ii])
 
-            all_walk_data = [all_xinds, all_yinds, all_times] # Store travel information
+            # Store travel information in all_walk_data
+            all_walk_data['xinds'] = all_xinds
+            all_walk_data['yinds'] = all_yinds
+            all_walk_data['travel_times'] = all_times
 
         else: # If we ARE aiming for a specific time, iterate each particle until we get there
             # Loop through all particles
@@ -484,6 +485,9 @@ class Particle(Tools):
                             print('Warning: Particle iterations exceeded limit before reaching target time. Try smaller time-step')
                             break
 
-            all_walk_data = [all_xinds, all_yinds, all_times]
+            # Store travel information in all_walk_data
+            all_walk_data['xinds'] = all_xinds
+            all_walk_data['yinds'] = all_yinds
+            all_walk_data['travel_times'] = all_times
 
         return all_walk_data
