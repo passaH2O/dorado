@@ -8,7 +8,7 @@ Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
-from math import sqrt
+from math import sqrt, pi
 import numpy as np
 import sys
 import os
@@ -77,6 +77,14 @@ class params:
                           weights are not dependent on the surface gradient,
                           and instead are based on the inertial forces (the
                           flow discharge).
+        
+        diff_coeff (`float`) : Diffusion/dispersion coefficient for use in 
+                              travel time computation. If set to 0.0, flow 
+                              is purely advection with no diffusion. Higher 
+                              values lead to more spread in exit age
+                              distribution. Max diffusion time in any given
+                              step is 0.5*diff_coeff percent. Default value 
+                              is 0.2 (i.e. max of 10%)
 
         dry_depth (`float`) : Minimum depth for a cell to be considered wet,
                               default value is 0.1m
@@ -210,11 +218,11 @@ class Particle(Tools):
             if params.qx is not None and params.qy is not None:
                 self.qx = params.qx
                 self.qx[np.isnan(self.qx)] = 0
-                self.u = self.qx*self.depth/(self.depth**2 + 1e-6)
+                self.u = self.qx*self.depth/(self.depth**2 + 1e-8)
 
                 self.qy = params.qy
                 self.qy[np.isnan(self.qy)] = 0
-                self.v = self.qy*self.depth/(self.depth**2 + 1e-6)
+                self.v = self.qy*self.depth/(self.depth**2 + 1e-8)
 
             elif params.u is not None and params.v is not None:
                 self.u = params.u
@@ -231,11 +239,11 @@ class Particle(Tools):
             if params.qx is not None and params.qy is not None:
                 self.qx = -1*params.qy
                 self.qx[np.isnan(self.qx)] = 0
-                self.u = self.qx*self.depth/(self.depth**2 + 1e-6)
+                self.u = self.qx*self.depth/(self.depth**2 + 1e-8)
 
                 self.qy = params.qx
                 self.qy[np.isnan(self.qy)] = 0
-                self.v = self.qy*self.depth/(self.depth**2 + 1e-6)
+                self.v = self.qy*self.depth/(self.depth**2 + 1e-8)
 
             elif params.u is not None and params.v is not None:
                 self.u = -1*params.v
@@ -252,8 +260,11 @@ class Particle(Tools):
         ### Define field of velocity magnitude (for travel time calculation)
         self.velocity = np.sqrt(self.u**2+self.v**2)
         # cannot have 0/nans - leads to infinite/nantravel times
-        self.velocity[self.velocity < 1e-6] = 1e-6
-
+        self.velocity[self.velocity < 1e-8] = 1e-8
+        self.u[self.u < 1e-8] = 1e-8
+        self.v[self.v < 1e-8] = 1e-8
+        ### Compute velocity orientation at each cell
+        self.velocity_angle = np.arctan(-1.0*self.u/self.v)
 
         ########## OPTIONAL PARAMETERS (Have default values) ##########
         ### Define the theta used to weight the random walk
@@ -273,6 +284,13 @@ class Particle(Tools):
         except:
             print("Gamma parameter not specified - using 0.05")
             self.gamma = 0.05
+        
+        try:
+            if params.diff_coeff >= 2:
+                print("Warning: Diffusion behaves non-physically when coefficient >= 2")
+            self.diff_coeff = float(params.diff_coeff)
+        except:
+            self.diff_coeff = 0.2
 
         ### Minimum depth for cell to be considered wet
         try:
@@ -314,7 +332,7 @@ class Particle(Tools):
         try:
             self.distances = params.distances
         except:
-            # defined this if not given
+            # defined if not given
             self.distances = np.array([[sqrt2, 1, sqrt2],
                                        [1, 1, 1],
                                        [sqrt2, 1, sqrt2]])
@@ -323,7 +341,7 @@ class Particle(Tools):
         try:
             self.ivec = params.ivec
         except:
-            # define this if not given
+            # defined if not given
             self.ivec = np.array([[-sqrt05, 0, sqrt05],
                                   [-1, 0, 1],
                                   [-sqrt05, 0, sqrt05]])
@@ -332,7 +350,7 @@ class Particle(Tools):
         try:
             self.jvec = params.jvec
         except:
-            # define this if not given
+            # defined if not given
             self.jvec = np.array([[-sqrt05, -1, -sqrt05],
                                   [0, 0, 0],
                                   [sqrt05, 1, sqrt05]])
@@ -354,6 +372,15 @@ class Particle(Tools):
             self.jwalk = np.array([[-1, -1, -1],
                                    [0, 0, 0],
                                    [1, 1, 1]])
+
+        ### Angles of D8 step directions
+        try:
+            self.angles = params.angles
+        except:
+            # defined if not given
+            self.angles = np.array([[3*pi/4, pi/2, pi/4],
+                                    [pi, 0, 0],
+                                    [5*pi/4, 3*pi/2, 7*pi/4]])
 
     # run an iteration where particles are moved
     # have option of specifying the particle start locations

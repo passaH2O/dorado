@@ -562,7 +562,7 @@ def draw_travel_path(depth, all_walk_data,
         col = [c[0], c[1], c[2], 0.85] # make color a bit transparent
         color_index += 1
         # visualize this particle's travel path
-        for j in range(1,len(all_walk_data['xinds'][0][:])):
+        for j in range(1,len(all_walk_data['xinds'][i][:])):
             # define old x-y point
             old_x = all_walk_data['xinds'][i][j-1]
             old_y = all_walk_data['yinds'][i][j-1]
