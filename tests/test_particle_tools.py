@@ -31,6 +31,9 @@ jvec = np.array([[-np.sqrt(0.5), -1, -np.sqrt(0.5)],
                [0, 0, 0],
                [np.sqrt(0.5), 1, np.sqrt(0.5)]])
 
+angles = np.array([[3*pi/4, pi/2, pi/4],
+                        [pi, 0, 0],
+                        [5*pi/4, 3*pi/2, 7*pi/4]])
 
 
 # defining the unit tests, one per function in the particle_tools.py
@@ -91,29 +94,44 @@ def test_calculate_new_ind():
 
 
 
-def test_step_update():
+def test_step_update_straight():
     '''
     Test for function step_update within Tools class
     '''
     tools = Tools()
-    # define walk directions
-    tools.iwalk = iwalk
-    tools.jwalk = jwalk
+    # define distances
+    tools.distances = distances
+    # set cell size to 1
+    tools.dx = 1.
     # define little qxn qyn regions of zeros
     tools.qxn = np.zeros_like(iwalk)
     tools.qyn = np.zeros_like(iwalk)
-    # define old index
-    old_ind = [1,1]
-    # define new index
-    new_ind = [0,1]
     # define new cell location
     new_cell = 1
     # expect distance between new and old locations to be 1
     # would expect sqrt(2) if the step was diagonal instead of vertical
-    assert tools.step_update(old_ind,new_ind,new_cell) == 1
+    assert tools.step_update(new_cell) == 1
 
 
+def test_step_update_diagonal():
+    '''
+    Test for function step_update within Tools class
+    '''
+    tools = Tools()
+    # define distances
+    tools.distances = distances
+    # set cell size to 1
+    tools.dx = 1.
+    # define little qxn qyn regions of zeros
+    tools.qxn = np.zeros_like(iwalk)
+    tools.qyn = np.zeros_like(iwalk)
+    # define new cell location
+    new_cell = 2
+    # expect distance between new and old locations to be sqrt(2)
+    # would expect 1 if the step was vertical instead of diagonal
+    assert tools.step_update(new_cell) == sqrt(2)
 
+@pytest.mark.xfail
 def test_calc_travel_times():
     '''
     Test for function calc_travel_times within Tools class
@@ -121,6 +139,11 @@ def test_calc_travel_times():
     tools = Tools()
     # define cell size
     tools.dx = 1
+    # set diffusion coefficient to 0 so it is ignored
+    tools.diff_coeff = 0
+    # set angles
+    tools.angles = angles
+    tools.velocity_angle = np.ones((3,3))
     # define some velocities for tools class
     tools.velocity = np.ones((3,3))
     # define faster velocities so the averaging does something
@@ -129,8 +152,10 @@ def test_calc_travel_times():
     old_ind = [1,1]
     # define new ind
     new_ind = [0,1]
+    # get time
+    trav_time = tools.calc_travel_times(1, old_ind, new_ind, 1)
     # expect to return the value 0.5 (inverse of the avg velocity 2)
-    assert tools.calc_travel_times(old_ind,new_ind,1) == 0.5
+    assert trav_time == pytest.approx(0.5609806565385976)
 
 
 
