@@ -8,7 +8,7 @@ from __future__ import division, print_function, absolute_import
 from builtins import range, map
 from math import sqrt, cos
 import numpy as np
-from random import random
+from numpy.random import random
 import sys
 import os
 import re

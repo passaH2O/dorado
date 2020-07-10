@@ -261,16 +261,16 @@ class Particle(Tools):
         self.velocity = np.sqrt(self.u**2+self.v**2)
         # cannot have 0/nans - leads to infinite/nantravel times
         self.velocity[self.velocity < 1e-8] = 1e-8
-        self.u[self.u < 1e-8] = 1e-8
-        self.v[self.v < 1e-8] = 1e-8
+        self.u[np.abs(self.u) < 1e-8] = 1e-8
+        self.v[np.abs(self.v) < 1e-8] = 1e-8
         ### Compute velocity orientation at each cell
-        self.velocity_angle = np.arctan(-1.0*self.u/self.v)
+        self.velocity_angle = np.arctan2(-1.0*self.u,self.v)
 
         ########## OPTIONAL PARAMETERS (Have default values) ##########
         ### Define the theta used to weight the random walk
         # Higher values give higher weighting probabilities to deeper cells
         try:
-            self.theta = params.theta
+            self.theta = float(params.theta)
         except:
             print("Theta parameter not specified - using 1.0")
             self.theta = 1.0 # if unspecified use 1
@@ -280,17 +280,25 @@ class Particle(Tools):
                             # 1 = water surface gradient only (stage based)
                             # 0 = inertial force only (discharge based)
         try:
-            self.gamma = params.gamma
+            self.gamma = float(params.gamma)
         except:
             print("Gamma parameter not specified - using 0.05")
             self.gamma = 0.05
         
         try:
-            if params.diff_coeff >= 2:
+            if params.diff_coeff < 0:
+                print("Warning: Specified diffusion coefficient is negative. Assigning as positive")
+                params.diff_coeff = abs(params.diff_coeff)
+            elif params.diff_coeff >= 2:
                 print("Warning: Diffusion behaves non-physically when coefficient >= 2")
             self.diff_coeff = float(params.diff_coeff)
         except:
-            self.diff_coeff = 0.2
+            if getattr(params,'steepest_descent',False) == True:
+                print("Diffusion disabled for steepest descent")
+                self.diff_coeff = 0.0
+            else:
+                print("Diffusion coefficient not specified - using 0.2")
+                self.diff_coeff = 0.2
 
         ### Minimum depth for cell to be considered wet
         try:
