@@ -463,9 +463,10 @@ def exposure_time(all_walk_data,
     # Exposure times after that are unreliable because not all particles have traveled for that long
     end_time = min(end_time)
 
-    # Ignore particles that never entered ROI for plotting
-    plotting_times = exposure_times[exposure_times > 1e-6] # Those particles will have had an ET of 0
-    num_particles_included = len(plotting_times) # Number of particles that spent at least some time in ROI
+    # Ignore particles that never entered ROI or exited ROI for plotting
+    plotting_times = exposure_times[exposure_times > 1e-6] # If never entered, ET of 0
+    plotting_times = plotting_times[plotting_times < 0.99*end_time] # If never exited, ET ~= end_time
+    num_particles_included = len(plotting_times) # Number of particles included in ETD plots
 
     # Full time vector (x-values) of CDF
     full_time_vect = np.append([0], np.sort(plotting_times)) # Add origin for plot
@@ -482,7 +483,7 @@ def exposure_time(all_walk_data,
     plt.ylabel('F(t) [-]')
     plt.xlim([0, end_time/timedelta])
     plt.ylim([0, 1])
-    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Exact_CETD.png')
+    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Exact_CETD.png', bbox_inches = 'tight')
     plt.close()
 
     # Smooth out the CDF by making it regular in time.
@@ -499,8 +500,7 @@ def exposure_time(all_walk_data,
     plt.ylabel('F(t) [-]')
     plt.xlim([0, end_time/timedelta])
     plt.ylim([0, 1])
-    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Smooth_CETD.png')
-    plt.close
+    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/Smooth_CETD.png', bbox_inches = 'tight')
 
     # Derive differential ETD from the CDF. Here we use 'linear' interpolation, because 'previous'
     # produces a choppy derivative if there aren't enough particles
@@ -516,8 +516,8 @@ def exposure_time(all_walk_data,
     plt.xlabel('Time ' + timeunit)
     plt.ylabel('E(t) ' + timeunit[0:-1] + '$^{-1}$]')
     plt.xlim([0, end_time/timedelta])
-    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/ETD.png')
-    plt.close
+    plt.ylim(ymin=0)
+    plt.savefig(os.getcwd()+'/'+folder_name+'/figs/ETD.png', bbox_inches = 'tight')
 
     return exposure_times
 

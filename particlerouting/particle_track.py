@@ -287,8 +287,8 @@ class Particle(Tools):
         
         try:
             if params.diff_coeff < 0:
-                print("Warning: Specified diffusion coefficient is negative. Assigning as positive")
-                params.diff_coeff = abs(params.diff_coeff)
+                print("Warning: Specified diffusion coefficient is negative. Rounding up to zero")
+                params.diff_coeff = 0.0
             elif params.diff_coeff >= 2:
                 print("Warning: Diffusion behaves non-physically when coefficient >= 2")
             self.diff_coeff = float(params.diff_coeff)
