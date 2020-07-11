@@ -14,45 +14,38 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
-
+import particlerouting as pr
 
 # -- Project information -----------------------------------------------------
 
-project = u'particlerouting'
-copyright = u'2020, J. Hariharan, K. Wright, P. Passalacqua'
-author = u'J. Hariharan, K. Wright, P. Passalacqua'
+project = 'particlerouting'
+copyright = '2020, J. Hariharan, K. Wright, P. Passalacqua'
+author = 'J. Hariharan, K. Wright, P. Passalacqua'
 
-# The short X.Y version
-version = u''
-# The full version, including alpha/beta/rc tags
-release = u'1.0'
-
+# release/version , including alpha/beta/rc tags
+version = pr.__version__
+release = pr.__version__
 
 # -- General configuration ---------------------------------------------------
-
-# If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
-]
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.doctest',
+              'sphinx.ext.autosummary',
+              'sphinx.ext.napoleon',
+              'sphinx.ext.graphviz',
+              'sphinx.ext.imgmath',
+              'sphinx.ext.githubpages',
+              'matplotlib.sphinxext.plot_directive',
+              'm2r']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
@@ -177,4 +170,25 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 
-# -- Extension configuration -------------------------------------------------
+# Autosummary / Automodapi settings
+autosummary_generate = True
+automodapi_inheritance_diagram = False
+autodoc_default_flags = ['members', 'inherited-members', 'no-private-members']
+
+# doctest
+doctest_global_setup = '''
+import particlerouting
+import numpy as np
+from matplotlib import pyplot as plt
+'''
+doctest_test_doctest_blocks = ''  # empty string disables testing all code in any docstring
+
+## mpl plots
+plot_basedir = 'pyplots'
+plot_html_show_source_link = False
+plot_formats = ['png', ('hires.png', 300)]
+plot_pre_code = '''
+import numpy as np
+from matplotlib import pyplot as plt
+import particlerouting
+'''

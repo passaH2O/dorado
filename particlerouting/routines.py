@@ -18,7 +18,8 @@ import string
 from tqdm import tqdm
 import json
 
-def steady_plots(params,num_iter,folder_name):
+
+def steady_plots(params,num_iter,folder_name,save_imgs=True):
     '''
     Function to automate plotting of particle movement over a steady flow
     fields. Particles all have same number of iterations and are allowed to
@@ -34,6 +35,10 @@ def steady_plots(params,num_iter,folder_name):
 
         folder_name : `str`
             String of folder name to put outputs in
+
+        save_imgs : `bool`, optional
+            Controls whether or not the output images are saved to disk.
+            Default value is True.
 
     **Outputs** :
 
@@ -61,26 +66,27 @@ def steady_plots(params,num_iter,folder_name):
     all_walk_data = None  # Initialize object for function call
 
     # Iterate and save results
-    for i in tqdm(list(range(0,num_iter)), ascii=True):
+    for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
         all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
-        plt.figure(figsize=(4,4),dpi=200)
-        for k in list(range(0,params.Np_tracer)):
-            plt.scatter(all_walk_data['yinds'][k][0],
-                        all_walk_data['xinds'][k][0],
-                        c='b',
-                        s=0.75)
-            plt.scatter(all_walk_data['yinds'][k][-1],
-                        all_walk_data['xinds'][k][-1],
-                        c='r',
-                        s=0.75)
-        plt.imshow(params.depth)
-        plt.title('Depth - Particle Iteration ' + str(i))
-        cbar = plt.colorbar()
-        cbar.set_label('Water Depth [m]')
-        plt.axis('scaled')
-        plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
-        plt.close()
+        if save_imgs:
+            plt.figure(figsize=(4,4),dpi=200)
+            for k in list(range(0,params.Np_tracer)):
+                plt.scatter(all_walk_data['yinds'][k][0],
+                            all_walk_data['xinds'][k][0],
+                            c='b',
+                            s=0.75)
+                plt.scatter(all_walk_data['yinds'][k][-1],
+                            all_walk_data['xinds'][k][-1],
+                            c='r',
+                            s=0.75)
+            plt.imshow(params.depth)
+            plt.title('Depth - Particle Iteration ' + str(i))
+            cbar = plt.colorbar()
+            cbar.set_label('Water Depth [m]')
+            plt.axis('scaled')
+            plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
+            plt.close()
 
     # save data as json text file - technically human readable
     fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'

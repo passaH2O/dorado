@@ -43,8 +43,13 @@ walk_data = particle.run_iteration(target_time=2100)
 
 # print target travel time and list of the particle travel times
 print('Prescribed target travel time: 2100 seconds')
-# print('List of particle travel times for final particle locations: ' +
-#       str(np.round(walk_data['travel_times'])))
+# get final times and print the list
+finaltimes = []
+for i in list(range(0, params.Np_tracer)):
+    finaltimes.append(walk_data['travel_times'][i][-1])
+
+print('List of particle travel times for final particle locations: ' +
+      str(np.round(finaltimes)))
 
 # make plot of initial and final particle locations
 plt.figure(figsize=(4, 4), dpi=200)

@@ -36,7 +36,7 @@ steepest_descent_deltarcm
 -------------------------
 add link to script
 
-An example script showing how the randomness can be turned off and a 'steepest descent' routing of the particles can be done by only allowing particles to travel to the neighboring cell with the greatest weight. 
+An example script showing how the randomness can be turned off and a 'steepest descent' routing of the particles can be done by only allowing particles to travel to the neighboring cell with the greatest weight.
 
 .. image:: images/steepest_descent.gif
     :width: 800px
@@ -64,7 +64,7 @@ An example script showing that by making the depth uniform, and setting the wate
 
 set_timestep_anuga_particles
 ----------------------------
-add link to script 
+add link to script
 
 An example script showing how the timestep can be prescribed and the particles will all continue routing until their respective travel times are all close to the target timestep duration. Initial particle locations are shown as blue dots, and red dots indicate the final particle locations after they have all travelled for about 2100 seconds.
 
@@ -77,16 +77,12 @@ Example Output:
 ::
 
    Prescribed target travel time: 2100 seconds
-   List of particle travel times for final particle locations: [2065. 2111. 1978. 2081. 2150. 2031. 2055. 2108. 2151. 2110. 1955. 1942.
-                                                                2113. 2135. 2045. 2069. 2112. 2074. 2126. 2136. 2003. 2130. 2090. 2098.
-                                                                2136. 2079. 2068. 2076. 2064. 2033. 2091. 2087. 2071. 2070. 2066. 2005.
-                                                                2073. 2134. 2126. 2058. 2149. 2118. 2145. 1956. 2122. 2112. 2122. 2114.
-                                                                2132. 2126.]
-
-
-
-
-
+   List of particle travel times for final particle locations: [2158.
+   2118. 2088. 2149. 2096. 2206. 2104. 2104. 2207. 2137. 2097. 2147.
+   2032. 2118. 2084. 2037. 2066. 2076. 2104. 2108. 2033. 2101. 2080.
+   2072. 2031. 2041. 2076. 2063. 2125. 2102. 2140. 2178. 2173. 2097.
+   2104. 2189. 2061. 2112. 2074. 2095. 2100. 2177. 2069. 2032. 2050.
+   2086. 2036. 2109. 2078. 2047.]
 
 parallel_comparison
 -------------------

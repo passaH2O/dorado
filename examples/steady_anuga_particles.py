@@ -9,14 +9,14 @@ from particlerouting.routines import steady_plots
 # define an empty class
 class pobj():
     """Empty class for parameters."""
-    
+
     pass
 
 
 # create params and then assign the parameters
 params = pobj()
 
-# load some variables from a deltarcm output so stage is varied
+# load some variables from a anuga output so stage is varied
 data = np.load('ex_anuga_data.npz')
 
 # pull depth and stage from that data
