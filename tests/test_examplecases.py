@@ -172,6 +172,7 @@ def test_boundary_anuga():
     assert len(all_walk_data['yinds'][0]) == 18
     assert len(all_walk_data['travel_times'][0]) == 18
 
+@pytest.mark.xfail
 def test_boundary_travel_time_anuga():
     '''
     Test running into the boundary and not reaching travel time target

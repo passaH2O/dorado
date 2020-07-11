@@ -349,8 +349,8 @@ class TestValueErrors:
         params.qy = np.ones((3,3))
         particle = particle_track.Particle(params)
         # should work so make assertion
-        assert np.all(particle.v == particle.qy*particle.depth/(particle.depth**2+1e-6))
-        assert np.all(particle.u == particle.qx*particle.depth/(particle.depth**2+1e-6))
+        assert np.all(particle.v == particle.qy*particle.depth/(particle.depth**2+1e-8))
+        assert np.all(particle.u == particle.qx*particle.depth/(particle.depth**2+1e-8))
         assert np.all(particle.qx == -1*params.qy)
         assert np.all(particle.qy == params.qx)
 

@@ -6,8 +6,9 @@ Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
-from math import sqrt
+from math import sqrt, cos
 import numpy as np
+from numpy.random import random
 import sys
 import os
 import re
@@ -183,18 +184,12 @@ class Tools():
 
 
     # update step
-    def step_update(self, ind, new_ind, new_cell):
+    def step_update(self, new_cell):
         '''
         Function to check new location is some distance away from old one,
         also provides way to track the travel distance of the particles
 
         **Inputs** :
-
-            ind : `tuple`
-                Tuple (x,y) of current location
-
-            new_ind : `tuple`
-                Tuple (x,y) of new location
 
             new_cell : `int`
                 Integer 1-8 indicating new location in D-8 way
@@ -206,25 +201,24 @@ class Tools():
 
         '''
 
-        # assign x-step by pulling 1-8 value from x-component walk 1-8 directions
-        istep = self.iwalk.flat[new_cell]
-        # assign y-step by pulling 1-8 value from y-component walk 1-8 directions
-        jstep = self.jwalk.flat[new_cell]
         # compute the step distance to be taken
-        dist = np.sqrt(istep**2 + jstep**2)
+        dist = self.distances.flat[new_cell]*float(self.dx)
 
         return dist
 
 
 
     # calculate travel time using avg of velocity and old and new index
-    def calc_travel_times(self, ind, new_ind, dist):
+    def calc_travel_times(self, new_cell, ind, new_ind, dist):
         '''
         Function to calculate the travel time for the particle to get from the
         current location to the new location. Calculated by taking the inverse
         of the velocity at the old and new locations.
 
         **Inputs** :
+
+            new_cell : `int`
+                Integer 1-8 indicating new location in D-8 way
 
             ind : `tuple`
                 Tuple (x,y) of the current location
@@ -250,10 +244,16 @@ class Tools():
             old_vel = self.velocity[ind[0],ind[1]]
             # new position velocity value
             new_vel = self.velocity[new_ind[0],new_ind[1]]
-            # avg velocity
-            avg_vel = np.mean([old_vel,new_vel])
-            # travel time based on distance traveled and mean velocity
-            trav_time = dist/avg_vel
+            # Compute diffusion term (sample uniform distribution centered at 0 and diff_coeff wide)
+            if self.diff_coeff > 0:
+                diff = (0.5 - random())*self.diff_coeff
+            else:
+                diff = 0.0
+            # Compute distance traveled in the orientation of the mean flow path
+            # If we moved backwards/orthogonal, step was instantaneous
+            projected_dist = dist*max(0,cos(self.angles.flat[new_cell]-self.velocity_angle[ind[0],ind[1]]))
+            # Compute average velocity over step            
+            trav_time = 0.5*projected_dist*(1/old_vel + 1/new_vel)*(1+diff)
         else:
             trav_time = 0 # particle did not move
 
@@ -400,7 +400,7 @@ class Tools():
         new_inds = list(map(lambda x,y: self.calculate_new_ind(x,y)
                         if y != 4 else x, inds_tuple, new_cells)) # for each particle get the new index
 
-        dist = list(map(lambda x,y,z: self.step_update(x,y,z), current_inds, new_inds, new_cells)) # move each particle to the new index
+        dist = list(map(lambda x: self.step_update(x), new_cells)) # move each particle to the new index
 
         new_inds = np.array(new_inds, dtype = np.int) # put new indices into array
         new_inds[np.array(dist) == 0] = 0
@@ -409,7 +409,7 @@ class Tools():
         new_inds = new_inds.tolist() # transform from np array to list
 
         # add the travel times
-        temp_travel = list(map(lambda x,y,z: self.calc_travel_times(x,y,z), current_inds, new_inds, dist))
+        temp_travel = list(map(lambda w,x,y,z: self.calc_travel_times(w,x,y,z), new_cells, current_inds, new_inds, dist))
         travel_times = [travel_times[i] + temp_travel[i] for i in range(0,len(travel_times))] # add to existing times
         travel_times = list(travel_times)
 
