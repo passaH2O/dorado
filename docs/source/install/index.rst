@@ -4,7 +4,7 @@
 Installation Instructions
 =========================
 
-particlerouting is compatible with Python 2.7, 3.6, 3.7, and 3.8. There are only 5 package dependencies: `numpy`, `matplotlib`, `scipy`, `future`, and `tqdm`.
+particlerouting is compatible with Python 2.7, 3.6, 3.7, and 3.8. There are only 4 dependencies: `numpy`, `matplotlib`, `scipy`, and `tqdm`.
 
 Installation via `pip`
 ----------------------
@@ -28,12 +28,12 @@ To `conda`-install this package, use the following command:
 
 Installation from source
 ------------------------
-1. Clone the repository
+1. Clone (or download) the repository
 ::
 
    $ git clone https://github.com/passaH2O/particlerouting
 
-2. From the cloned folder, run the following in the command line:
+2. From the cloned (or extracted) folder, run the following in the command line:
 ::
 
    $ python setup.py install
