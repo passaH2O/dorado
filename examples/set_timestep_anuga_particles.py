@@ -1,17 +1,9 @@
-# make an example of the workflow with gridded anuga output data
+"""Example of the workflow with gridded anuga output data"""
 
 import numpy as np
 import particlerouting.particle_track as pt
+from particlerouting.particle_track import params
 import matplotlib.pyplot as plt
-
-### Define the parameters that are being used
-
-# define an empty class
-class pobj():
-    pass
-
-# create params and then assign the parameters
-params = pobj()
 
 # load some variables from a deltarcm output so stage is varied
 data = np.load('ex_anuga_data.npz')
@@ -20,6 +12,9 @@ data = np.load('ex_anuga_data.npz')
 depth = data['depth']
 qx = data['qx']
 qy = data['qy']
+
+# create params and then assign the parameters
+params = params()
 
 # define the params variables
 params.depth = depth
@@ -38,13 +33,19 @@ params.model = 'Anuga'
 
 ### Apply the parameters to run the particle routing model
 particle = pt.Particle(params)
+np.random.seed(0)
 # run model until all particles have travelled for about 1.5 hours
 walk_data = particle.run_iteration(target_time=2100)
 
 # print target travel time and list of the particle travel times
 print('Prescribed target travel time: 2100 seconds')
-# print('List of particle travel times for final particle locations: ' +
-#       str(np.round(walk_data['travel_times'])))
+# get final times and print the list
+finaltimes = []
+for i in list(range(0, params.Np_tracer)):
+    finaltimes.append(walk_data['travel_times'][i][-1])
+
+print('List of particle travel times for final particle locations: ' +
+      str(np.round(finaltimes)))
 
 # make plot of initial and final particle locations
 plt.figure(figsize=(4, 4), dpi=200)
