@@ -19,7 +19,7 @@ from tqdm import tqdm
 import json
 
 
-def steady_plots(params, num_iter, folder_name, save_imgs=True):
+def steady_plots(params, num_iter, folder_name, save_output=True):
     """Automated particle movement in steady flow field.
 
     Function to automate plotting of particle movement over a steady flow
@@ -37,8 +37,8 @@ def steady_plots(params, num_iter, folder_name, save_imgs=True):
         folder_name : `str`
             String of folder name to put outputs in
 
-        save_imgs : `bool`, optional
-            Controls whether or not the output images are saved to disk.
+        save_output : `bool`, optional
+            Controls whether or not the output images/data are saved to disk.
             Default value is True.
 
     **Outputs** :
@@ -47,21 +47,23 @@ def steady_plots(params, num_iter, folder_name, save_imgs=True):
             Dictionary of all x and y locations and travel times, with
             details same as input previous_walk_data
 
-        Script saves result of each iteration to a folder with the figure for
-        each iteration as a png and the data with the particle locations and
-        travel times as a json ('human-readable') text file
+        If `save_output` is set to True, script saves result of each iteration
+        to a folder with the figure for each iteration as a png and the data
+        with the particle locations and travel times as a json
+        ('human-readable') text file.
 
     """
     # define the particle
     particle = Particle(params)
 
     # make directory to save the data
-    try:
-        os.makedirs(os.getcwd() + '/' + folder_name)
-        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
-        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
-    except Exception:
-        print('Directories already exist')
+    if save_output:
+        try:
+            os.makedirs(os.getcwd() + '/' + folder_name)
+            os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
+            os.makedirs(os.getcwd() + '/' + folder_name + '/data')
+        except Exception:
+            print('Directories already exist')
 
     walk_data = None  # Initialize object for function call
 
@@ -69,7 +71,7 @@ def steady_plots(params, num_iter, folder_name, save_imgs=True):
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
         walk_data = particle.run_iteration(previous_walk_data=walk_data)
-        if save_imgs:
+        if save_output:
             plt.figure(figsize=(4, 4), dpi=200)
             for k in list(range(0, params.Np_tracer)):
                 plt.scatter(walk_data['yinds'][k][0],
@@ -89,12 +91,13 @@ def steady_plots(params, num_iter, folder_name, save_imgs=True):
                         '/figs/output'+str(i)+'.png')
             plt.close()
 
-    # save data as json text file - technically human readable
-    fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
-    json.dump(walk_data, open(fpath, 'w'))
+    if save_output:
+        # save data as json text file - technically human readable
+        fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+        json.dump(walk_data, open(fpath, 'w'))
 
-    # example code to load the dictionary back from the output json file
-    # data = json.load(open('data.txt'))
+        # example code to load the dictionary back from the output json file
+        # data = json.load(open('data.txt'))
 
     return walk_data
 
@@ -318,7 +321,7 @@ def time_plots(params, num_iter, folder_name):
 # requires installation of the animation writer 'ffmpeg' which is not part of
 # the default installation set of packages
 def animate_plots(start_val, end_val, folder_name):
-    """Animation routine, requires optional 'ffmpeg' animation writer.
+    """Animation routine, requires an optional animation writer.
 
     Routine to make mp4 animation of the particle routing from png outputs
     of the previous plotting routines.
@@ -625,3 +628,79 @@ def draw_travel_path(depth, walk_data,
     plt.tight_layout()
     plt.savefig(output_file)
     plt.close()
+
+
+def plot_initial(grid, all_walk_data, c='b'):
+    """Plot initial particle positions on an array.
+
+    **Inputs** :
+
+        grid : `numpy.ndarray`
+            A 2-D grid upon which the particles will be plotted. Examples of
+            grids that might be nice to use are `params.depth`, `params.stage`,
+            `params.topography`.
+
+        all_walk_data : `dict`
+            The dictionary with the particle information. This is the output
+            from one of the other routines or the
+            :obj:particle_track.run_iteration() function.
+
+        c : `str`, optional
+            String to specify the color of the particle marks to draw on the
+            figure, default is 'b' for blue
+
+    **Outputs** :
+
+        ax : `matplotlib.axes`
+            A `matplotlib.axes` with the intended plot drawn on it
+
+    """
+    ax = plt.gca()
+    ax.imshow(grid)
+    x = []
+    y = []
+    for i in range(0, len(all_walk_data['xinds'])):
+        x.append(all_walk_data['yinds'][i][0])
+        y.append(all_walk_data['xinds'][i][0])
+    # plot them up
+    plt.scatter(x, y, c=c)
+
+    return ax
+
+
+def plot_final(grid, all_walk_data, c='r'):
+    """Plot final particle positions on an array.
+
+    **Inputs** :
+
+        grid : `numpy.ndarray`
+            A 2-D grid upon which the particles will be plotted. Examples of
+            grids that might be nice to use are `params.depth`, `params.stage`,
+            `params.topography`.
+
+        all_walk_data : `dict`
+            The dictionary with the particle information. This is the output
+            from one of the other routines or the
+            :obj:particle_track.run_iteration() function.
+
+        c : `str`, optional
+            String to specify the color of the particle marks to draw on the
+            figure, default is 'r' for blue
+
+    **Outputs** :
+
+        ax : `matplotlib.axes`
+            A `matplotlib.axes` with the intended plot drawn on it
+
+    """
+    ax = plt.gca()
+    ax.imshow(grid)
+    x = []
+    y = []
+    for i in range(0, len(all_walk_data['xinds'])):
+        x.append(all_walk_data['yinds'][i][-1])
+        y.append(all_walk_data['xinds'][i][-1])
+
+    plt.scatter(x, y, c=c)
+
+    return ax

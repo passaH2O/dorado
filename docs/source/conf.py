@@ -16,6 +16,9 @@ import os
 import sys
 import particlerouting as pr
 
+# add path to repo-head
+sys.path.insert(0, os.path.abspath('..'))
+
 # -- Project information -----------------------------------------------------
 
 project = 'particlerouting'
@@ -64,7 +67,6 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
-
 
 # -- Options for HTML output -------------------------------------------------
 

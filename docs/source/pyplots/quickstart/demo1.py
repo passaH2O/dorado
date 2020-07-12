@@ -6,7 +6,7 @@ import numpy as np
 
 np.random.seed(1)  # fix random seed so example is always the same
 params = make_rcm_params()
-all_walk_data = routines.steady_plots(params, 50, 'demo-1', save_imgs=False)
+all_walk_data = routines.steady_plots(params, 50, 'demo-1', save_output=False)
 
 plt.figure(figsize=(8, 5))
 for k in list(range(0, params.Np_tracer)):

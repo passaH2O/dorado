@@ -50,7 +50,7 @@ def make_anuga_params():
     params.seed_xloc = list(range(20, 30))
     params.seed_yloc = list(range(48, 53))
     params.Np_tracer = 50
-    params.dx = 50.
+    params.dx = 10.
     params.theta = 1.0
     params.model = 'Anuga'
 
