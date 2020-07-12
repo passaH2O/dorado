@@ -2,15 +2,7 @@
 
 import numpy as np
 from particlerouting.routines import steady_plots
-
-### Define the parameters that are being used
-
-# define an empty class
-class pobj():
-    pass
-
-# create params and then assign the parameters
-params = pobj()
+from particlerouting.particle_track import params
 
 # load some variables from a deltarcm output so stage is varied
 data = np.load('ex_deltarcm_data.npz')
@@ -18,6 +10,9 @@ data = np.load('ex_deltarcm_data.npz')
 # pull depth and stage from that data
 stage = data['stage']
 depth = data['depth']
+
+# create params and then assign the parameters
+params = params()
 
 # define the params variables
 params.stage = stage

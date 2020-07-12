@@ -6,19 +6,10 @@ from particlerouting.parallel_routing import parallel_routing
 
 # for serial run comparison import the regular iterator
 from particlerouting.particle_track import Particle
-
-# Define the parameters that are being used
-
-
-# define an empty class
-class pobj():
-    """Empty class to put parameters in."""
-
-    pass
-
+import particlerouting.particle_track as pt
 
 # create params and then assign the parameters
-params = pobj()
+params = pt.params()
 
 # load some variables from a deltarcm output so stage is varied
 data = np.load('ex_anuga_data.npz')

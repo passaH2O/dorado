@@ -14,7 +14,6 @@ to a true random walk.
 # particle movement on a steady flow field, and plotting particle locations.
 
 import numpy as np
-import matplotlib.pyplot as plt
 from particlerouting import particle_track
 from particlerouting import routines
 
@@ -46,6 +45,6 @@ params.model = 'None'
 # Default behavior for this function is to write and save figures and particle
 # location data to the disk, for this example we are turning that option off.
 
+np.random.seed(0)  # fix random seed for the example
 # using steady (time-invariant) plotting routine
-walk_data = routines.steady_plots(params, 50, 'true_random_walk',
-                                  save_output=False)
+walk_data = routines.steady_plots(params, 50, 'true_random_walk')
