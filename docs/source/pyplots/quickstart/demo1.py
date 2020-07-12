@@ -8,7 +8,7 @@ np.random.seed(1)  # fix random seed so example is always the same
 params = make_rcm_params()
 all_walk_data = routines.steady_plots(params, 50, 'demo-1', save_output=False)
 
-plt.figure(figsize=(8, 5))
+fig = plt.figure(figsize=(8, 5))
 for k in list(range(0, params.Np_tracer)):
     plt.scatter(all_walk_data['yinds'][k][0],
                 all_walk_data['xinds'][k][0],
@@ -18,9 +18,13 @@ for k in list(range(0, params.Np_tracer)):
                 all_walk_data['xinds'][k][-1],
                 c='r',
                 s=4.0)
-plt.imshow(params.depth)
+ax = plt.gca()
+im = ax.imshow(params.depth)
 plt.title('Depth - Particle Iteration 49')
-cbar = plt.colorbar(fraction=0.025, pad=0.03)
+cax = fig.add_axes([ax.get_position().x1+0.01,
+                    ax.get_position().y0,
+                    0.02,
+                    ax.get_position().height])
+cbar = plt.colorbar(im, cax=cax)
 cbar.set_label('Water Depth [m]', labelpad=10.0)
-plt.axis('scaled')
 plt.show()

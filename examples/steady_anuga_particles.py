@@ -2,6 +2,7 @@
 
 import numpy as np
 from particlerouting.routines import steady_plots
+from particlerouting.routines import draw_travel_path
 
 # Define the parameters that are being used
 
@@ -40,4 +41,8 @@ params.model = 'Anuga'
 # Apply the parameters to run the particle routing model
 np.random.seed(0)  # fix the random seed
 # using steady (time-invariant) plotting routine
-steady_plots(params, 50, 'steady_anuga_example')
+walk_data = steady_plots(params, 50, 'steady_anuga_example')
+
+# let's visualize a few of these particle travel paths
+draw_travel_path(depth, walk_data, [0,1,2,3],
+                 'steady_anuga_example/figs/travel_paths.png')

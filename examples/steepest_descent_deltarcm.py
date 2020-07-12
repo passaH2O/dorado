@@ -1,4 +1,4 @@
-# make an example of the workflow with deltarcm output data
+"""Example of the workflow with deltarcm output data"""
 
 import numpy as np
 from particlerouting.routines import steady_plots

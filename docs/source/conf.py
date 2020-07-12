@@ -175,7 +175,7 @@ epub_exclude_files = ['search.html']
 # Autosummary / Automodapi settings
 autosummary_generate = True
 automodapi_inheritance_diagram = False
-autodoc_default_flags = ['members', 'inherited-members', 'no-private-members']
+autodoc_default_flags = ['members']
 
 # doctest
 doctest_global_setup = '''

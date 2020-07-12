@@ -1,4 +1,4 @@
-# make an example of the workflow with gridded anuga output data
+"""Example of the workflow with gridded anuga output data"""
 
 import numpy as np
 from particlerouting.routines import time_plots

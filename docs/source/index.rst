@@ -1,6 +1,10 @@
 particlerouting's Documentation
 ===========================================
 
+.. image:: examples/images/logo.svg
+   :width: 60px
+   :align: center
+
 particlerouting is a python package developed to simulate the transport of passive particles in a flow field. Particle movement is simulated in a Lagrangian fashion using a weighted random walk formulation.
 
 
@@ -26,8 +30,9 @@ Background
 User Guide
 ##########
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
+   userguide/index
 
 Examples
 ########

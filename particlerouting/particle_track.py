@@ -24,84 +24,88 @@ from .particle_tools import Tools
 class params:
     """Parameter class with attributes and grid particles will be routed on.
 
-    The parameters class, `params`, which must be populated with user-defined
+    The parameters class, `params`, must be populated with user-defined
     attributes of the grid the particles will be modeled on.
 
-    Expected Parameters:
-    --------------------
+    **Required Parameters:**
 
-        seed_xloc (`list`) : List of x-coordinates over which to initially
-                             distribute the particles
+        seed_xloc : `list`
+            List of x-coordinates over which to initially distribute the
+            particles
 
-        seed_yloc (`list`) : List of y-coordinates over which to initially
-                             distribute the particles
+        seed_yloc : `list`
+            List of y-coordinates over which to initially distribute the
+            particles
 
-        Np_tracer (`int`) : Number of particles to use
+        Np_tracer : `int`
+            Number of particles to use
 
-        dx (`float`) : Length along one square cell face
+        dx : `float`
+            Length along one square cell face
 
-        depth (`numpy.ndarray`) : Array of water depth values, if absent then
-                                  the stage and topography arrays will be used
-                                  to compute it
+        depth : `numpy.ndarray`
+            Array of water depth values, if absent then the stage and
+            topography arrays will be used to compute it
 
-        stage (`numpy.ndarray`) : Array of water stage values, if absent then
-                                  the depth and topography arrays will be used
-                                  to compute it
+        stage : `numpy.ndarray`
+            Array of water stage values, if absent then the depth and
+            topography arrays will be used to compute it
 
-        qx (`numpy.ndarray`) : Array of the x-component of flow discharge
+        qx : `numpy.ndarray`
+            Array of the x-component of flow discharge
 
-        qy (`numpy.ndarray`) : Array of the y-component of flow discharge
+        qy : `numpy.ndarray`
+            Array of the y-component of flow discharge
 
-        u (`numpy.ndarray`) : Array of the x-component of flow velocity
+        u : `numpy.ndarray`
+            Array of the x-component of flow velocity
 
-        v (`numpy.ndarray`) : Array of the y-component of flow velocity
+        v : `numpy.ndarray`
+            Array of the y-component of flow velocity
 
-    Optional Parameters:
-    --------------------
+    **Optional Parameters:**
 
-        topography (`numpy.ndarray`) : Array of cell elevation values
+        topography : `numpy.ndarray`
+            Array of cell elevation values
 
-        model (`str`) : Name of the hydrodynamic model input being used
-                        (e.g. 'DeltaRCM')
+        model : `str`
+            Name of the hydrodynamic model input being used (e.g. 'DeltaRCM')
 
-        theta (`float`) : First of two weighting parameters for the weighted
-                          random walk. Default value is 1.0, higher values
-                          give higher weighting probabilities to cells with
-                          greater water depths
+        theta : `float`
+            First of two weighting parameters for the weighted random walk.
+            Default value is 1.0, higher values give higher weighting
+            probabilities to cells with greater water depths
 
-        gamma (`float`) : Second of two weighting parameters for the weighted
-                          random walk. Default value is 0.05. Gamma must be in
-                          the range [0,1]. Gamma == 0 means that the random
-                          walk weights are independent of the discharge values,
-                          and instead are based on the water surface gradient
-                          (the stage). Gamma == 1 means that the random walk
-                          weights are not dependent on the surface gradient,
-                          and instead are based on the inertial forces (the
-                          flow discharge).
+        gamma  : `float`
+            Second of two weighting parameters for the weighted random walk.
+            Default value is 0.05. Gamma must be in the range [0,1]. Gamma == 0
+            means that the random walk weights are independent of the discharge
+            values, and instead are based on the water surface gradient (the
+            stage). Gamma == 1 means that the random walk weights are not
+            dependent on the surface gradient, and instead are based on the
+            inertial forces (the flow discharge).
 
-        diff_coeff (`float`) : Diffusion/dispersion coefficient for use in
-                              travel time computation. If set to 0.0, flow
-                              is purely advection with no diffusion. Higher
-                              values lead to more spread in exit age
-                              distribution. Max diffusion time in any given
-                              step is 0.5*diff_coeff percent. Default value
-                              is 0.2 (i.e. max of 10%)
+        diff_coeff : `float`
+            Diffusion/dispersion coefficient for use in travel time
+            computation. If set to 0.0, flow is purely advection with no
+            diffusion. Higher values lead to more spread in exit age
+            distribution. Max diffusion time in any given step is
+            0.5*diff_coeff percent. Default value is 0.2 (i.e. max of 10%)
 
-        dry_depth (`float`) : Minimum depth for a cell to be considered wet,
-                              default value is 0.1m
+        dry_depth : `float`
+            Minimum depth for a cell to be considered wet,
+            default value is 0.1m
 
-        cell_type (`numpy.ndarray`) : Array of the different types of cells in
-                                      the domain where 2 = land, 1 = channel, 0
-                                      = ocean, and -1 = edge. If not explicitly
-                                      defined then the values are estimated
-                                      based on the depth array and the defined
-                                      dry_depth
+        cell_type : `numpy.ndarray`
+            Array of the different types of cells in the domain where 2 = land,
+            1 = channel, 0 = ocean, and -1 = edge. If not explicitly defined
+            then the values are estimated based on the depth array and the
+            defined dry_depth
 
-        steepest_descent (`bool`) : Toggle for routing based on a steepest
-                                    descent rather than the weighted random
-                                    walk. If True, then the highest weighted
-                                    cells are used to route the particles.
-                                    Default value is False.
+        steepest_descent : `bool`
+            Toggle for routing based on a steepest descent rather than the
+            weighted random walk. If True, then the highest weighted cells are
+            used to route the particles. Default value is False.
 
     This list of expected parameter values can also be obtained by querying the
     class attributes with `dir(params)`, `params.__dict__`, or `vars(params)`.
@@ -130,13 +134,13 @@ class params:
 
 
 class Particle(Tools):
-    """Class for the particle(s)that is going to be routed."""
+    """Class for the particle(s) that is(are) going to be routed."""
 
     def __init__(self, params):
         """Check input parameters and assign default values where/if needed.
 
-        Methods require a class of parameters (params) to be passed to the
-        Particles class. e.g. particle = Particles(params)
+        Methods require a class of parameters (:obj:`params`) to be passed to
+        the Particles class. e.g. particle = Particles(params)
 
         Initialization tries to assign each value from the parameter class,
         otherwise an error is raised or default values are assigned when

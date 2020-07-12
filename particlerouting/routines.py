@@ -10,6 +10,7 @@ from .particle_track import Particle
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scipy
 import sys
 import os
@@ -72,21 +73,27 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
         # Do particle iterations
         walk_data = particle.run_iteration(previous_walk_data=walk_data)
         if save_output:
-            plt.figure(figsize=(4, 4), dpi=200)
-            for k in list(range(0, params.Np_tracer)):
-                plt.scatter(walk_data['yinds'][k][0],
-                            walk_data['xinds'][k][0],
-                            c='b',
-                            s=0.75)
-                plt.scatter(walk_data['yinds'][k][-1],
-                            walk_data['xinds'][k][-1],
-                            c='r',
-                            s=0.75)
-            plt.imshow(params.depth)
+            fig = plt.figure(dpi=200)
+            ax = plt.gca()
+            im = ax.imshow(params.depth)
             plt.title('Depth - Particle Iteration ' + str(i))
-            cbar = plt.colorbar()
+            cax = fig.add_axes([ax.get_position().x1+0.01,
+                                ax.get_position().y0,
+                                0.02,
+                                ax.get_position().height])
+            cbar = plt.colorbar(im, cax=cax)
             cbar.set_label('Water Depth [m]')
-            plt.axis('scaled')
+
+            for k in list(range(0, params.Np_tracer)):
+                ax.scatter(walk_data['yinds'][k][0],
+                           walk_data['xinds'][k][0],
+                           c='b',
+                           s=0.75)
+                ax.scatter(walk_data['yinds'][k][-1],
+                           walk_data['xinds'][k][-1],
+                           c='r',
+                           s=0.75)
+
             plt.savefig(os.getcwd()+'/'+folder_name +
                         '/figs/output'+str(i)+'.png')
             plt.close()
@@ -204,7 +211,7 @@ def unsteady_plots(params, num_steps, timestep,
                                            target_time=target_times[i])
 
         # make and save plots and data
-        plt.figure(figsize=(4, 4), dpi=200)
+        fig = plt.figure(dpi=200)
         for k in range(0, params.Np_tracer):
             plt.scatter(walk_data['yinds'][k][0],
                         walk_data['xinds'][k][0],
@@ -214,10 +221,14 @@ def unsteady_plots(params, num_steps, timestep,
                         walk_data['xinds'][k][-1],
                         c='r',
                         s=0.75)
-        plt.imshow(params.depth)
-        plt.axis('scaled')
+        ax = plt.gca()
+        im = ax.imshow(params.depth)
         plt.title('Depth at Time ' + str(target_times[i]))
-        cbar = plt.colorbar()
+        cax = fig.add_axes([ax.get_position().x1+0.01,
+                            ax.get_position().y0,
+                            0.02,
+                            ax.get_position().height])
+        cbar = plt.colorbar(im, cax=cax)
         cbar.set_label('Water Depth [m]')
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
@@ -285,7 +296,8 @@ def time_plots(params, num_iter, folder_name):
         cm = matplotlib.cm.colors.Normalize(vmax=np.percentile(temptimes, 90),
                                             vmin=np.percentile(temptimes, 10))
 
-        plt.figure(figsize=(4, 4), dpi=200)
+        fig = plt.figure(dpi=200)
+        plt.title('Depth - Particle Iteration ' + str(i))
         for k in range(0, params.Np_tracer):
             plt.scatter(walk_data['yinds'][k][0],
                         walk_data['xinds'][k][0],
@@ -297,13 +309,16 @@ def time_plots(params, num_iter, folder_name):
                         s=0.75,
                         cmap='coolwarm',
                         norm=cm)
-        cbar = plt.colorbar()
+        ax = plt.gca()
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(cax=cax)
         cbar.set_label('Particle Travel Times [s]')
-        plt.imshow(params.depth)
-        plt.title('Depth - Particle Iteration ' + str(i))
-        cbar2 = plt.colorbar(orientation='horizontal')
+        im = ax.imshow(params.depth)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("bottom", size="5%", pad=0.5)
+        cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
         cbar2.set_label('Water Depth [m]')
-        plt.axis('scaled')
         plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
         plt.close()
 

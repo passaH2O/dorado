@@ -4,33 +4,23 @@
 API Reference
 =============
 
+Below are links to the API reference for each component of the `particlerouting` software.
+
 .. toctree::
    :maxdepth: 2
 
-particlerouting.particle_track
-------------------------------
+   particletrack
+   particletools
+   routines
+   parallelrouting
 
-.. automodule:: particlerouting.particle_track
-   :members:
-   :special-members:
 
-particlerouting.particle_tools
-------------------------------
+Search
+------
 
-.. automodule:: particlerouting.particle_tools
-   :members:
-   :special-members:
+* :ref:`search`
 
-particlerouting.routines
-------------------------
+.. Search the Index
+.. ==================
 
-.. automodule:: particlerouting.routines
-   :members:
-   :special-members:
-
-particlerouting.parallel_routing
---------------------------------
-
-.. automodule:: particlerouting.parallel_routing
-   :members:
-   :special-members:
+.. * :ref:`genindex`
