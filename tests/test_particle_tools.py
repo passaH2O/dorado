@@ -131,7 +131,7 @@ def test_step_update_diagonal():
     # would expect 1 if the step was vertical instead of diagonal
     assert tools.step_update(new_cell) == sqrt(2)
 
-@pytest.mark.xfail
+
 def test_calc_travel_times():
     '''
     Test for function calc_travel_times within Tools class
