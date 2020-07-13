@@ -4,4 +4,4 @@
 RST-Rendered Paper
 ==================
 
-.. mdinclude:: paper.md
+.. mdinclude:: ../../../joss/paper.md
