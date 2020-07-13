@@ -2,4 +2,4 @@
 
 from particlerouting.routines import animate_plots
 
-animate_plots(0,50,'steady_deltarcm_example')
+animate_plots(0, 50, 'steady_deltarcm_example')

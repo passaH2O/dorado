@@ -1,6 +1,6 @@
 # ParticleRouting
 
-v1.01
+v1.00
 
 Lagrangian particle routing via weighted random walks.
 
@@ -9,6 +9,7 @@ Lagrangian particle routing via weighted random walks.
 - numpy
 - matplotlib
 - scipy
+- tqdm
 - (optional) requires the 'ffmpeg' writer to use the animate_plots routine
 
 ### Installation:
@@ -25,12 +26,12 @@ Initial particle locations indicated by blue dots, active/evolving particle loca
 
 ### Particles on a DeltaRCM Simulated Delta
 <div class="nav3" style="height:705px;">
-    <img src="docs/examples/images/steady_deltarcm.gif" alt="Example" width="75%"></a>
+    <img src="docs/source/examples/images/example02/steady_deltarcm.gif" alt="Example" width="75%"></a>
 </div>
 
 ### Particles on a ANUGA Hydro generated flow field
 <div class="nav3" style="height:705px;">
-    <img src="docs/examples/images/steady_anuga.gif" alt="Example" width="75%"></a>
+    <img src="docs/source/examples/images/example01/steady_anuga.gif" alt="Example" width="75%"></a>
 </div>
 
 ## Documentation

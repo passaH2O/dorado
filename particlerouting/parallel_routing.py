@@ -18,7 +18,7 @@ from multiprocessing import Pool
 
 # convert run script into a function that returns a single dictionary 'data'
 def run_iter(params):
-    """ Wrapper run script for the particle iterations.
+    """Wrapper run script for the particle iterations.
 
     Uses params class to define a *Particle* and does iterations of the
     particle. Requires a new params variable : *params.num_iter* to define the
@@ -46,7 +46,7 @@ def run_iter(params):
 
 
 def combine_result(par_result):
-    """Combines results from each core.
+    """Combine results from each core.
 
     Take the parallel resulting list and combine the entries so that a single
     dictionary with the beginning/end indices and travel times for all
@@ -84,7 +84,7 @@ def combine_result(par_result):
 
 
 def parallel_routing(params, num_iter, num_cores):
-    """Function to do the parallel routing of particles.
+    """Do the parallel routing of particles.
 
     Function to do parallel routing of particles. Does this by duplicating the
     call to *Particle.run_iteration()* across different processes.
@@ -107,7 +107,6 @@ def parallel_routing(params, num_iter, num_cores):
             and travel times for each particle computed by that process/core
 
     """
-
     # assign number of iterations to the params class
     params.num_iter = num_iter
 
