@@ -5,3 +5,4 @@ omit =
     particlerouting/parallel_routing.py
     particlerouting/routines.py
     *__init__*
+    particlerouting/example_data/define_params.py
