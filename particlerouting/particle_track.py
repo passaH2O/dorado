@@ -12,12 +12,15 @@ from __future__ import division, print_function, absolute_import
 from builtins import range, map
 from math import sqrt, pi
 import numpy as np
+from scipy.interpolate import interp1d
+from matplotlib import pyplot as plt
 import sys
 import os
 import re
 import string
 import copy
 import time
+from tqdm import tqdm
 from .particle_tools import Tools
 
 
@@ -227,10 +230,12 @@ class Particle(Tools):
                 self.qx = params.qx
                 self.qx[np.isnan(self.qx)] = 0
                 self.u = self.qx*self.depth/(self.depth**2 + 1e-8)
+                self.u[np.isnan(self.u)] = 0
 
                 self.qy = params.qy
                 self.qy[np.isnan(self.qy)] = 0
                 self.v = self.qy*self.depth/(self.depth**2 + 1e-8)
+                self.v[np.isnan(self.v)] = 0
 
             elif params.u is not None and params.v is not None:
                 self.u = params.u
@@ -249,10 +254,12 @@ class Particle(Tools):
                 self.qx = -1*params.qy
                 self.qx[np.isnan(self.qx)] = 0
                 self.u = self.qx*self.depth/(self.depth**2 + 1e-8)
+                self.u[np.isnan(self.u)] = 0
 
                 self.qy = params.qx
                 self.qy[np.isnan(self.qy)] = 0
                 self.v = self.qy*self.depth/(self.depth**2 + 1e-8)
+                self.v[np.isnan(self.v)] = 0
 
             elif params.u is not None and params.v is not None:
                 self.u = -1*params.v
@@ -569,3 +576,272 @@ class Particle(Tools):
             all_walk_data['travel_times'] = all_times
 
         return all_walk_data
+
+
+    def coord2ind(self, coordinates, raster_origin):
+        """Convert geographical coordinates into raster index coordinates. 
+
+        Assumes geographic coordinates are projected onto a cartesian grid.
+        Accepts coordinates in meters, most likely in UTM.
+
+        **Inputs** :
+
+            coordinates : `list`
+                List [] of (x,y) pairs or tuples of coordinates to be 
+                converted from starting units (e.g. meters UTM) into raster 
+                index coordinates used in particle routing functions. 
+
+            raster_origin : `tuple`
+                Tuple of the (x,y) raster origin in physical space, i.e. the 
+                coordinates of lower left corner. For rasters loaded from a 
+                GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
+
+        **Outputs** :
+
+            inds : `list`
+                List [] of tuples (x,y) of raster index coordinates
+
+        """
+        x_orig = float(raster_origin[0])
+        y_orig = float(raster_origin[1])
+        dx = float(self.dx)
+        width = int(np.shape(self.depth)[1])
+
+        inds = []
+        for i in list(range(0, len(coordinates))):
+            new_ind = (int(width - round((coordinates[i][1] - y_orig)/dx)),
+                       int(round((coordinates[i][0] - x_orig)/dx)))
+            inds.append(new_ind)
+
+        return inds
+
+    def ind2coord(self, walk_data, raster_origin):
+        """Convert raster index coordinates into geographical coordinates
+        
+        Appends the all_walk_data dictionary from the output of run_iteration
+        with additional fields 'xcoord' and 'ycoord' in projected geographic 
+        coordinate space. Locations align with cell centroids.
+        Output coordinates are in meters, presumably in UTM.
+
+        **Inputs** :
+
+            walk_data : `dict`
+                Dictionary of all prior x locations, y locations, and travel
+                times (the output of run_iteration)
+
+            raster_origin : `tuple`
+                Tuple of the (x,y) raster origin in physical space, i.e. the 
+                coordinates of lower left corner. For rasters loaded from a 
+                GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
+
+        **Outputs** :
+
+            walk_data : `dict`
+                Same as the input walk_data dictionary, with the added
+                'xcoord' and 'ycoord' fields representing the particles geographic 
+                position at each iteration. 
+
+        """
+        x_orig = float(raster_origin[0])
+        y_orig = float(raster_origin[1])
+        dx = float(self.dx)
+        width = int(np.shape(self.depth)[1])
+
+        all_xcoord = []
+        all_ycoord = []
+
+        for i in list(range(0, len(self.Np_tracer))):
+            this_xcoord = [(width - float(j))*self.dx + y_orig for j in walk_data['yinds'][i]]
+            all_xcoord.append(this_xcoord)
+
+            this_ycoord = [float(j)*self.dx + x_orig for j in walk_data['xinds'][i]]
+            all_ycoord.append(this_ycoord)
+
+        walk_data['xcoord'] = all_xcoord
+        walk_data['ycoord'] = all_ycoord
+
+        return walk_data
+
+
+    def exposure_time(self, 
+                      walk_data,
+                      region_of_interest,
+                      folder_name=None,
+                      timedelta=1,
+                      nbins=100,
+                      save_output=True):
+        """Measure exposure time distribution of particles in a specified region.
+
+        Function to measure the exposure time distribution (ETD) of particles to
+        the specified region. For steady flows, the ETD is exactly equivalent to
+        the residence time distribution. For unsteady flows, if particles make
+        multiple excursions into the region, all of those times are counted.
+
+        **Inputs** :
+
+            walk_data : `dict`
+                Output of a previous function call to run_iteration
+
+            region_of_interest : `int array`
+                Binary array the same size as input arrays in params class
+                with 1's everywhere inside the region in which we want to
+                measure exposure time, and 0's everywhere else.
+
+            folder_name : `str`
+                Path to folder in which to save output plots
+
+            timedelta : `int or float`
+                Unit of time for time-axis of ETD plots, specified as time
+                in seconds (e.g. an input of 60 plots things by minute)
+
+            nbins : `int`
+                Number of bins to use as the time axis for differential ETD.
+                Using fewer bins smoothes out curves
+
+        **Outputs** :
+
+            exposure_times : `list`
+                List of exposure times to region of interest, listed
+                in order of particle ID
+
+            If `save_output` is set to True, script saves plots of the cumulative 
+            and differential forms of the ETD as a png and the list of exposure
+            times as a json ('human-readable') text file.
+        """
+        # Initialize arrays to record exposure time of each particle
+        Np_tracer = len(walk_data['xinds'])  # Number of particles
+        # Array to be populated
+        exposure_times = np.zeros([Np_tracer], dtype='float')
+        # Array to record final travel times
+        end_time = np.zeros([Np_tracer], dtype='float')
+
+        # Handle the timedelta
+        if timedelta == 1:
+            timeunit = '[s]'
+        elif timedelta == 60:
+            timeunit = '[m]'
+        elif timedelta == 3600:
+            timeunit = '[hr]'
+        elif timedelta == 86400:
+            timeunit == '[day]'
+        else:
+            timeunit = '[' + str(timedelta) + ' s]'
+        
+        if folder_name is None:
+            folder_name = os.getcwd()
+
+        # Loop through particles to measure exposure time
+        for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
+            # Determine the starting region for particle ii
+            previous_reg = region_of_interest[int(walk_data['xinds'][ii][0]),
+                                              int(walk_data['yinds'][ii][0])]
+            # Length of runtime for particle ii
+            end_time[ii] = walk_data['travel_times'][ii][-1]
+
+            # Loop through iterations
+            for jj in list(range(1, len(walk_data['travel_times'][ii]))):
+                # Determine the new region and compare to previous region
+                current_reg = region_of_interest[int(walk_data['xinds'][ii][jj]),
+                                                 int(walk_data['yinds'][ii][jj])]
+
+                # Check to see if whole step was inside ROI
+                # If so, travel time of the whole step added to ET
+                if (current_reg + previous_reg) == 2:
+                    exposure_times[ii] += (walk_data['travel_times'][ii][jj] -
+                                           walk_data['travel_times'][ii][jj-1])
+                # Check to see if half of the step was inside ROI
+                # (either entering or exiting)
+                # If so, travel time of half of the step added to ET
+                elif (current_reg + previous_reg) == 1:
+                    exposure_times[ii] += 0.5*(walk_data['travel_times'][ii][jj] -
+                                               walk_data['travel_times'][ii][jj-1])
+
+                # Update previous region
+                previous_reg = current_reg
+
+                # Check if particle is still stuck in ROI at the end of the run
+                # (which can bias result)
+                if jj == len(walk_data['travel_times'][ii])-1:
+                    if current_reg == 1:
+                        print(('Warning: Particle ' + str(ii) + ' is still within'
+                               ' ROI at final timestep. \n' +
+                               'Run more iterations to get tail of ETD'))
+
+        if save_output: # Save exposure times by particle ID
+            np.savetxt('ExposureTimes', exposure_times, delimiter=',')
+
+        # Set end of ETD as the minimum travel time of particles
+        # Exposure times after that are unreliable because not all particles have
+        # traveled for that long
+        end_time = min(end_time)
+
+        # Ignore particles that never entered ROI or exited ROI for plotting
+        # If never entered, ET of 0
+        plotting_times = exposure_times[exposure_times > 1e-6]
+        # If never exited, ET ~= end_time
+        plotting_times = plotting_times[plotting_times < 0.99*end_time]
+        # Number of particles included in ETD plots
+        num_particles_included = len(plotting_times)
+
+        # Full time vector (x-values) of CDF
+        # Add origin for plot
+        full_time_vect = np.append([0], np.sort(plotting_times))
+        full_time_vect = np.append(full_time_vect, [end_time])
+        # Y-values of CDF, normalized
+        frac_exited = np.arange(0, num_particles_included + 1,
+                                dtype='float')/Np_tracer
+        frac_exited = np.append(frac_exited,
+                                [float(num_particles_included)/float(Np_tracer)])
+
+        if save_output:
+            # Plot the cumulative ETD in its exact form
+            plt.figure(figsize=(5, 3), dpi=150)
+            plt.step(full_time_vect/timedelta, frac_exited, where='post')
+            plt.title('Cumulative Exposure Time Distribution')
+            plt.xlabel('Time ' + timeunit)
+            plt.ylabel('F(t) [-]')
+            plt.xlim([0, end_time/timedelta])
+            plt.ylim([0, 1])
+            plt.savefig(folder_name+'/Exact_CETD.png',bbox_inches='tight')
+            plt.close()
+
+        # Smooth out the CDF by making it regular in time.
+        # Here we use 'previous' interpolation to be maximally accurate in time
+        create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect,
+                                                       frac_exited,
+                                                       kind='previous')
+        smooth_time_vect = np.linspace(0, end_time, nbins)
+        smooth_CDF = create_smooth_CDF(smooth_time_vect)
+
+        # Plot the cumulative ETD in its smooth form
+        plt.figure(figsize=(5, 3), dpi=150)
+        plt.plot(smooth_time_vect/timedelta, smooth_CDF)
+        plt.title('Cumulative Exposure Time Distribution')
+        plt.xlabel('Time ' + timeunit)
+        plt.ylabel('F(t) [-]')
+        plt.xlim([0, end_time/timedelta])
+        plt.ylim([0, 1])
+        if save_output:
+            plt.savefig(folder_name+'/Smooth_CETD.png',bbox_inches='tight')
+
+        # Derive differential ETD from the CDF
+        # Here we use 'linear' interpolation, because 'previous'
+        # produces a choppy derivative if there aren't enough particles
+        create_linear_CDF = scipy.interpolate.interp1d(full_time_vect, frac_exited,
+                                                       kind='linear')
+        linear_CDF = create_linear_CDF(smooth_time_vect)
+
+        timestep = smooth_time_vect[1] - smooth_time_vect[0]
+        RTD = np.gradient(linear_CDF, timestep)
+
+        plt.figure(figsize=(5, 4), dpi=150)
+        plt.plot(smooth_time_vect/timedelta, RTD*timedelta)
+        plt.title('Exposure Time Distribution')
+        plt.xlabel('Time ' + timeunit)
+        plt.ylabel('E(t) ' + timeunit[0:-1] + '$^{-1}$]')
+        plt.xlim([0, end_time/timedelta])
+        plt.ylim(ymin=0)
+        if save_output:
+            plt.savefig(folder_name+'/ETD.png',bbox_inches='tight')
+
+        return exposure_times
