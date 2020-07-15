@@ -368,7 +368,7 @@ def get_state(walk_data, iteration=-1):
     yinds = []
     times = []
     # Pull out the specified value
-    for i in list(range(Np_tracer)):
+    for ii in list(range(Np_tracer)):
         xinds.append(walk_data['xinds'][ii][iteration])
         yinds.append(walk_data['yinds'][ii][iteration])
         times.append(walk_data['travel_times'][ii][iteration])
@@ -413,7 +413,7 @@ def get_time_state(walk_data, target_time):
     yinds = []
     times = []
     # Pull out the specified value
-    for i in list(range(Np_tracer)):
+    for ii in list(range(Np_tracer)):
         for jj in list(range(len(walk_data['travel_times'][ii])-1)):
             this_time = walk_data['travel_times'][ii][jj]
             next_time = walk_data['travel_times'][ii][jj+1]
