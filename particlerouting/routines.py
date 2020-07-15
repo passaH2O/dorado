@@ -329,7 +329,6 @@ def time_plots(params, num_iter, folder_name):
     # data = json.load(open('data.txt'))
 
     return walk_data
-#--------------------------------------------------------
 
 #--------------------------------------------------------
 # Functions for plotting/interpreting outputs
@@ -363,9 +362,8 @@ def get_state(walk_data, iteration=-1):
 
     """
     iteration = int(iteration)
-    # Initialize arrays to record exposure time of each particle
     Np_tracer = len(walk_data['xinds'])  # Number of particles
-    
+
     xinds = []
     yinds = []
     times = []
@@ -374,7 +372,65 @@ def get_state(walk_data, iteration=-1):
         xinds.append(walk_data['xinds'][ii][iteration])
         yinds.append(walk_data['yinds'][ii][iteration])
         times.append(walk_data['travel_times'][ii][iteration])
-    
+
+    return xinds, yinds, times
+
+
+def get_time_state(walk_data, target_time):
+    """Pull walk_data values nearest to a specific time
+
+    Routine to return slices of the walk_data dict at a given travel time.
+    This function provides a shortcut to 'smart' indexing of the dict.
+
+    **Inputs** :
+
+        walk_data : `dict`
+            Dictionary of all x and y locations and travel times
+
+        target_time : `float`
+            Travel time at which to slice the dictionary.
+
+    **Outputs** :
+
+        xinds : `list`
+            List containing equivalent of walk_data['xinds'][:][i], where i
+            represents the index at which travel time is nearest to input.
+
+        yinds : `list`
+            List containing equivalent of walk_data['yinds'][:][i], where i
+            represents the index at which travel time is nearest to input.
+
+        times : `list`
+            List containing equivalent of walk_data['travel_times'][:][i], 
+            where i represents the index at which travel time is nearest 
+            to input. Times will differ slightly from input time due to 
+            the nature of the method.
+
+    """
+    Np_tracer = len(walk_data['xinds'])  # Number of particles
+
+    xinds = []
+    yinds = []
+    times = []
+    # Pull out the specified value
+    for i in list(range(Np_tracer)):
+        for jj in list(range(len(walk_data['travel_times'][ii])-1)):
+            this_time = walk_data['travel_times'][ii][jj]
+            next_time = walk_data['travel_times'][ii][jj+1]
+            # Save once the next step takes us farther from the target time
+            # than we are right now
+            if abs(this_time - target_time) <= abs(next_time - target_time):
+                xinds.append(walk_data['xinds'][ii][jj])
+                yinds.append(walk_data['yinds'][ii][jj])
+                times.append(walk_data['travel_times'][ii][jj])
+                break
+            # If we made it to the end without getting there, save last
+            elif (jj==len(walk_data['travel_times'][ii])-1):
+                xinds.append(walk_data['xinds'][ii][jj+1])
+                yinds.append(walk_data['yinds'][ii][jj+1])
+                times.append(walk_data['travel_times'][ii][jj+1])
+                print('Note: Particle '+str(ii)+' never reached target_time')
+
     return xinds, yinds, times
 
 
@@ -437,7 +493,7 @@ def plot_exposure_time(walk_data,
     # Save exposure times by particle ID
     fpath = folder_name + '/exposure_times.txt'
     json.dump(exposure_times, open(fpath, 'w'))
-    
+
     # Set end of ETD as the minimum travel time of particles
     # Exposure times after that are unreliable because not all particles have
     # traveled for that long
