@@ -723,11 +723,7 @@ def ind2coord(walk_data, raster_origin, raster_size=None, cellsize=None):
 
 
 def exposure_time(walk_data,
-                  region_of_interest,
-                  folder_name=None,
-                  timedelta=1,
-                  nbins=100,
-                  save_output=True):
+                  region_of_interest):
     """Measure exposure time distribution of particles in a specified region.
 
     Function to measure the exposure time distribution (ETD) of particles to
@@ -745,56 +741,23 @@ def exposure_time(walk_data,
             with 1's everywhere inside the region in which we want to
             measure exposure time, and 0's everywhere else.
 
-        folder_name : `str`
-            Path to folder in which to save output plots.
-
-        timedelta : `int or float`
-            Unit of time for time-axis of ETD plots, specified as time
-            in seconds (e.g. an input of 60 plots things by minute).
-
-        nbins : `int`
-            Number of bins to use as the time axis for differential ETD.
-            Using fewer bins smoothes out curves.
-
     **Outputs** :
 
         exposure_times : `list`
             List of exposure times to region of interest, listed
             in order of particle ID.
 
-        If `save_output` is set to True, script saves plots of the cumulative 
-        and differential forms of the ETD as a png and the list of exposure
-        times as a json ('human-readable') text file.
     """
     # Initialize arrays to record exposure time of each particle
     Np_tracer = len(walk_data['xinds'])  # Number of particles
     # Array to be populated
     exposure_times = np.zeros([Np_tracer], dtype='float')
-    # Array to record final travel times
-    end_time = np.zeros([Np_tracer], dtype='float')
-
-    # Handle the timedelta
-    if timedelta == 1:
-        timeunit = '[s]'
-    elif timedelta == 60:
-        timeunit = '[m]'
-    elif timedelta == 3600:
-        timeunit = '[hr]'
-    elif timedelta == 86400:
-        timeunit == '[day]'
-    else:
-        timeunit = '[' + str(timedelta) + ' s]'
-    
-    if folder_name is None:
-        folder_name = os.getcwd()
 
     # Loop through particles to measure exposure time
     for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
         # Determine the starting region for particle ii
         previous_reg = region_of_interest[int(walk_data['xinds'][ii][0]),
                                           int(walk_data['yinds'][ii][0])]
-        # Length of runtime for particle ii
-        end_time[ii] = walk_data['travel_times'][ii][-1]
 
         # Loop through iterations
         for jj in list(range(1, len(walk_data['travel_times'][ii]))):
@@ -824,84 +787,6 @@ def exposure_time(walk_data,
                     print(('Warning: Particle ' + str(ii) + ' is still within'
                            ' ROI at final timestep. \n' +
                            'Run more iterations to get tail of ETD'))
-
-    if save_output: # Save exposure times by particle ID
-        np.savetxt('ExposureTimes', exposure_times, delimiter=',')
-
-    # Set end of ETD as the minimum travel time of particles
-    # Exposure times after that are unreliable because not all particles have
-    # traveled for that long
-    end_time = min(end_time)
-
-    # Ignore particles that never entered ROI or exited ROI for plotting
-    # If never entered, ET of 0
-    plotting_times = exposure_times[exposure_times > 1e-6]
-    # If never exited, ET ~= end_time
-    plotting_times = plotting_times[plotting_times < 0.99*end_time]
-    # Number of particles included in ETD plots
-    num_particles_included = len(plotting_times)
-
-    # Full time vector (x-values) of CDF
-    # Add origin for plot
-    full_time_vect = np.append([0], np.sort(plotting_times))
-    full_time_vect = np.append(full_time_vect, [end_time])
-    # Y-values of CDF, normalized
-    frac_exited = np.arange(0, num_particles_included + 1,
-                            dtype='float')/Np_tracer
-    frac_exited = np.append(frac_exited,
-                            [float(num_particles_included)/float(Np_tracer)])
-
-    if save_output:
-        # Plot the cumulative ETD in its exact form
-        plt.figure(figsize=(5, 3), dpi=150)
-        plt.step(full_time_vect/timedelta, frac_exited, where='post')
-        plt.title('Cumulative Exposure Time Distribution')
-        plt.xlabel('Time ' + timeunit)
-        plt.ylabel('F(t) [-]')
-        plt.xlim([0, end_time/timedelta])
-        plt.ylim([0, 1])
-        plt.savefig(folder_name+'/Exact_CETD.png',bbox_inches='tight')
-        plt.close()
-
-    # Smooth out the CDF by making it regular in time.
-    # Here we use 'previous' interpolation to be maximally accurate in time
-    create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect,
-                                                   frac_exited,
-                                                   kind='previous')
-    smooth_time_vect = np.linspace(0, end_time, nbins)
-    smooth_CDF = create_smooth_CDF(smooth_time_vect)
-
-    # Plot the cumulative ETD in its smooth form
-    plt.figure(figsize=(5, 3), dpi=150)
-    plt.plot(smooth_time_vect/timedelta, smooth_CDF)
-    plt.title('Cumulative Exposure Time Distribution')
-    plt.xlabel('Time ' + timeunit)
-    plt.ylabel('F(t) [-]')
-    plt.xlim([0, end_time/timedelta])
-    plt.ylim([0, 1])
-    if save_output:
-        plt.savefig(folder_name+'/Smooth_CETD.png',bbox_inches='tight')
-
-    # Derive differential ETD from the CDF
-    # Here we use 'linear' interpolation, because 'previous'
-    # produces a choppy derivative if there aren't enough particles
-    create_linear_CDF = scipy.interpolate.interp1d(full_time_vect,
-                                                   frac_exited,
-                                                   kind='linear')
-    linear_CDF = create_linear_CDF(smooth_time_vect)
-
-    timestep = smooth_time_vect[1] - smooth_time_vect[0]
-    RTD = np.gradient(linear_CDF, timestep)
-
-    plt.figure(figsize=(5, 4), dpi=150)
-    plt.plot(smooth_time_vect/timedelta, RTD*timedelta)
-    plt.title('Exposure Time Distribution')
-    plt.xlabel('Time ' + timeunit)
-    plt.ylabel('E(t) ' + timeunit[0:-1] + '$^{-1}$]')
-    plt.xlim([0, end_time/timedelta])
-    plt.ylim(ymin=0)
-    if save_output:
-        plt.savefig(folder_name+'/ETD.png',bbox_inches='tight')
 
     return exposure_times
 
