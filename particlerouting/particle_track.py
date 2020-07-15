@@ -578,416 +578,440 @@ class Particle(Tools):
         return all_walk_data
 
 
-    def coord2ind(self, coordinates, raster_origin, cellsize=None):
-        """Convert geographical coordinates into raster index coordinates. 
+def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
+    """Convert geographical coordinates into raster index coordinates. 
 
-        Assumes geographic coordinates are projected onto a Cartesian grid.
-        Accepts coordinates in meters or decimal degrees.
+    Assumes geographic coordinates are projected onto a Cartesian grid.
+    Accepts coordinates in meters or decimal degrees.
 
-        **Inputs** :
+    **Inputs** :
 
-            coordinates : `list`
-                List [] of (x,y) pairs or tuples of coordinates to be 
-                converted from starting units (e.g. meters UTM) into raster 
-                index coordinates used in particle routing functions. 
+        coordinates : `list`
+            List [] of (x,y) pairs or tuples of coordinates to be 
+            converted from starting units (e.g. meters UTM) into raster 
+            index coordinates used in particle routing functions. 
 
-            raster_origin : `tuple`
-                Tuple of the (x,y) raster origin in physical space, i.e. the 
-                coordinates of lower left corner. For rasters loaded from a 
-                GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
+        raster_origin : `tuple`
+            Tuple of the (x,y) raster origin in physical space, i.e. the 
+            coordinates of lower left corner. For rasters loaded from a 
+            GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
 
-            cellsize : `float or int`
-                Length along one square cell face. If not given, uses value
-                stored in self.dx. (Note: If not specified, coordinates
-                are assumed to be in meters to match self.dx!)
+        raster_size : `tuple`
+            Tuple (L,W) of the raster dimensions, i.e. the output of 
+            numpy.shape(raster)
 
-        **Outputs** :
+        cellsize : `float or int`
+            Length along one square cell face. If not given, uses value
+            stored in self.dx. (Note: If not specified, coordinates
+            are assumed to be in meters to match self.dx!)
 
-            inds : `list`
-                List [] of tuples (x,y) of raster index coordinates
+    **Outputs** :
 
-        """
-        x_orig = float(raster_origin[0])
-        y_orig = float(raster_origin[1])
+        inds : `list`
+            List [] of tuples (x,y) of raster index coordinates
 
-        if cellsize is None:
-            try:
-                cellsize = float(self.dx)
-                print('Grid size not specified. '
-                      'Assuming coordinates are in meters, using params.dx')
-            except Exception:
-                raise ValueError("Grid size is undefined")
-        else:
-            cellsize = float(cellsize)
+    """
+    x_orig = float(raster_origin[0])
+    y_orig = float(raster_origin[1])
 
-        width = int(np.shape(self.depth)[1])
+    if cellsize is None:
+        try:
+            cellsize = float(params.dx)
+            print('Grid size not specified. '
+                  'Assuming coordinates are in meters, using params.dx')
+        except Exception:
+            raise ValueError("Grid size is undefined")
+    else:
+        cellsize = float(cellsize)
 
-        inds = []
-        for i in list(range(0, len(coordinates))):
-            new_ind = (int(width - round((coordinates[i][1] - y_orig)/cellsize)),
-                       int(round((coordinates[i][0] - x_orig)/cellsize)))
-            inds.append(new_ind)
+    if raster_size is None:
+        try:
+            raster_size = np.shape(params.depth)
+            print('Raster size not specified. '
+                  'Estimating from params.depth')
+        except Exception:
+            raise ValueError("Raster size is undefined")
 
-        return inds
+    L = int(raster_size[0]) # Need domain extent
 
-    def ind2coord(self, walk_data, raster_origin, cellsize=None):
-        """Convert raster index coordinates into geographical coordinates
-        
-        Appends the all_walk_data dictionary from the output of run_iteration
-        with additional fields 'xcoord' and 'ycoord' in projected geographic 
-        coordinate space. Locations align with cell centroids.
-        Output coordinates match those of raster_origin and cellsize, can be
-        meters or decimal degrees.
+    inds = []
+    for i in list(range(0, len(coordinates))):
+        # Do coordinate transform:
+        new_ind = (int(L - round((coordinates[i][1] - y_orig)/cellsize)),
+                   int(round((coordinates[i][0] - x_orig)/cellsize)))
+        inds.append(new_ind)
 
-        **Inputs** :
+    return inds
 
-            walk_data : `dict`
-                Dictionary of all prior x locations, y locations, and travel
-                times (the output of run_iteration)
+def ind2coord(walk_data, raster_origin, raster_size=None, cellsize=None):
+    """Convert raster index coordinates into geographical coordinates
+    
+    Appends the all_walk_data dictionary from the output of run_iteration
+    with additional fields 'xcoord' and 'ycoord' in projected geographic 
+    coordinate space. Locations align with cell centroids.
+    Output coordinates match those of raster_origin and cellsize, can be
+    meters or decimal degrees.
 
-            raster_origin : `tuple`
-                Tuple of the (x,y) raster origin in physical space, i.e. the 
-                coordinates of lower left corner. For rasters loaded from a 
-                GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
+    **Inputs** :
 
-            cellsize : `float or int`
-                Length along one square cell face. If not given, uses value
-                stored in self.dx. (Note: If not specified, coordinates
-                are assumed to be in meters to match self.dx!)
+        walk_data : `dict`
+            Dictionary of all prior x locations, y locations, and travel
+            times (the output of run_iteration)
 
-        **Outputs** :
+        raster_origin : `tuple`
+            Tuple of the (x,y) raster origin in physical space, i.e. the 
+            coordinates of lower left corner. For rasters loaded from a 
+            GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
 
-            walk_data : `dict`
-                Same as the input walk_data dictionary, with the added
-                'xcoord' and 'ycoord' fields representing the particles 
-                geographic position at each iteration. 
+        cellsize : `float or int`
+            Length along one square cell face. If not given, uses value
+            stored in params.dx. (Note: If not specified, coordinates
+            are assumed to be in meters to match params.dx!)
 
-        """
-        x_orig = float(raster_origin[0])
-        y_orig = float(raster_origin[1])
+    **Outputs** :
 
-        if cellsize is None:
-            try:
-                cellsize = float(self.dx)
-                print('Grid size not specified. '
-                      'Assuming coordinates are in meters, using params.dx')
-            except Exception:
-                raise ValueError("Grid size is undefined")
-        else:
-            cellsize = float(cellsize)
+        walk_data : `dict`
+            Same as the input walk_data dictionary, with the added
+            'xcoord' and 'ycoord' fields representing the particles 
+            geographic position at each iteration. 
 
-        width = int(np.shape(self.depth)[1])
+    """
+    x_orig = float(raster_origin[0])
+    y_orig = float(raster_origin[1])
 
-        all_xcoord = []
-        all_ycoord = []
+    if cellsize is None:
+        try:
+            cellsize = float(params.dx)
+            print('Grid size not specified. '
+                  'Assuming coordinates are in meters, using params.dx')
+        except Exception:
+            raise ValueError("Grid size is undefined")
+    else:
+        cellsize = float(cellsize)
 
-        for i in list(range(0, len(self.Np_tracer))):
-            this_xcoord = [(width-float(j))*cellsize+y_orig for j in walk_data['yinds'][i]]
-            all_xcoord.append(this_xcoord)
+    if raster_size is None:
+        try:
+            raster_size = np.shape(params.depth)
+            print('Raster size not specified. '
+                  'Estimating from params.depth')
+        except Exception:
+            raise ValueError("Raster size is undefined")
 
-            this_ycoord = [float(j)*cellsize+x_orig for j in walk_data['xinds'][i]]
-            all_ycoord.append(this_ycoord)
+    L = int(raster_size[0]) # Need domain extent
+    Np_tracer = len(walk_data['xinds']) # Get number of particles
 
-        walk_data['xcoord'] = all_xcoord
-        walk_data['ycoord'] = all_ycoord
+    all_xcoord = [] # Initialize
+    all_ycoord = []
 
-        return walk_data
+    for i in list(range(0, Np_tracer)):
+        # Do coordinate transform:
+        this_ycoord = [(L-float(j))*cellsize+y_orig for j in walk_data['xinds'][i]]
+        all_ycoord.append(this_ycoord)
+
+        this_xcoord = [float(j)*cellsize+x_orig for j in walk_data['yinds'][i]]
+        all_xcoord.append(this_xcoord)
+
+    # Save back into dict:
+    walk_data['xcoord'] = all_xcoord
+    walk_data['ycoord'] = all_ycoord
+
+    return walk_data
 
 
-    def exposure_time(self, 
-                      walk_data,
-                      region_of_interest,
-                      folder_name=None,
-                      timedelta=1,
-                      nbins=100,
-                      save_output=True):
-        """Measure exposure time distribution of particles in a specified region.
+def exposure_time(walk_data,
+                  region_of_interest,
+                  folder_name=None,
+                  timedelta=1,
+                  nbins=100,
+                  save_output=True):
+    """Measure exposure time distribution of particles in a specified region.
 
-        Function to measure the exposure time distribution (ETD) of particles to
-        the specified region. For steady flows, the ETD is exactly equivalent to
-        the residence time distribution. For unsteady flows, if particles make
-        multiple excursions into the region, all of those times are counted.
+    Function to measure the exposure time distribution (ETD) of particles to
+    the specified region. For steady flows, the ETD is exactly equivalent to
+    the residence time distribution. For unsteady flows, if particles make
+    multiple excursions into the region, all of those times are counted.
 
-        **Inputs** :
+    **Inputs** :
 
-            walk_data : `dict`
-                Output of a previous function call to run_iteration.
+        walk_data : `dict`
+            Output of a previous function call to run_iteration.
 
-            region_of_interest : `int array`
-                Binary array the same size as input arrays in params class
-                with 1's everywhere inside the region in which we want to
-                measure exposure time, and 0's everywhere else.
+        region_of_interest : `int array`
+            Binary array the same size as input arrays in params class
+            with 1's everywhere inside the region in which we want to
+            measure exposure time, and 0's everywhere else.
 
-            folder_name : `str`
-                Path to folder in which to save output plots.
+        folder_name : `str`
+            Path to folder in which to save output plots.
 
-            timedelta : `int or float`
-                Unit of time for time-axis of ETD plots, specified as time
-                in seconds (e.g. an input of 60 plots things by minute).
+        timedelta : `int or float`
+            Unit of time for time-axis of ETD plots, specified as time
+            in seconds (e.g. an input of 60 plots things by minute).
 
-            nbins : `int`
-                Number of bins to use as the time axis for differential ETD.
-                Using fewer bins smoothes out curves.
+        nbins : `int`
+            Number of bins to use as the time axis for differential ETD.
+            Using fewer bins smoothes out curves.
 
-        **Outputs** :
+    **Outputs** :
 
-            exposure_times : `list`
-                List of exposure times to region of interest, listed
-                in order of particle ID.
+        exposure_times : `list`
+            List of exposure times to region of interest, listed
+            in order of particle ID.
 
-            If `save_output` is set to True, script saves plots of the cumulative 
-            and differential forms of the ETD as a png and the list of exposure
-            times as a json ('human-readable') text file.
-        """
-        # Initialize arrays to record exposure time of each particle
-        Np_tracer = len(walk_data['xinds'])  # Number of particles
-        # Array to be populated
-        exposure_times = np.zeros([Np_tracer], dtype='float')
-        # Array to record final travel times
-        end_time = np.zeros([Np_tracer], dtype='float')
+        If `save_output` is set to True, script saves plots of the cumulative 
+        and differential forms of the ETD as a png and the list of exposure
+        times as a json ('human-readable') text file.
+    """
+    # Initialize arrays to record exposure time of each particle
+    Np_tracer = len(walk_data['xinds'])  # Number of particles
+    # Array to be populated
+    exposure_times = np.zeros([Np_tracer], dtype='float')
+    # Array to record final travel times
+    end_time = np.zeros([Np_tracer], dtype='float')
 
-        # Handle the timedelta
-        if timedelta == 1:
-            timeunit = '[s]'
-        elif timedelta == 60:
-            timeunit = '[m]'
-        elif timedelta == 3600:
-            timeunit = '[hr]'
-        elif timedelta == 86400:
-            timeunit == '[day]'
-        else:
-            timeunit = '[' + str(timedelta) + ' s]'
-        
-        if folder_name is None:
-            folder_name = os.getcwd()
+    # Handle the timedelta
+    if timedelta == 1:
+        timeunit = '[s]'
+    elif timedelta == 60:
+        timeunit = '[m]'
+    elif timedelta == 3600:
+        timeunit = '[hr]'
+    elif timedelta == 86400:
+        timeunit == '[day]'
+    else:
+        timeunit = '[' + str(timedelta) + ' s]'
+    
+    if folder_name is None:
+        folder_name = os.getcwd()
 
-        # Loop through particles to measure exposure time
-        for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
-            # Determine the starting region for particle ii
-            previous_reg = region_of_interest[int(walk_data['xinds'][ii][0]),
-                                              int(walk_data['yinds'][ii][0])]
-            # Length of runtime for particle ii
-            end_time[ii] = walk_data['travel_times'][ii][-1]
+    # Loop through particles to measure exposure time
+    for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
+        # Determine the starting region for particle ii
+        previous_reg = region_of_interest[int(walk_data['xinds'][ii][0]),
+                                          int(walk_data['yinds'][ii][0])]
+        # Length of runtime for particle ii
+        end_time[ii] = walk_data['travel_times'][ii][-1]
 
-            # Loop through iterations
-            for jj in list(range(1, len(walk_data['travel_times'][ii]))):
-                # Determine the new region and compare to previous region
-                current_reg = region_of_interest[int(walk_data['xinds'][ii][jj]),
-                                                 int(walk_data['yinds'][ii][jj])]
+        # Loop through iterations
+        for jj in list(range(1, len(walk_data['travel_times'][ii]))):
+            # Determine the new region and compare to previous region
+            current_reg = region_of_interest[int(walk_data['xinds'][ii][jj]),
+                                             int(walk_data['yinds'][ii][jj])]
 
-                # Check to see if whole step was inside ROI
-                # If so, travel time of the whole step added to ET
-                if (current_reg + previous_reg) == 2:
-                    exposure_times[ii] += (walk_data['travel_times'][ii][jj] -
+            # Check to see if whole step was inside ROI
+            # If so, travel time of the whole step added to ET
+            if (current_reg + previous_reg) == 2:
+                exposure_times[ii] += (walk_data['travel_times'][ii][jj] -
+                                       walk_data['travel_times'][ii][jj-1])
+            # Check to see if half of the step was inside ROI
+            # (either entering or exiting)
+            # If so, travel time of half of the step added to ET
+            elif (current_reg + previous_reg) == 1:
+                exposure_times[ii] += 0.5*(walk_data['travel_times'][ii][jj] -
                                            walk_data['travel_times'][ii][jj-1])
-                # Check to see if half of the step was inside ROI
-                # (either entering or exiting)
-                # If so, travel time of half of the step added to ET
-                elif (current_reg + previous_reg) == 1:
-                    exposure_times[ii] += 0.5*(walk_data['travel_times'][ii][jj] -
-                                               walk_data['travel_times'][ii][jj-1])
 
-                # Update previous region
-                previous_reg = current_reg
+            # Update previous region
+            previous_reg = current_reg
 
-                # Check if particle is still stuck in ROI at the end of the run
-                # (which can bias result)
-                if jj == len(walk_data['travel_times'][ii])-1:
-                    if current_reg == 1:
-                        print(('Warning: Particle ' + str(ii) + ' is still within'
-                               ' ROI at final timestep. \n' +
-                               'Run more iterations to get tail of ETD'))
+            # Check if particle is still stuck in ROI at the end of the run
+            # (which can bias result)
+            if jj == len(walk_data['travel_times'][ii])-1:
+                if current_reg == 1:
+                    print(('Warning: Particle ' + str(ii) + ' is still within'
+                           ' ROI at final timestep. \n' +
+                           'Run more iterations to get tail of ETD'))
 
-        if save_output: # Save exposure times by particle ID
-            np.savetxt('ExposureTimes', exposure_times, delimiter=',')
+    if save_output: # Save exposure times by particle ID
+        np.savetxt('ExposureTimes', exposure_times, delimiter=',')
 
-        # Set end of ETD as the minimum travel time of particles
-        # Exposure times after that are unreliable because not all particles have
-        # traveled for that long
-        end_time = min(end_time)
+    # Set end of ETD as the minimum travel time of particles
+    # Exposure times after that are unreliable because not all particles have
+    # traveled for that long
+    end_time = min(end_time)
 
-        # Ignore particles that never entered ROI or exited ROI for plotting
-        # If never entered, ET of 0
-        plotting_times = exposure_times[exposure_times > 1e-6]
-        # If never exited, ET ~= end_time
-        plotting_times = plotting_times[plotting_times < 0.99*end_time]
-        # Number of particles included in ETD plots
-        num_particles_included = len(plotting_times)
+    # Ignore particles that never entered ROI or exited ROI for plotting
+    # If never entered, ET of 0
+    plotting_times = exposure_times[exposure_times > 1e-6]
+    # If never exited, ET ~= end_time
+    plotting_times = plotting_times[plotting_times < 0.99*end_time]
+    # Number of particles included in ETD plots
+    num_particles_included = len(plotting_times)
 
-        # Full time vector (x-values) of CDF
-        # Add origin for plot
-        full_time_vect = np.append([0], np.sort(plotting_times))
-        full_time_vect = np.append(full_time_vect, [end_time])
-        # Y-values of CDF, normalized
-        frac_exited = np.arange(0, num_particles_included + 1,
-                                dtype='float')/Np_tracer
-        frac_exited = np.append(frac_exited,
-                                [float(num_particles_included)/float(Np_tracer)])
+    # Full time vector (x-values) of CDF
+    # Add origin for plot
+    full_time_vect = np.append([0], np.sort(plotting_times))
+    full_time_vect = np.append(full_time_vect, [end_time])
+    # Y-values of CDF, normalized
+    frac_exited = np.arange(0, num_particles_included + 1,
+                            dtype='float')/Np_tracer
+    frac_exited = np.append(frac_exited,
+                            [float(num_particles_included)/float(Np_tracer)])
 
-        if save_output:
-            # Plot the cumulative ETD in its exact form
-            plt.figure(figsize=(5, 3), dpi=150)
-            plt.step(full_time_vect/timedelta, frac_exited, where='post')
-            plt.title('Cumulative Exposure Time Distribution')
-            plt.xlabel('Time ' + timeunit)
-            plt.ylabel('F(t) [-]')
-            plt.xlim([0, end_time/timedelta])
-            plt.ylim([0, 1])
-            plt.savefig(folder_name+'/Exact_CETD.png',bbox_inches='tight')
-            plt.close()
-
-        # Smooth out the CDF by making it regular in time.
-        # Here we use 'previous' interpolation to be maximally accurate in time
-        create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect,
-                                                       frac_exited,
-                                                       kind='previous')
-        smooth_time_vect = np.linspace(0, end_time, nbins)
-        smooth_CDF = create_smooth_CDF(smooth_time_vect)
-
-        # Plot the cumulative ETD in its smooth form
+    if save_output:
+        # Plot the cumulative ETD in its exact form
         plt.figure(figsize=(5, 3), dpi=150)
-        plt.plot(smooth_time_vect/timedelta, smooth_CDF)
+        plt.step(full_time_vect/timedelta, frac_exited, where='post')
         plt.title('Cumulative Exposure Time Distribution')
         plt.xlabel('Time ' + timeunit)
         plt.ylabel('F(t) [-]')
         plt.xlim([0, end_time/timedelta])
         plt.ylim([0, 1])
-        if save_output:
-            plt.savefig(folder_name+'/Smooth_CETD.png',bbox_inches='tight')
+        plt.savefig(folder_name+'/Exact_CETD.png',bbox_inches='tight')
+        plt.close()
 
-        # Derive differential ETD from the CDF
-        # Here we use 'linear' interpolation, because 'previous'
-        # produces a choppy derivative if there aren't enough particles
-        create_linear_CDF = scipy.interpolate.interp1d(full_time_vect,
-                                                       frac_exited,
-                                                       kind='linear')
-        linear_CDF = create_linear_CDF(smooth_time_vect)
+    # Smooth out the CDF by making it regular in time.
+    # Here we use 'previous' interpolation to be maximally accurate in time
+    create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect,
+                                                   frac_exited,
+                                                   kind='previous')
+    smooth_time_vect = np.linspace(0, end_time, nbins)
+    smooth_CDF = create_smooth_CDF(smooth_time_vect)
 
-        timestep = smooth_time_vect[1] - smooth_time_vect[0]
-        RTD = np.gradient(linear_CDF, timestep)
+    # Plot the cumulative ETD in its smooth form
+    plt.figure(figsize=(5, 3), dpi=150)
+    plt.plot(smooth_time_vect/timedelta, smooth_CDF)
+    plt.title('Cumulative Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('F(t) [-]')
+    plt.xlim([0, end_time/timedelta])
+    plt.ylim([0, 1])
+    if save_output:
+        plt.savefig(folder_name+'/Smooth_CETD.png',bbox_inches='tight')
 
-        plt.figure(figsize=(5, 4), dpi=150)
-        plt.plot(smooth_time_vect/timedelta, RTD*timedelta)
-        plt.title('Exposure Time Distribution')
-        plt.xlabel('Time ' + timeunit)
-        plt.ylabel('E(t) ' + timeunit[0:-1] + '$^{-1}$]')
-        plt.xlim([0, end_time/timedelta])
-        plt.ylim(ymin=0)
-        if save_output:
-            plt.savefig(folder_name+'/ETD.png',bbox_inches='tight')
+    # Derive differential ETD from the CDF
+    # Here we use 'linear' interpolation, because 'previous'
+    # produces a choppy derivative if there aren't enough particles
+    create_linear_CDF = scipy.interpolate.interp1d(full_time_vect,
+                                                   frac_exited,
+                                                   kind='linear')
+    linear_CDF = create_linear_CDF(smooth_time_vect)
 
-        return exposure_times
+    timestep = smooth_time_vect[1] - smooth_time_vect[0]
+    RTD = np.gradient(linear_CDF, timestep)
 
-        
-    def unstruct2grid(self, 
-                      coordinates, 
-                      quantity, 
-                      cellsize=None, 
-                      k_nearest_neighbors=3):
-        """Convert unstructured model outputs into gridded arrays 
+    plt.figure(figsize=(5, 4), dpi=150)
+    plt.plot(smooth_time_vect/timedelta, RTD*timedelta)
+    plt.title('Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('E(t) ' + timeunit[0:-1] + '$^{-1}$]')
+    plt.xlim([0, end_time/timedelta])
+    plt.ylim(ymin=0)
+    if save_output:
+        plt.savefig(folder_name+'/ETD.png',bbox_inches='tight')
 
-        Interpolates model variables (e.g. depth, velocity) from an 
-        unstructured grid onto a Cartesian grid using inverse-distance-weighted
-        interpolation. Assumes projected (i.e. "flat") geographic coordinates.
-        Accepts coordinates in meters or decimal degrees. Extent of output
-        rasters are based on extent of coordinates.
-        (Function modeled after ANUGA plot_utils code)
+    return exposure_times
 
-        **Inputs** :
 
-            coordinates : `list`
-                List [] of (x,y) pairs or tuples of coordinates at which the
-                interpolant quantities are located (e.g. centroids or vertices
-                of an unstructured hydrodynamic model).
+def unstruct2grid(coordinates, 
+                  quantity, 
+                  cellsize=None, 
+                  k_nearest_neighbors=3):
+    """Convert unstructured model outputs into gridded arrays 
 
-            quantity : `list`
-                List [] of data to be interpolated with indices matching
-                each (x,y) location given in coordinates. If quantity is 
-                depth, list would be formatted as [d1, d2, ... , dn].
+    Interpolates model variables (e.g. depth, velocity) from an 
+    unstructured grid onto a Cartesian grid using inverse-distance-weighted
+    interpolation. Assumes projected (i.e. "flat") geographic coordinates.
+    Accepts coordinates in meters or decimal degrees. Extent of output
+    rasters are based on extent of coordinates.
+    (Function modeled after ANUGA plot_utils code)
 
-            cellsize : `float or int`
-                Length along one square cell face. If not given, uses value
-                stored in self.dx. (Note: If not specified, coordinates
-                are assumed to be in meters to match self.dx!).
+    **Inputs** :
 
-            k_nearest_neighbors : `int`
-                Number of nearest neighbors to use in the interpolation. 
-                If k>1, inverse-distance-weighted interpolation is used.
+        coordinates : `list`
+            List [] of (x,y) pairs or tuples of coordinates at which the
+            interpolant quantities are located (e.g. centroids or vertices
+            of an unstructured hydrodynamic model).
 
-        **Outputs** :
+        quantity : `list`
+            List [] of data to be interpolated with indices matching
+            each (x,y) location given in coordinates. If quantity is 
+            depth, list would be formatted as [d1, d2, ... , dn].
 
-            interp_func : `function`
-                Nearest-neighbor interpolation function for gridding additional
-                quantities. Quicker to use this output function on additional
-                variables (e.g. later time-steps of an unsteady model) than 
-                to make additional function calls to unstruct2grid. Function 
-                assumes data have the same coordinates, and is called as
-                "new_gridded_quantity = interp_func(new_quantity)".
+        cellsize : `float or int`
+            Length along one square cell face. If not given, uses value
+            stored in params.dx. (Note: If not specified, coordinates
+            are assumed to be in meters to match params.dx!)
 
-            gridded_quantity : `numpy.ndarray`
-                Array of quantity after interpolation.
+        k_nearest_neighbors : `int`
+            Number of nearest neighbors to use in the interpolation. 
+            If k>1, inverse-distance-weighted interpolation is used.
 
-        """
-        if cellsize is None:
-            try:
-                cellsize = float(self.dx)
-                print('Grid size not specified. '
-                      'Assuming coordinates are in meters, using params.dx')
-            except Exception:
-                raise ValueError("Grid size is undefined")
-        else:
-            cellsize = float(cellsize)
+    **Outputs** :
 
-        # Make sure all input values are floats
-        x = [float(coordinates[i][0]) for i in coordinates]
-        y = [float(coordinates[i][1]) for i in coordinates]
-        quantity = [float(quantity) for i in quantity]
+        interp_func : `function`
+            Nearest-neighbor interpolation function for gridding additional
+            quantities. Quicker to use this output function on additional
+            variables (e.g. later time-steps of an unsteady model) than 
+            to make additional function calls to unstruct2grid. Function 
+            assumes data have the same coordinates, and is called as
+            "new_gridded_quantity = interp_func(new_quantity)".
 
-        # Get some dimensions and make x,y grid
-        nx = int(ceil((x.max()-x.min())/cellsize) + 1)
-        xvect = np.linspace(x.min(), x.min()+cellsize*nx, nx)
-        ny = int(ceil((y.max()-y.min())/cellsize) + 1)
-        yvect = np.linspace(y.min(), y.min()+cellsize*ny, ny)
+        gridded_quantity : `numpy.ndarray`
+            Array of quantity after interpolation.
 
-        gridX, gridY = np.meshgrid(xvect, yvect)
+    """
+    if cellsize is None:
+        try:
+            cellsize = float(params.dx)
+            print('Grid size not specified. '
+                  'Assuming coordinates are in meters, using params.dx')
+        except Exception: 
+            raise ValueError("Grid size is undefined")
+    else:
+        cellsize = float(cellsize)
 
-        inputXY = scipy.array([x[:],y[:]]).transpose()
+    # Make sure all input values are floats
+    x = [float(i) for i,j in coordinates]
+    y = [float(j) for i,j in coordinates]
+    quantity = np.array([float(i) for i in quantity])
+    if len(quantity) != len(x):
+        raise ValueError("Coordinate and quantity arrays must be equal length")
 
-        # Get function to interpolate quantity onto gridXY_array
-        gridXY_array = scipy.array([scipy.concatenate(gridX),
-            scipy.concatenate(gridY)]).transpose()
-        gridXY_array = scipy.ascontiguousarray(gridXY_array)
+    # Get some dimensions and make x,y grid
+    nx = int(np.ceil((max(x)-min(x))/cellsize)+1)
+    xvect = np.linspace(min(x), min(x)+cellsize*(nx-1), nx)
+    ny = int(np.ceil((max(y)-min(y))/cellsize)+1)
+    yvect = np.linspace(min(y), min(y)+cellsize*(ny-1), ny)
 
-        # Create Interpolation function
-        if(k_nearest_neighbours == 1): # Only use nearest neighbors
-            index_qFun = scipy.interpolate.NearestNDInterpolator(inputXY,
-                          scipy.arange(len(x),dtype='int64').transpose())
-            gridqInd = index_qFun(gridXY_array)
-            # Function to do the interpolation
-            def interp_func(data):
-                gridded_data = data[gridqInd]
-                gridded_data.shape = (nx, ny)
-                gridded_data = np.flipud(np.array(gridded_data))
-                return gridded_data
-        else:
-            # Inverse-distance interpolation
-            index_qFun = scipy.spatial.cKDTree(inputXY)
-            NNInfo = index_qFun.query(gridXY_array, k=k_nearest_neighbours)
-            # Weights for interpolation
-            nn_wts = 1./(NNInfo[0]+1.0e-100)
-            nn_inds = NNInfo[1]
-            def interp_func(data):
-                denom = 0.
-                num = 0.
-                for i in list(range(k_nearest_neighbours)):
-                    denom += nn_wts[:,i]
-                    num += data[nn_inds[:,i]]*nn_wts[:,i]
-                gridded_data = (num/denom)
-                gridded_data.shape = (nx, ny)
-                gridded_data = np.flipud(np.array(gridded_data))
-                return gridded_data
+    gridX, gridY = np.meshgrid(xvect, yvect)
 
-        # Finally, call the interpolation function to create array:
-        gridded_quantity = interp_func(quantity)
+    inputXY = scipy.array([x[:],y[:]]).transpose()
 
-        return interp_func, gridded_quantity
+    # Get function to interpolate quantity onto gridXY_array
+    gridXY_array = scipy.array([scipy.concatenate(gridX),
+        scipy.concatenate(gridY)]).transpose()
+    gridXY_array = scipy.ascontiguousarray(gridXY_array)
+
+    # Create Interpolation function
+    if(k_nearest_neighbors == 1): # Only use nearest neighbors
+        index_qFun = scipy.interpolate.NearestNDInterpolator(inputXY,
+                      scipy.arange(len(x),dtype='int64').transpose())
+        gridqInd = index_qFun(gridXY_array)
+        # Function to do the interpolation
+        def interp_func(data):
+            gridded_data = data[gridqInd]
+            gridded_data.shape = (len(yvect), len(xvect))
+            gridded_data = np.flipud(gridded_data)
+            return gridded_data
+    else:
+        # Inverse-distance interpolation
+        index_qFun = scipy.spatial.cKDTree(inputXY)
+        NNInfo = index_qFun.query(gridXY_array, k=k_nearest_neighbors)
+        # Weights for interpolation
+        nn_wts = 1./(NNInfo[0]+1.0e-100)
+        nn_inds = NNInfo[1]
+        def interp_func(data):
+            denom = 0.
+            num = 0.
+            for i in list(range(k_nearest_neighbors)):
+                denom += nn_wts[:,i]
+                num += data[nn_inds[:,i]]*nn_wts[:,i]
+            gridded_data = (num/denom)
+            gridded_data.shape = (len(yvect), len(xvect))
+            gridded_data = np.flipud(gridded_data)
+            return gridded_data
+
+    # Finally, call the interpolation function to create array:
+    gridded_quantity = interp_func(quantity)
+
+    return interp_func, gridded_quantity
