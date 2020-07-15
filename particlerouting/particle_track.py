@@ -598,7 +598,7 @@ def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
 
         raster_size : `tuple`
             Tuple (L,W) of the raster dimensions, i.e. the output of 
-            numpy.shape(raster)
+            numpy.shape(raster). If not specified, estimated from params.depth
 
         cellsize : `float or int`
             Length along one square cell face. If not given, uses value
@@ -646,11 +646,11 @@ def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
 def ind2coord(walk_data, raster_origin, raster_size=None, cellsize=None):
     """Convert raster index coordinates into geographical coordinates
     
-    Appends the all_walk_data dictionary from the output of run_iteration
+    Appends the walk_data dictionary from the output of run_iteration
     with additional fields 'xcoord' and 'ycoord' in projected geographic 
     coordinate space. Locations align with cell centroids.
-    Output coordinates match those of raster_origin and cellsize, can be
-    meters or decimal degrees.
+    Units of output coordinates match those of raster_origin and cellsize, 
+    can be meters or decimal degrees.
 
     **Inputs** :
 
@@ -662,6 +662,10 @@ def ind2coord(walk_data, raster_origin, raster_size=None, cellsize=None):
             Tuple of the (x,y) raster origin in physical space, i.e. the 
             coordinates of lower left corner. For rasters loaded from a 
             GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
+
+        raster_size : `tuple`
+            Tuple (L,W) of the raster dimensions, i.e. the output of 
+            numpy.shape(raster). If not specified, estimated from params.depth
 
         cellsize : `float or int`
             Length along one square cell face. If not given, uses value
@@ -919,7 +923,7 @@ def unstruct2grid(coordinates,
 
         coordinates : `list`
             List [] of (x,y) pairs or tuples of coordinates at which the
-            interpolant quantities are located (e.g. centroids or vertices
+            interpolation quantities are located (e.g. centroids or vertices
             of an unstructured hydrodynamic model).
 
         quantity : `list`
@@ -943,7 +947,7 @@ def unstruct2grid(coordinates,
             quantities. Quicker to use this output function on additional
             variables (e.g. later time-steps of an unsteady model) than 
             to make additional function calls to unstruct2grid. Function 
-            assumes data have the same coordinates, and is called as
+            assumes data have the same coordinates. It is used as follows:
             "new_gridded_quantity = interp_func(new_quantity)".
 
         gridded_quantity : `numpy.ndarray`
@@ -977,13 +981,12 @@ def unstruct2grid(coordinates,
 
     inputXY = scipy.array([x[:],y[:]]).transpose()
 
-    # Get function to interpolate quantity onto gridXY_array
     gridXY_array = scipy.array([scipy.concatenate(gridX),
         scipy.concatenate(gridY)]).transpose()
     gridXY_array = scipy.ascontiguousarray(gridXY_array)
 
     # Create Interpolation function
-    if(k_nearest_neighbors == 1): # Only use nearest neighbors
+    if(k_nearest_neighbors == 1): # Only use nearest neighbor
         index_qFun = scipy.interpolate.NearestNDInterpolator(inputXY,
                       scipy.arange(len(x),dtype='int64').transpose())
         gridqInd = index_qFun(gridXY_array)
