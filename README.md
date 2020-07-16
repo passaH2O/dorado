@@ -1,5 +1,9 @@
 # ParticleRouting
 
+<div class="nav3" style="height:705px;">
+    <img src="docs/source/examples/images/logo.gif" alt="Particle routing on Lidar-derived bathymetry" width="75%"></a>
+</div>
+
 v1.00
 
 Lagrangian particle routing via weighted random walks.
