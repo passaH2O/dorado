@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Higher-level methods to manage parameters and particle movement.
+Lower-level methods to manage parameters and particle movement.
 
 Particle class for managing the definition of particle attributes and
 parameters of the domain as well as iterative movement of the particles
