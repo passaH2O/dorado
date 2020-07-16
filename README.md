@@ -13,7 +13,7 @@ Lagrangian particle routing via weighted random walks.
 - (optional) requires the 'ffmpeg' writer to use the animate_plots routine
 
 ### Installation:
-(tested on Ubuntu)
+(tested on Ubuntu, Windows, and Mac)
 - Clone the repository
 - From the cloned folder, run `python setup.py install` to install most of package (will run into error related to Python2.7 retirement)
 - Then run `pip install particlerouting` to finish installing the package
