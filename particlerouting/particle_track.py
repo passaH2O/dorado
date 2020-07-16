@@ -13,6 +13,7 @@ from builtins import range, map
 from math import sqrt, pi
 import numpy as np
 import scipy
+from scipy import interpolate
 from matplotlib import pyplot as plt
 import sys
 import os
@@ -827,8 +828,8 @@ def unstruct2grid(coordinates,
     gridXY_array = scipy.ascontiguousarray(gridXY_array)
 
     # Create Interpolation function
-    if(k_nearest_neighbors == 1):  # Only use nearest neighbor
-        index_qFun = scipy.interpolate.NearestNDInterpolator(inputXY,
+    if k_nearest_neighbors == 1:  # Only use nearest neighbor
+        index_qFun = interpolate.NearestNDInterpolator(inputXY,
                     scipy.arange(len(x), dtype='int64').transpose())
         gridqInd = index_qFun(gridXY_array)
 
