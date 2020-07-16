@@ -74,6 +74,9 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
         # Do particle iterations
         walk_data = particle.run_iteration(previous_walk_data=walk_data)
         if save_output:
+            x0, y0, t0 = get_state(walk_data, 0)
+            xi, yi, ti = get_state(walk_data)
+
             fig = plt.figure(dpi=200)
             ax = plt.gca()
             im = ax.imshow(params.depth)
@@ -84,13 +87,8 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
                                 ax.get_position().height])
             cbar = plt.colorbar(im, cax=cax)
             cbar.set_label('Water Depth [m]')
-
-            x0, y0, t0 = get_state(walk_data, 0)
-            xi, yi, ti = get_state(walk_data)
-
             ax.scatter(y0, x0, c='b', s=0.75)
             ax.scatter(yi, xi, c='r', s=0.75)
-
             plt.savefig(os.getcwd()+'/'+folder_name +
                         '/figs/output'+str(i)+'.png')
             plt.close()
