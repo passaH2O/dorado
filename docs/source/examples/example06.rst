@@ -29,13 +29,11 @@ To set a travel time target, we will use the lower-level API and access the `par
 
 .. plot:: quickstart/demo2.py
 
-To see how close we are to the prescribed target travel time of 2100 seconds, we will loop through the particles and get a list of the final travel times that we then print to the console.
+To see how close we are to the prescribed target travel time of 2100 seconds, we will loop through the particles and get a list of the final travel times that we then print to the console. We can access the data from the most recent step using `get_state`.
 
 .. doctest::
 
-   >>> finaltimes = []
-   >>> for i in list(range(0, params.Np_tracer)):
-   >>>    finaltimes.append(walk_data['travel_times'][i][-1])
+   >>> xi, yi, finaltimes = get_state(walk_data)
    >>> print('List of particle travel times for final particle locations: ' +
    >>>       str(np.round(finaltimes)))
 
