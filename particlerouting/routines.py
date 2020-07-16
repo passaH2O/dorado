@@ -296,9 +296,9 @@ def time_plots(params, num_iter, folder_name):
 
         fig = plt.figure(dpi=200)
         plt.title('Depth - Particle Iteration ' + str(i))
-        ax = plt.gca()
         ax.scatter(y0, x0, c='b', s=0.75)
         ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
+        ax = plt.gca()
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(cax=cax)
