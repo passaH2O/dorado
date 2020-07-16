@@ -3,6 +3,7 @@
 import numpy as np
 import particlerouting.particle_track as pt
 from particlerouting.particle_track import params
+from particlerouting.routines import get_state
 import matplotlib.pyplot as plt
 
 # load some variables from a deltarcm output so stage is varied
@@ -37,25 +38,18 @@ np.random.seed(0)
 # run model until all particles have travelled for about 1.5 hours
 walk_data = particle.run_iteration(target_time=2100)
 
+x0, y0, t0 = get_state(walk_data, 0)
+xi, yi, finaltimes = get_state(walk_data)
+
 # print target travel time and list of the particle travel times
 print('Prescribed target travel time: 2100 seconds')
-# get final times and print the list
-finaltimes = []
-for i in list(range(0, params.Np_tracer)):
-    finaltimes.append(walk_data['travel_times'][i][-1])
-
 print('List of particle travel times for final particle locations: ' +
       str(np.round(finaltimes)))
 
 # make plot of initial and final particle locations
 plt.figure(figsize=(4, 4), dpi=200)
-for k in range(0, len(walk_data['xinds'])):
-    plt.scatter(walk_data['yinds'][k][0],
-                walk_data['xinds'][k][0],
-                c='b', s=0.75)
-    plt.scatter(walk_data['yinds'][k][-1],
-                walk_data['xinds'][k][-1],
-                c='r', s=0.75)
+plt.scatter(y0, x0, c='b', s=0.75)
+plt.scatter(yi, xi, c='r', s=0.75)
 plt.imshow(params.depth)
 plt.title('Depth')
 plt.colorbar()

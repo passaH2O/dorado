@@ -85,15 +85,11 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
             cbar = plt.colorbar(im, cax=cax)
             cbar.set_label('Water Depth [m]')
 
-            for k in list(range(0, params.Np_tracer)):
-                ax.scatter(walk_data['yinds'][k][0],
-                           walk_data['xinds'][k][0],
-                           c='b',
-                           s=0.75)
-                ax.scatter(walk_data['yinds'][k][-1],
-                           walk_data['xinds'][k][-1],
-                           c='r',
-                           s=0.75)
+            x0, y0, t0 = get_state(walk_data, 0)
+            xi, yi, ti = get_state(walk_data)
+
+            ax.scatter(y0, x0, c='b', s=0.75)
+            ax.scatter(yi, xi, c='r', s=0.75)
 
             plt.savefig(os.getcwd()+'/'+folder_name +
                         '/figs/output'+str(i)+'.png')
@@ -210,17 +206,13 @@ def unsteady_plots(params, num_steps, timestep,
         walk_data = particle.run_iteration(previous_walk_data=walk_data,
                                            target_time=target_times[i])
 
+        x0, y0, t0 = get_state(walk_data, 0)
+        xi, yi, ti = get_state(walk_data)
+
         # make and save plots and data
         fig = plt.figure(dpi=200)
-        for k in range(0, params.Np_tracer):
-            plt.scatter(walk_data['yinds'][k][0],
-                        walk_data['xinds'][k][0],
-                        c='b',
-                        s=0.75)
-            plt.scatter(walk_data['yinds'][k][-1],
-                        walk_data['xinds'][k][-1],
-                        c='r',
-                        s=0.75)
+        ax.scatter(y0, x0, c='b', s=0.75)
+        ax.scatter(yi, xi, c='r', s=0.75)
         ax = plt.gca()
         im = ax.imshow(params.depth)
         plt.title('Depth at Time ' + str(target_times[i]))
@@ -287,9 +279,8 @@ def time_plots(params, num_iter, folder_name):
         walk_data = particle.run_iteration(previous_walk_data=walk_data)
 
         # collect latest travel times
-        temptimes = []
-        for ii in list(range(0, particle.Np_tracer)):
-            temptimes.append(walk_data['travel_times'][ii][-1])
+        x0, y0, t0 = get_state(walk_data, 0)
+        xi, yi, temptimes = get_state(walk_data)
 
         # set colorbar using 10th and 90th percentile values
         cm = matplotlib.cm.colors.Normalize(vmax=np.percentile(temptimes, 90),
@@ -297,17 +288,8 @@ def time_plots(params, num_iter, folder_name):
 
         fig = plt.figure(dpi=200)
         plt.title('Depth - Particle Iteration ' + str(i))
-        for k in range(0, params.Np_tracer):
-            plt.scatter(walk_data['yinds'][k][0],
-                        walk_data['xinds'][k][0],
-                        c='b',
-                        s=0.75)
-            plt.scatter(walk_data['yinds'][k][-1],
-                        walk_data['xinds'][k][-1],
-                        c=walk_data['travel_times'][k][-1],
-                        s=0.75,
-                        cmap='coolwarm',
-                        norm=cm)
+        ax.scatter(y0, x0, c='b', s=0.75)
+        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm
         ax = plt.gca()
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -345,7 +327,7 @@ def get_state(walk_data, iteration=-1):
         walk_data : `dict`
             Dictionary of all x and y locations and travel times
 
-        iteration : `int`
+        iteration : `int`, optional
             Iteration number at which to slice the dictionary. Defaults
             to -1, i.e. the most recent step
 
@@ -387,7 +369,7 @@ def get_time_state(walk_data, target_time):
         walk_data : `dict`
             Dictionary of all x and y locations and travel times
 
-        target_time : `float`
+        target_time : `float`, optional
             Travel time at which to slice the dictionary.
 
     **Outputs** :
@@ -456,13 +438,17 @@ def plot_exposure_time(walk_data,
         folder_name : `str`
             Path to folder in which to save output plots.
 
-        timedelta : `int or float`
+        timedelta : `int or float`, optional
             Unit of time for time-axis of ETD plots, specified as time
             in seconds (e.g. an input of 60 plots things by minute).
 
-        nbins : `int`
+        nbins : `int`, optional
             Number of bins to use as the time axis for differential ETD.
             Using fewer bins smoothes out curves.
+
+        save_output : `bool`, optional
+            Controls whether or not the output images/data are saved to disk.
+            Default value is True.
 
     **Outputs** :
 
@@ -643,7 +629,8 @@ def animate_plots(start_val, end_val, folder_name):
 
 
 def draw_travel_path(depth, walk_data,
-                     particles_to_follow, output_file='travel_paths.png'):
+                     particles_to_follow='all', 
+                     output_file='travel_paths.png'):
     """Make a plot with the travel path of specified particles drawn out.
 
     **Inputs** :
@@ -655,10 +642,11 @@ def draw_travel_path(depth, walk_data,
             Output of `steady_plots`, `unsteady_plots`, `time_plots`, as well
             as the `particle_track.run_iteration` method.
 
-        particles_to_follow : `list`
-            List of particle numbers to draw the travel paths for.
+        particles_to_follow : `list`, optional
+            List of particle numbers for which to draw the travel paths. 
+            Default is `all` particles.
 
-        output_file : `str`
+        output_file : `str`, optional
             Path to save the output image to.
 
     **Outputs** :
@@ -668,6 +656,10 @@ def draw_travel_path(depth, walk_data,
     """
     from matplotlib import cm
     color_index = 0
+    
+    if(particles_to_follow == 'all'):
+        Np_tracer = len(walk_data['xinds'])
+        particles_to_follow = list(range(Np_tracer))
 
     plt.figure(figsize=(7, 4), dpi=300)
     plt.imshow(depth, cmap='bone')
@@ -710,8 +702,8 @@ def draw_travel_path(depth, walk_data,
     plt.close()
 
 
-def plot_initial(grid, all_walk_data, c='b'):
-    """Plot initial particle positions on an array.
+def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
+    """Plot particle positions on an array.
 
     **Inputs** :
 
@@ -720,10 +712,18 @@ def plot_initial(grid, all_walk_data, c='b'):
             grids that might be nice to use are `params.depth`, `params.stage`,
             `params.topography`.
 
-        all_walk_data : `dict`
+        walk_data : `dict`
             The dictionary with the particle information. This is the output
             from one of the other routines or the
             :obj:particle_track.run_iteration() function.
+
+        iteration : `int`, optional
+            Iteration number at which to plot the particles. Default is -1, 
+            i.e. the most recent step
+
+        target_time : `float`, optional
+            Travel time at which to plot the particles. If specified, iteration
+            is ignored. 
 
         c : `str`, optional
             String to specify the color of the particle marks to draw on the
@@ -735,52 +735,12 @@ def plot_initial(grid, all_walk_data, c='b'):
             A `matplotlib.axes` with the intended plot drawn on it
 
     """
+    if time is None:
+        x, y, t = get_state(walk_data, int(iteration))
+    else:
+        x, y, t = get_time_state(walk_data, target_time)
     ax = plt.gca()
     ax.imshow(grid)
-    x = []
-    y = []
-    for i in range(0, len(all_walk_data['xinds'])):
-        x.append(all_walk_data['yinds'][i][0])
-        y.append(all_walk_data['xinds'][i][0])
-    # plot them up
-    plt.scatter(x, y, c=c)
-
-    return ax
-
-
-def plot_final(grid, all_walk_data, c='r'):
-    """Plot final particle positions on an array.
-
-    **Inputs** :
-
-        grid : `numpy.ndarray`
-            A 2-D grid upon which the particles will be plotted. Examples of
-            grids that might be nice to use are `params.depth`, `params.stage`,
-            `params.topography`.
-
-        all_walk_data : `dict`
-            The dictionary with the particle information. This is the output
-            from one of the other routines or the
-            :obj:particle_track.run_iteration() function.
-
-        c : `str`, optional
-            String to specify the color of the particle marks to draw on the
-            figure, default is 'r' for blue
-
-    **Outputs** :
-
-        ax : `matplotlib.axes`
-            A `matplotlib.axes` with the intended plot drawn on it
-
-    """
-    ax = plt.gca()
-    ax.imshow(grid)
-    x = []
-    y = []
-    for i in range(0, len(all_walk_data['xinds'])):
-        x.append(all_walk_data['yinds'][i][-1])
-        y.append(all_walk_data['xinds'][i][-1])
-
-    plt.scatter(x, y, c=c)
+    plt.scatter(y, x, c=c)
 
     return ax

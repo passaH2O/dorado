@@ -784,9 +784,9 @@ def exposure_time(walk_data,
             # (which can bias result)
             if jj == len(walk_data['travel_times'][ii])-1:
                 if current_reg == 1:
-                    print(('Warning: Particle ' + str(ii) + ' is still within'
+                    print('Warning: Particle ' + str(ii) + ' is still within'
                            ' ROI at final timestep. \n' +
-                           'Run more iterations to get tail of ETD'))
+                           'Run more iterations to get tail of ETD')
 
     return exposure_times
 
