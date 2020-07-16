@@ -17,13 +17,13 @@ Shortened code for the synthetic channel creation will be provided, for the full
    >>> depth[:, 10:40] = 1.0
    >>> v[:, 10:40] = -10.0
 
-In the 100 x 50 cell domain, we have a straight channel with flow from the top of the domain to the bottom at -10 m/s. Our cell size is 50m, and the particles will be seeded at row 10. At row 70, we will measure their travel times. Since the flow velocity is both steady and uniform in this channel, our expected travel time is simply:
+In the 100 x 50 cell domain, we have a straight channel with flow from the top of the domain to the bottom at -10 m/s. Our cell size is 50m, and the particles will be seeded at row 10. We will define a region of interest that extends to row 70, and apply the `exposure_time` function to calculate the amount of times the particles have traveled. The region will end at the boundary of row 70. Since the flow velocity is both steady and uniform in this channel, our expected travel time is simply:
 
 .. math::
    :nowrap:
 
    \begin{eqnarray}
-   {\text{Exp. Time} = 60 \text{ cells} \times 50 \text{ m/cell} \div 10 \text{ m/s} = 300 \text{ seconds}}`.
+   {\text{Exp. Time} = 59.5 \text{ cells} \times 50 \text{ m/cell} \div 10 \text{ m/s} = 297.5 \text{ seconds}}`.
    \end{eqnarray}
 
 With this in mind we will conduct two simulations, both using 500 tracer particles. In the first, we will set the travel time diffusion coefficient (`diff_coeff`) to 0, and in the second we will set it to 1.0 (a significant amount of added diffusivity).
@@ -48,7 +48,7 @@ Then we will define `diff_coeff`, initialize the Particle class, and do the simu
    >>>        params.diff_coeff = 0.0
    >>>    else:
    >>>        params.diff_coeff = 1.0
-   
+
    >>>    # make particle
    >>>    particle = pt.Particle(params)
 

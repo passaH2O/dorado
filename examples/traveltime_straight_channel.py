@@ -27,9 +27,10 @@ num_iter = 100
 
 # define your 'known' or 'expected' travel time for this simple geometry
 # picking expected time from location x=10 to x=70
-# 60 cells * 50 m/cell / 10 m/s = 300 seconds
+# (really the boundary of row 70, so 1/2 a cell)
+# 59.5 cells * 50 m/cell / 10 m/s = 297.5 seconds
 target_row = 70
-expected_time = 300
+expected_time = 297.5
 
 # assign particle parameters
 params = pt.params()
@@ -74,17 +75,14 @@ for dc in range(0, 2):
         walk_data = particle.run_iteration(previous_walk_data=walk_data)
 
     # get travel times associated with particles when they are at coord x=70
-    final_times = []
-    for i in range(0, Np_tracer):
-        for j in range(0, len(walk_data['xinds'][i])):
-            if walk_data['xinds'][i][j] == target_row:
-                final_times.append(walk_data['travel_times'][i][j])
-            else:
-                pass
+    # use the exposure_time function to measure this
+    roi = np.zeros_like(depth, dtype='int')
+    roi[0:target_row, :] = 1
+    target_times = pt.exposure_time(walk_data, roi)
 
     # plot histogram
     plt.subplot(1, 2, dc+1)
-    n, bins, _ = plt.hist(final_times, bins=100, range=(200, 400),
+    n, bins, _ = plt.hist(target_times, bins=100, range=(200, 400),
                           histtype='bar', density=True,
                           color=[0.5, 0.5, 1, 0.5])
 
