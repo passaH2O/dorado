@@ -195,7 +195,7 @@ def unsteady_plots(params, num_steps, timestep,
                                    delimiter=',')
         elif output_type == 'npy':
             params.depth = np.load(os.path.join(output_base, depthlist[i]))
-            params.stage = np.loadtxt(os.path.join(output_base, stagelist[i]))
+            params.stage = np.load(os.path.join(output_base, stagelist[i]))
             params.qx = np.load(os.path.join(output_base, qxlist[i]))
             params.qy = np.load(os.path.join(output_base, qylist[i]))
         elif output_type == 'npz':
