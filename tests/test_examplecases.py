@@ -168,11 +168,11 @@ def test_boundary_anuga():
     assert all_walk_data['travel_times'][0][0] == 0.0
     # particle reaches boundary after 18 iterations
     # data shouldn't be recorded after boundary is reached
-    assert len(all_walk_data['xinds'][0]) == 18
-    assert len(all_walk_data['yinds'][0]) == 18
-    assert len(all_walk_data['travel_times'][0]) == 18
+    assert len(all_walk_data['xinds'][0]) == 15
+    assert len(all_walk_data['yinds'][0]) == 15
+    assert len(all_walk_data['travel_times'][0]) == 15
 
-@pytest.mark.xfail
+
 def test_boundary_travel_time_anuga():
     '''
     Test running into the boundary and not reaching travel time target
@@ -191,6 +191,6 @@ def test_boundary_travel_time_anuga():
     assert all_walk_data['travel_times'][0][0] == 0.0
     # particle reaches boundary after 18 iterations
     # data shouldn't be recorded after boundary is reached
-    assert len(all_walk_data['xinds'][0]) == 18
-    assert len(all_walk_data['yinds'][0]) == 18
-    assert len(all_walk_data['travel_times'][0]) == 18
+    assert len(all_walk_data['xinds'][0]) == 9
+    assert len(all_walk_data['yinds'][0]) == 9
+    assert len(all_walk_data['travel_times'][0]) == 9

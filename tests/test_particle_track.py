@@ -58,6 +58,16 @@ def test_velocity():
 def test_theta():
     assert particle.theta == params.theta
 
+def test_neg_diffcoeff():
+    params.diff_coeff = -1.0
+    particle = particle_track.Particle(params)
+    assert particle.diff_coeff == 0.0
+
+def test_big_diffcoeff():
+    params.diff_coeff = 3.0
+    particle = particle_track.Particle(params)
+    assert particle.diff_coeff == 3.0
+
 def test_dry_depth():
     assert particle.dry_depth == 0.1
 
@@ -90,6 +100,7 @@ def test_steep():
     assert particle.steepest_descent == False
 
 def test_steep_true():
+    params.diff_coeff = 'invalid'
     params.steepest_descent = True
     particle = particle_track.Particle(params)
     assert particle.steepest_descent == True
