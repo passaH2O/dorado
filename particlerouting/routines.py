@@ -296,9 +296,9 @@ def time_plots(params, num_iter, folder_name):
 
         fig = plt.figure(dpi=200)
         plt.title('Depth - Particle Iteration ' + str(i))
-        ax.scatter(y0, x0, c='b', s=0.75)
-        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm
         ax = plt.gca()
+        ax.scatter(y0, x0, c='b', s=0.75)
+        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(cax=cax)
@@ -391,9 +391,9 @@ def get_time_state(walk_data, target_time):
             represents the index at which travel time is nearest to input.
 
         times : `list`
-            List containing equivalent of walk_data['travel_times'][:][i], 
-            where i represents the index at which travel time is nearest 
-            to input. Times will differ slightly from input time due to 
+            List containing equivalent of walk_data['travel_times'][:][i],
+            where i represents the index at which travel time is nearest
+            to input. Times will differ slightly from input time due to
             the nature of the method.
 
     """
@@ -460,7 +460,7 @@ def plot_exposure_time(walk_data,
 
     **Outputs** :
 
-        If `save_output` is set to True, script saves plots of the cumulative 
+        If `save_output` is set to True, script saves plots of the cumulative
         and differential forms of the ETD as a png and the list of exposure
         times as a json ('human-readable') text file.
     """
@@ -480,7 +480,7 @@ def plot_exposure_time(walk_data,
         timeunit == '[day]'
     else:
         timeunit = '[' + str(timedelta) + ' s]'
-    
+
     if folder_name is None:
         folder_name = os.getcwd()
 
@@ -637,7 +637,7 @@ def animate_plots(start_val, end_val, folder_name):
 
 
 def draw_travel_path(depth, walk_data,
-                     particles_to_follow='all', 
+                     particles_to_follow='all',
                      output_file='travel_paths.png'):
     """Make a plot with the travel path of specified particles drawn out.
 
@@ -651,7 +651,7 @@ def draw_travel_path(depth, walk_data,
             as the `particle_track.run_iteration` method.
 
         particles_to_follow : `list`, optional
-            List of particle numbers for which to draw the travel paths. 
+            List of particle numbers for which to draw the travel paths.
             Default is `all` particles.
 
         output_file : `str`, optional
@@ -664,7 +664,7 @@ def draw_travel_path(depth, walk_data,
     """
     from matplotlib import cm
     color_index = 0
-    
+
     if(particles_to_follow == 'all'):
         Np_tracer = len(walk_data['xinds'])
         particles_to_follow = list(range(Np_tracer))
@@ -726,12 +726,12 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
             :obj:particle_track.run_iteration() function.
 
         iteration : `int`, optional
-            Iteration number at which to plot the particles. Default is -1, 
+            Iteration number at which to plot the particles. Default is -1,
             i.e. the most recent step
 
         target_time : `float`, optional
             Travel time at which to plot the particles. If specified, iteration
-            is ignored. 
+            is ignored.
 
         c : `str`, optional
             String to specify the color of the particle marks to draw on the
@@ -743,7 +743,7 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
             A `matplotlib.axes` with the intended plot drawn on it
 
     """
-    if time is None:
+    if target_time is None:
         x, y, t = get_state(walk_data, int(iteration))
     else:
         x, y, t = get_time_state(walk_data, target_time)
