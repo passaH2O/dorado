@@ -164,6 +164,12 @@ def unsteady_plots(params, num_steps, timestep,
     qxlist = [x for x in os.listdir(output_base) if x.startswith('qx')]
     qylist = [x for x in os.listdir(output_base) if x.startswith('qy')]
     datalist = [x for x in os.listdir(output_base) if x.startswith('data')]
+    # sort the lists
+    depthlist = sorted(depthlist)
+    stagelist = sorted(stagelist)
+    qxlist = sorted(qxlist)
+    qylist = sorted(qylist)
+    datalist = sorted(datalist)
     if num_steps > max(len(depthlist), len(datalist)):
         print('Warning: num_steps exceeds number of model outputs in'
               ' output_base')
@@ -174,22 +180,26 @@ def unsteady_plots(params, num_steps, timestep,
     target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
     walk_data = None
     # Iterate through model timesteps
-    for i in tqdm(list(range(0, num_steps+1)), ascii=True):
+    for i in tqdm(list(range(0, num_steps)), ascii=True):
         # load depth, stage, qx, qy for this timestep
         # Making assumption that other variables are constant between output
         # files !!!!
         if output_type == 'csv':
-            params.depth = np.loadtxt(depthlist[i], delimiter=',')
-            params.stage = np.loadtxt(stagelist[i], delimiter=',')
-            params.qx = np.loadtxt(qxlist[i], delimiter=',')
-            params.qy = np.loadtxt(qylist[i], delimiter=',')
+            params.depth = np.loadtxt(os.path.join(output_base, depthlist[i]),
+                                      delimiter=',')
+            params.stage = np.loadtxt(os.path.join(output_base, stagelist[i]),
+                                      delimiter=',')
+            params.qx = np.loadtxt(os.path.join(output_base, qxlist[i]),
+                                   delimiter=',')
+            params.qy = np.loadtxt(os.path.join(output_base, qylist[i]),
+                                   delimiter=',')
         elif output_type == 'npy':
-            params.depth = np.load(depthlist[i])
-            params.stage = np.loadtxt(stagelist[i])
-            params.qx = np.load(qxlist[i])
-            params.qy = np.load(qylist[i])
+            params.depth = np.load(os.path.join(output_base, depthlist[i]))
+            params.stage = np.loadtxt(os.path.join(output_base, stagelist[i]))
+            params.qx = np.load(os.path.join(output_base, qxlist[i]))
+            params.qy = np.load(os.path.join(output_base, qylist[i]))
         elif output_type == 'npz':
-            data = np.load(datalist[i])
+            data = np.load(os.path.join(output_base, datalist[i]))
             params.depth = data['depth']
             params.stage = data['stage']
             params.qx = data['qx']
