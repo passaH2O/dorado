@@ -578,8 +578,8 @@ class Particle(Tools):
         return all_walk_data
 
 
-def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
-    """Convert geographical coordinates into raster index coordinates. 
+def coord2ind(coordinates, raster_origin, raster_size, cellsize):
+    """Convert geographical coordinates into raster index coordinates.
 
     Assumes geographic coordinates are projected onto a Cartesian grid.
     Accepts coordinates in meters or decimal degrees.
@@ -587,23 +587,21 @@ def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
     **Inputs** :
 
         coordinates : `list`
-            List [] of (x,y) pairs or tuples of coordinates to be 
-            converted from starting units (e.g. meters UTM) into raster 
-            index coordinates used in particle routing functions. 
+            List [] of (x,y) pairs or tuples of coordinates to be
+            converted from starting units (e.g. meters UTM) into raster
+            index coordinates used in particle routing functions.
 
         raster_origin : `tuple`
-            Tuple of the (x,y) raster origin in physical space, i.e. the 
-            coordinates of lower left corner. For rasters loaded from a 
+            Tuple of the (x,y) raster origin in physical space, i.e. the
+            coordinates of lower left corner. For rasters loaded from a
             GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
 
         raster_size : `tuple`
-            Tuple (L,W) of the raster dimensions, i.e. the output of 
-            numpy.shape(raster). If not specified, estimated from params.depth
+            Tuple (L,W) of the raster dimensions, i.e. the output of
+            numpy.shape(raster).
 
         cellsize : `float or int`
-            Length along one square cell face. If not given, uses value
-            stored in self.dx. (Note: If not specified, coordinates
-            are assumed to be in meters to match self.dx!)
+            Length along one square cell face.
 
     **Outputs** :
 
@@ -614,25 +612,9 @@ def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
     x_orig = float(raster_origin[0])
     y_orig = float(raster_origin[1])
 
-    if cellsize is None:
-        try:
-            cellsize = float(params.dx)
-            print('Grid size not specified. '
-                  'Assuming coordinates are in meters, using params.dx')
-        except Exception:
-            raise ValueError("Grid size is undefined")
-    else:
-        cellsize = float(cellsize)
+    cellsize = float(cellsize)
 
-    if raster_size is None:
-        try:
-            raster_size = np.shape(params.depth)
-            print('Raster size not specified. '
-                  'Estimating from params.depth')
-        except Exception:
-            raise ValueError("Raster size is undefined")
-
-    L = int(raster_size[0]) # Need domain extent
+    L = int(raster_size[0])  # Need domain extent
 
     inds = []
     for i in list(range(0, len(coordinates))):
@@ -643,13 +625,14 @@ def coord2ind(coordinates, raster_origin, raster_size=None, cellsize=None):
 
     return inds
 
-def ind2coord(walk_data, raster_origin, raster_size=None, cellsize=None):
-    """Convert raster index coordinates into geographical coordinates
-    
+
+def ind2coord(walk_data, raster_origin, raster_size, cellsize):
+    """Convert raster index coordinates into geographical coordinates.
+
     Appends the walk_data dictionary from the output of run_iteration
-    with additional fields 'xcoord' and 'ycoord' in projected geographic 
+    with additional fields 'xcoord' and 'ycoord' in projected geographic
     coordinate space. Locations align with cell centroids.
-    Units of output coordinates match those of raster_origin and cellsize, 
+    Units of output coordinates match those of raster_origin and cellsize,
     can be meters or decimal degrees.
 
     **Inputs** :
@@ -659,57 +642,40 @@ def ind2coord(walk_data, raster_origin, raster_size=None, cellsize=None):
             times (the output of run_iteration)
 
         raster_origin : `tuple`
-            Tuple of the (x,y) raster origin in physical space, i.e. the 
-            coordinates of lower left corner. For rasters loaded from a 
+            Tuple of the (x,y) raster origin in physical space, i.e. the
+            coordinates of lower left corner. For rasters loaded from a
             GeoTIFF, lower left corner can be obtained using e.g. gdalinfo
 
         raster_size : `tuple`
-            Tuple (L,W) of the raster dimensions, i.e. the output of 
-            numpy.shape(raster). If not specified, estimated from params.depth
+            Tuple (L,W) of the raster dimensions, i.e. the output of
+            numpy.shape(raster).
 
         cellsize : `float or int`
-            Length along one square cell face. If not given, uses value
-            stored in params.dx. (Note: If not specified, coordinates
-            are assumed to be in meters to match params.dx!)
+            Length along one square cell face.
 
     **Outputs** :
 
         walk_data : `dict`
             Same as the input walk_data dictionary, with the added
-            'xcoord' and 'ycoord' fields representing the particles 
-            geographic position at each iteration. 
+            'xcoord' and 'ycoord' fields representing the particles
+            geographic position at each iteration.
 
     """
     x_orig = float(raster_origin[0])
     y_orig = float(raster_origin[1])
 
-    if cellsize is None:
-        try:
-            cellsize = float(params.dx)
-            print('Grid size not specified. '
-                  'Assuming coordinates are in meters, using params.dx')
-        except Exception:
-            raise ValueError("Grid size is undefined")
-    else:
-        cellsize = float(cellsize)
+    cellsize = float(cellsize)
 
-    if raster_size is None:
-        try:
-            raster_size = np.shape(params.depth)
-            print('Raster size not specified. '
-                  'Estimating from params.depth')
-        except Exception:
-            raise ValueError("Raster size is undefined")
+    L = int(raster_size[0])  # Need domain extent
+    Np_tracer = len(walk_data['xinds'])  # Get number of particles
 
-    L = int(raster_size[0]) # Need domain extent
-    Np_tracer = len(walk_data['xinds']) # Get number of particles
-
-    all_xcoord = [] # Initialize
+    all_xcoord = []  # Initialize
     all_ycoord = []
 
     for i in list(range(0, Np_tracer)):
         # Do coordinate transform:
-        this_ycoord = [(L-float(j))*cellsize+y_orig for j in walk_data['xinds'][i]]
+        this_ycoord = [(L-float(j))*cellsize+y_orig for j in
+                       walk_data['xinds'][i]]
         all_ycoord.append(this_ycoord)
 
         this_xcoord = [float(j)*cellsize+x_orig for j in walk_data['yinds'][i]]
@@ -785,19 +751,19 @@ def exposure_time(walk_data,
             if jj == len(walk_data['travel_times'][ii])-1:
                 if current_reg == 1:
                     print('Warning: Particle ' + str(ii) + ' is still within'
-                           ' ROI at final timestep. \n' +
-                           'Run more iterations to get tail of ETD')
+                          ' ROI at final timestep. \n' +
+                          'Run more iterations to get tail of ETD')
 
     return exposure_times
 
 
-def unstruct2grid(coordinates, 
-                  quantity, 
-                  cellsize=None, 
+def unstruct2grid(coordinates,
+                  quantity,
+                  cellsize,
                   k_nearest_neighbors=3):
-    """Convert unstructured model outputs into gridded arrays 
+    """Convert unstructured model outputs into gridded arrays.
 
-    Interpolates model variables (e.g. depth, velocity) from an 
+    Interpolates model variables (e.g. depth, velocity) from an
     unstructured grid onto a Cartesian grid using inverse-distance-weighted
     interpolation. Assumes projected (i.e. "flat") geographic coordinates.
     Accepts coordinates in meters or decimal degrees. Extent of output
@@ -813,16 +779,14 @@ def unstruct2grid(coordinates,
 
         quantity : `list`
             List [] of data to be interpolated with indices matching
-            each (x,y) location given in coordinates. If quantity is 
+            each (x,y) location given in coordinates. If quantity is
             depth, list would be formatted as [d1, d2, ... , dn].
 
         cellsize : `float or int`
-            Length along one square cell face. If not given, uses value
-            stored in params.dx. (Note: If not specified, coordinates
-            are assumed to be in meters to match params.dx!)
+            Length along one square cell face.
 
         k_nearest_neighbors : `int`
-            Number of nearest neighbors to use in the interpolation. 
+            Number of nearest neighbors to use in the interpolation.
             If k>1, inverse-distance-weighted interpolation is used.
 
     **Outputs** :
@@ -830,8 +794,8 @@ def unstruct2grid(coordinates,
         interp_func : `function`
             Nearest-neighbor interpolation function for gridding additional
             quantities. Quicker to use this output function on additional
-            variables (e.g. later time-steps of an unsteady model) than 
-            to make additional function calls to unstruct2grid. Function 
+            variables (e.g. later time-steps of an unsteady model) than
+            to make additional function calls to unstruct2grid. Function
             assumes data have the same coordinates. It is used as follows:
             "new_gridded_quantity = interp_func(new_quantity)".
 
@@ -839,19 +803,11 @@ def unstruct2grid(coordinates,
             Array of quantity after interpolation.
 
     """
-    if cellsize is None:
-        try:
-            cellsize = float(params.dx)
-            print('Grid size not specified. '
-                  'Assuming coordinates are in meters, using params.dx')
-        except Exception: 
-            raise ValueError("Grid size is undefined")
-    else:
-        cellsize = float(cellsize)
+    cellsize = float(cellsize)
 
     # Make sure all input values are floats
-    x = [float(i) for i,j in coordinates]
-    y = [float(j) for i,j in coordinates]
+    x = [float(i) for i, j in coordinates]
+    y = [float(j) for i, j in coordinates]
     quantity = np.array([float(i) for i in quantity])
     if len(quantity) != len(x):
         raise ValueError("Coordinate and quantity arrays must be equal length")
@@ -864,17 +820,18 @@ def unstruct2grid(coordinates,
 
     gridX, gridY = np.meshgrid(xvect, yvect)
 
-    inputXY = scipy.array([x[:],y[:]]).transpose()
+    inputXY = scipy.array([x[:], y[:]]).transpose()
 
     gridXY_array = scipy.array([scipy.concatenate(gridX),
-        scipy.concatenate(gridY)]).transpose()
+                                scipy.concatenate(gridY)]).transpose()
     gridXY_array = scipy.ascontiguousarray(gridXY_array)
 
     # Create Interpolation function
-    if(k_nearest_neighbors == 1): # Only use nearest neighbor
+    if(k_nearest_neighbors == 1):  # Only use nearest neighbor
         index_qFun = scipy.interpolate.NearestNDInterpolator(inputXY,
-                      scipy.arange(len(x),dtype='int64').transpose())
+                    scipy.arange(len(x), dtype='int64').transpose())
         gridqInd = index_qFun(gridXY_array)
+
         # Function to do the interpolation
         def interp_func(data):
             gridded_data = data[gridqInd]
@@ -888,12 +845,13 @@ def unstruct2grid(coordinates,
         # Weights for interpolation
         nn_wts = 1./(NNInfo[0]+1.0e-100)
         nn_inds = NNInfo[1]
+
         def interp_func(data):
             denom = 0.
             num = 0.
             for i in list(range(k_nearest_neighbors)):
-                denom += nn_wts[:,i]
-                num += data[nn_inds[:,i]]*nn_wts[:,i]
+                denom += nn_wts[:, i]
+                num += data[nn_inds[:, i]]*nn_wts[:, i]
             gridded_data = (num/denom)
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
