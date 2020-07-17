@@ -9,18 +9,11 @@ through the domain.
 Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
-from builtins import range, map
-from math import sqrt, pi
+from builtins import range
+from math import pi
 import numpy as np
 import scipy
 from scipy import interpolate
-from matplotlib import pyplot as plt
-import sys
-import os
-import re
-import string
-import copy
-import time
 from tqdm import tqdm
 from .particle_tools import Tools
 
