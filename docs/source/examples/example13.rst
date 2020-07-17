@@ -334,10 +334,6 @@ return the xindex for the 6th particle’s 11th iteration)
 
 .. parsed-literal::
 
-      0%|                                                                                          | 0/200 [00:00<?, ?it/s]
-
-.. parsed-literal::
-
     Theta parameter not specified - using 1.0
     Gamma parameter not specified - using 0.05
     Diffusion coefficient not specified - using 0.2
@@ -453,7 +449,7 @@ with ``['xcoord']`` and ``['ycoord']`` fields in the units we started
 with (meters or decimal degrees).
 
 **Note:** Particle locations are only known to within the specified grid
-size (i.e. :math:`\pm \Delta x/2`)
+size (i.e. +/- dx/2)
 
 .. code:: ipython2
 
