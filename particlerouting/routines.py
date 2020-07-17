@@ -78,7 +78,7 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
             xi, yi, ti = get_state(walk_data)
 
             fig = plt.figure(dpi=200)
-            ax = plt.gca()
+            ax = fig.add_subplot(111)
             im = ax.imshow(params.depth)
             plt.title('Depth - Particle Iteration ' + str(i))
             cax = fig.add_axes([ax.get_position().x1+0.01,
@@ -219,9 +219,9 @@ def unsteady_plots(params, num_steps, timestep,
 
         # make and save plots and data
         fig = plt.figure(dpi=200)
+        ax = fig.subplot(111)
         ax.scatter(y0, x0, c='b', s=0.75)
         ax.scatter(yi, xi, c='r', s=0.75)
-        ax = plt.gca()
         im = ax.imshow(params.depth)
         plt.title('Depth at Time ' + str(target_times[i]))
         cax = fig.add_axes([ax.get_position().x1+0.01,
@@ -295,10 +295,10 @@ def time_plots(params, num_iter, folder_name):
                                             vmin=np.percentile(temptimes, 10))
 
         fig = plt.figure(dpi=200)
+        ax = fig.subplot(111)
         plt.title('Depth - Particle Iteration ' + str(i))
         ax.scatter(y0, x0, c='b', s=0.75)
-        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm
-        ax = plt.gca()
+        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(cax=cax)
@@ -595,7 +595,7 @@ def animate_plots(start_val, end_val, folder_name):
 
     # set up the figure
     fig = plt.figure()
-    ax = plt.gca()
+    ax = fig.subplot(111)
 
     # initialization of animation, plot array of zeros
     def init():
@@ -743,7 +743,7 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
             A `matplotlib.axes` with the intended plot drawn on it
 
     """
-    if time is None:
+    if target_time is None:
         x, y, t = get_state(walk_data, int(iteration))
     else:
         x, y, t = get_time_state(walk_data, target_time)
