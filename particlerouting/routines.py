@@ -219,7 +219,7 @@ def unsteady_plots(params, num_steps, timestep,
 
         # make and save plots and data
         fig = plt.figure(dpi=200)
-        ax = fig.subplot(111)
+        ax = fig.add_subplot(111)
         ax.scatter(y0, x0, c='b', s=0.75)
         ax.scatter(yi, xi, c='r', s=0.75)
         im = ax.imshow(params.depth)
@@ -295,13 +295,13 @@ def time_plots(params, num_iter, folder_name):
                                             vmin=np.percentile(temptimes, 10))
 
         fig = plt.figure(dpi=200)
-        ax = fig.subplot(111)
+        ax = plt.gca()
         plt.title('Depth - Particle Iteration ' + str(i))
         ax.scatter(y0, x0, c='b', s=0.75)
-        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
+        sc = ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
-        cbar = plt.colorbar(cax=cax)
+        cbar = plt.colorbar(sc, cax=cax)
         cbar.set_label('Particle Travel Times [s]')
         im = ax.imshow(params.depth)
         divider = make_axes_locatable(ax)
@@ -595,7 +595,7 @@ def animate_plots(start_val, end_val, folder_name):
 
     # set up the figure
     fig = plt.figure()
-    ax = fig.subplot(111)
+    ax = fig.add_subplot(111)
 
     # initialization of animation, plot array of zeros
     def init():
