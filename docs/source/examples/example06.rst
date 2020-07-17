@@ -22,18 +22,18 @@ To set a travel time target, we will use the lower-level API and access the `par
 .. doctest::
 
    >>> walk_data = particle.run_iteration(target_time=2100)
-   >>> pr.routines.plot_initial(anugaparams.depth, walk_data)
-   >>> pr.routines.plot_final(anugaparams.depth, walk_depth)
+   >>> pr.routines.plot_state(anugaparams.depth, walk_data, iteration=0, c='b')
+   >>> pr.routines.plot_final(anugaparams.depth, walk_data, iteration=-1, c='r')
    >>> plt.title('Initial and Final Particle Locations')
    >>> plt.show()
 
 .. plot:: quickstart/demo2.py
 
-To see how close we are to the prescribed target travel time of 2100 seconds, we will loop through the particles and get a list of the final travel times that we then print to the console. We can access the data from the most recent step using `get_state`.
+To see how close we are to the prescribed target travel time of 2100 seconds, we will get a list of the final travel times that we then print to the console. We can access the data from the most recent step using `get_state`.
 
 .. doctest::
 
-   >>> xi, yi, finaltimes = get_state(walk_data)
+   >>> _, _, finaltimes = get_state(walk_data)
    >>> print('List of particle travel times for final particle locations: ' +
    >>>       str(np.round(finaltimes)))
 

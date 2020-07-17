@@ -6,14 +6,9 @@ Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
-from math import sqrt, cos
+from math import cos
 import numpy as np
 from numpy.random import random
-import sys
-import os
-import re
-import string
-import time
 
 
 class Tools():
@@ -52,6 +47,7 @@ class Tools():
     do a single iteration of the particle transport (**run_iteration**)
 
     """
+    
     # random pick seeding location
     def random_pick_seed(self, choices, probs=None):
         """Randomly pick a number from array of choices.

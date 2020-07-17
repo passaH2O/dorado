@@ -5,23 +5,21 @@ Higher level methods for routing and visualizing tracer particles.
 Project Homepage: https://github.com/
 """
 from __future__ import division, print_function, absolute_import
-from builtins import range, map
+from builtins import range
 from .particle_track import Particle
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scipy
-import sys
 import os
-import re
-import string
 from tqdm import tqdm
 import json
 
-#--------------------------------------------------------
+
+# --------------------------------------------------------
 # Functions for running random walk model
-#--------------------------------------------------------
+# --------------------------------------------------------
 def steady_plots(params, num_iter, folder_name, save_output=True):
     """Automated particle movement in steady flow field.
 
@@ -219,7 +217,7 @@ def unsteady_plots(params, num_steps, timestep,
 
         # make and save plots and data
         fig = plt.figure(dpi=200)
-        ax = fig.subplot(111)
+        ax = fig.add_subplot(111)
         ax.scatter(y0, x0, c='b', s=0.75)
         ax.scatter(yi, xi, c='r', s=0.75)
         im = ax.imshow(params.depth)
@@ -295,13 +293,13 @@ def time_plots(params, num_iter, folder_name):
                                             vmin=np.percentile(temptimes, 10))
 
         fig = plt.figure(dpi=200)
-        ax = fig.subplot(111)
+        ax = plt.gca()
         plt.title('Depth - Particle Iteration ' + str(i))
         ax.scatter(y0, x0, c='b', s=0.75)
-        ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
+        sc = ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
-        cbar = plt.colorbar(cax=cax)
+        cbar = plt.colorbar(sc, cax=cax)
         cbar.set_label('Particle Travel Times [s]')
         im = ax.imshow(params.depth)
         divider = make_axes_locatable(ax)
@@ -320,11 +318,12 @@ def time_plots(params, num_iter, folder_name):
 
     return walk_data
 
-#--------------------------------------------------------
+
+# --------------------------------------------------------
 # Functions for plotting/interpreting outputs
-#--------------------------------------------------------
+# --------------------------------------------------------
 def get_state(walk_data, iteration=-1):
-    """Pull walk_data values from a specific iteration
+    """Pull walk_data values from a specific iteration.
 
     Routine to return slices of the walk_data dict at a given iteration #.
     This function provides a shortcut to 'smart' indexing of the dict.
@@ -348,7 +347,8 @@ def get_state(walk_data, iteration=-1):
             List containing equivalent of walk_data['yinds'][:][iteration]
 
         times : `list`
-            List containing equivalent of walk_data['travel_times'][:][iteration]
+            List containing equivalent of
+            walk_data['travel_times'][:][iteration]
 
     """
     iteration = int(iteration)
@@ -367,7 +367,7 @@ def get_state(walk_data, iteration=-1):
 
 
 def get_time_state(walk_data, target_time):
-    """Pull walk_data values nearest to a specific time
+    """Pull walk_data values nearest to a specific time.
 
     Routine to return slices of the walk_data dict at a given travel time.
     This function provides a shortcut to 'smart' indexing of the dict.
@@ -415,7 +415,7 @@ def get_time_state(walk_data, target_time):
                 times.append(walk_data['travel_times'][ii][jj])
                 break
             # If we made it to the end without getting there, save last
-            elif (jj==len(walk_data['travel_times'][ii])-1):
+            elif (jj == len(walk_data['travel_times'][ii])-1):
                 xinds.append(walk_data['xinds'][ii][jj+1])
                 yinds.append(walk_data['yinds'][ii][jj+1])
                 times.append(walk_data['travel_times'][ii][jj+1])
@@ -441,7 +441,8 @@ def plot_exposure_time(walk_data,
             Output of a previous function call to run_iteration.
 
         exposure_times : `list`
-            List [] of floats containing the output of particle_track.exposure_time
+            List [] of floats containing the output of
+            particle_track.exposure_time
 
         folder_name : `str`
             Path to folder in which to save output plots.
@@ -520,7 +521,7 @@ def plot_exposure_time(walk_data,
         plt.ylabel('F(t) [-]')
         plt.xlim([0, end_time/timedelta])
         plt.ylim([0, 1])
-        plt.savefig(folder_name+'/Exact_CETD.png',bbox_inches='tight')
+        plt.savefig(folder_name+'/Exact_CETD.png', bbox_inches='tight')
         plt.close()
 
     # Smooth out the CDF by making it regular in time.
@@ -540,7 +541,7 @@ def plot_exposure_time(walk_data,
     plt.xlim([0, end_time/timedelta])
     plt.ylim([0, 1])
     if save_output:
-        plt.savefig(folder_name+'/Smooth_CETD.png',bbox_inches='tight')
+        plt.savefig(folder_name+'/Smooth_CETD.png', bbox_inches='tight')
 
     # Derive differential ETD from the CDF
     # Here we use 'linear' interpolation, because 'previous'
@@ -561,9 +562,10 @@ def plot_exposure_time(walk_data,
     plt.xlim([0, end_time/timedelta])
     plt.ylim(ymin=0)
     if save_output:
-        plt.savefig(folder_name+'/ETD.png',bbox_inches='tight')
+        plt.savefig(folder_name+'/ETD.png', bbox_inches='tight')
 
     return exposure_times
+
 
 # Function to automate animation of the png outputs
 # requires installation of the animation writer 'ffmpeg' which is not part of
@@ -595,7 +597,7 @@ def animate_plots(start_val, end_val, folder_name):
 
     # set up the figure
     fig = plt.figure()
-    ax = fig.subplot(111)
+    ax = fig.add_subplot(111)
 
     # initialization of animation, plot array of zeros
     def init():
