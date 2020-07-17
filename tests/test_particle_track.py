@@ -2,7 +2,7 @@ from __future__ import division, print_function, absolute_import
 from builtins import range, map
 from math import floor, sqrt, pi
 import pytest
-
+import io
 import sys, os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
@@ -376,3 +376,98 @@ class TestValueErrors:
         params.u = np.ones((3,3))
         with pytest.raises(ValueError):
             particle = particle_track.Particle(params)
+
+
+def test_coord2ind():
+    coords = [(10, 10),
+              (10, 15),
+              (15, 20)]
+    raster_origin = (2, 5)
+    raster_size = (25, 25)
+    cellsize = 1.0
+    inds = particle_track.coord2ind(coords, raster_origin,
+                                    raster_size, cellsize)
+    assert inds[0] == (20, 8)
+    assert inds[1] == (15, 8)
+    assert inds[2] == (10, 13)
+
+def test_ind2coord():
+    walk_data = dict()
+    walk_data['xinds'] = [[20], [15, 10]]
+    walk_data['yinds'] = [[8], [8, 13]]
+    raster_origin = (2, 5)
+    raster_size = (25, 25)
+    cellsize = 1.0
+    new_data = particle_track.ind2coord(walk_data, raster_origin,
+                                        raster_size, cellsize)
+    assert new_data['xcoord'][0] == [10.0]
+    assert new_data['ycoord'][0] == [10.0]
+    assert new_data['xcoord'][1] == [10.0, 15.0]
+    assert new_data['ycoord'][1] == [15.0, 20.0]
+
+def test_exposure_time_y():
+    walk_data = dict()
+    walk_data['xinds'] = [[1, 1, 1, 1, 1]]
+    walk_data['yinds'] = [[1, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 10]]
+    roi = np.zeros((6, 6))
+    roi[:, 2:4] = 1
+    exp_times = particle_track.exposure_time(walk_data, roi)
+    assert exp_times[0] == 4.0
+
+def test_exposure_time_y():
+    walk_data = dict()
+    walk_data['yinds'] = [[1, 1, 1, 1, 1]]
+    walk_data['xinds'] = [[1, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 10]]
+    roi = np.zeros((6, 6))
+    roi[2:4, :] = 1
+    exp_times = particle_track.exposure_time(walk_data, roi)
+    assert exp_times[0] == 4.0
+
+def test_exposure_reenter():
+    walk_data = dict()
+    walk_data['yinds'] = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+    walk_data['xinds'] = [[1, 2, 3, 4, 5, 4, 3, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 10, 11, 12, 13, 14, 15, 16]]
+    roi = np.zeros((6, 6))
+    roi[2:3, :] = 1
+    exp_times = particle_track.exposure_time(walk_data, roi)
+    assert exp_times[0] == 3.0
+
+def test_unstruct2grid_k1():
+    coords = [(10.5, 10.1),
+              (10.1, 15.1),
+              (15.2, 20.2)]
+    quantity = [1, 2, 3]
+    cellsize = 1.0
+    interp_func, gridd = particle_track.unstruct2grid(coords, quantity,
+                                                      cellsize,
+                                                      k_nearest_neighbors=1)
+    assert np.all(gridd == np.array([[3., 3., 3., 3., 3., 3., 3.],
+                                     [2., 3., 3., 3., 3., 3., 3.],
+                                     [2., 2., 3., 3., 3., 3., 3.],
+                                     [2., 2., 2., 3., 3., 3., 3.],
+                                     [2., 2., 2., 2., 3., 3., 3.],
+                                     [2., 2., 2., 2., 2., 3., 3.],
+                                     [2., 2., 2., 2., 2., 2., 3.],
+                                     [2., 2., 2., 2., 2., 2., 2.],
+                                     [2., 2., 2., 2., 2., 2., 2.],
+                                     [1., 1., 1., 1., 1., 1., 1.],
+                                     [1., 1., 1., 1., 1., 1., 1.],
+                                     [1., 1., 1., 1., 1., 1., 1.]]))
+
+def test_unstruct2grid_k3():
+    coords = [(1.5, 1.1),
+              (0.1, 2.1),
+              (1.2, 2.2)]
+    quantity = [1, 2, 3]
+    cellsize = 1.0
+    interp_func, gridd = particle_track.unstruct2grid(coords, quantity,
+                                                      cellsize,
+                                                      k_nearest_neighbors=3)
+    assert pytest.approx(gridd == np.array([[2.13911589, 2.26676874,
+                                             2.1792037],
+                                            [2., 2.68254467, 2.10026059],
+                                            [1.96968263, 1.6122416,
+                                             1.65818041]]))
