@@ -32,8 +32,8 @@ Now let's route 50 particles with a target travel time of 2100 seconds. We will 
 .. doctest::
 
    >>> walk_data = particle.run_iteration(target_time=2100)
-   >>> pr.routines.plot_initial(anugaparams.depth, walk_data)
-   >>> pr.routines.plot_final(anugaparams.depth, walk_depth)
+   >>> pr.routines.plot_state(anugaparams.depth, walk_data, iteration=0, c='b')
+   >>> pr.routines.plot_state(anugaparams.depth, walk_data, iteration=-1, c='r')
    >>> plt.title('Initial and Final Particle Locations')
    >>> plt.show()
 
