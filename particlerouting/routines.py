@@ -488,6 +488,7 @@ def plot_exposure_time(walk_data,
     # Save exposure times by particle ID
     fpath = folder_name + '/exposure_times.txt'
     json.dump(exposure_times, open(fpath, 'w'))
+    exposure_times = np.array(exposure_times)
 
     # Set end of ETD as the minimum travel time of particles
     # Exposure times after that are unreliable because not all particles have
@@ -563,8 +564,6 @@ def plot_exposure_time(walk_data,
     plt.ylim(ymin=0)
     if save_output:
         plt.savefig(folder_name+'/ETD.png', bbox_inches='tight')
-
-    return exposure_times
 
 
 # Function to automate animation of the png outputs
