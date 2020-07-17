@@ -748,7 +748,7 @@ def exposure_time(walk_data,
                           ' ROI at final timestep. \n' +
                           'Run more iterations to get tail of ETD')
 
-    return exposure_times
+    return exposure_times.tolist()
 
 
 def unstruct2grid(coordinates,
