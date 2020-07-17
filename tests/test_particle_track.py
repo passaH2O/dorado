@@ -435,7 +435,7 @@ def test_exposure_reenter():
     exp_times = particle_track.exposure_time(walk_data, roi)
     assert exp_times[0] == 3.0
 
-def test_unstruct2grid():
+def test_unstruct2grid_k1():
     coords = [(10.5, 10.1),
               (10.1, 15.1),
               (15.2, 20.2)]
@@ -457,7 +457,7 @@ def test_unstruct2grid():
                                      [1., 1., 1., 1., 1., 1., 1.],
                                      [1., 1., 1., 1., 1., 1., 1.]]))
 
-def test_unstruct2grid():
+def test_unstruct2grid_k3():
     coords = [(1.5, 1.1),
               (0.1, 2.1),
               (1.2, 2.2)]
