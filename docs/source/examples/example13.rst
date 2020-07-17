@@ -174,7 +174,7 @@ data.
 
 
 
-.. image:: unstructured_grid_anuga_files%5Cunstructured_grid_anuga_10_1.png
+.. image:: images/example13/unstructured_grid_anuga_10_1.png
 
 
 Now, let’s use the new function ``myInterp`` to grid our additional
@@ -210,7 +210,7 @@ dataset, and we assume that they have all the same coordinates.
 
 
 
-.. image:: unstructured_grid_anuga_files%5Cunstructured_grid_anuga_12_1.png
+.. image:: images/example13/unstructured_grid_anuga_12_1.png
 
 
 **Note:** In all these cases, if your unstructured data does not fill
@@ -284,7 +284,7 @@ of either meters or decimal degrees.
 
 
 
-.. image:: unstructured_grid_anuga_files%5Cunstructured_grid_anuga_15_2.png
+.. image:: images/example13/unstructured_grid_anuga_15_2.png
 
 
 Set up particle routing parameters
@@ -536,7 +536,7 @@ First, let’s generate and visualize the ROI:
 
 
 
-.. image:: unstructured_grid_anuga_files%5Cunstructured_grid_anuga_29_1.png
+.. image:: images/example13/unstructured_grid_anuga_29_1.png
 
 
 Then compute. ``exposure_time()`` outputs a list of exposure times by
@@ -622,11 +622,11 @@ generate plots of the cumulative and differential forms of the ETD
 
 
 
-.. image:: unstructured_grid_anuga_files%5Cunstructured_grid_anuga_31_2.png
+.. image:: images/example13/unstructured_grid_anuga_31_2.png
 
 
 
-.. image:: unstructured_grid_anuga_files%5Cunstructured_grid_anuga_31_3.png
+.. image:: images/example13/unstructured_grid_anuga_31_3.png
 
 
 **Note:** If any particles are still in the ROI at the end of their
