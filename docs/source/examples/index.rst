@@ -21,3 +21,4 @@ Examples of the high-level API functionality are provided here. These examples r
    example10
    example11
    example12
+   example13

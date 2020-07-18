@@ -828,6 +828,8 @@ def unstruct2grid(coordinates,
 
         # Function to do the interpolation
         def interp_func(data):
+            if isinstance(data, list):
+                data = np.array(data)
             gridded_data = data[gridqInd]
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
@@ -841,6 +843,8 @@ def unstruct2grid(coordinates,
         nn_inds = NNInfo[1]
 
         def interp_func(data):
+            if isinstance(data, list):
+                data = np.array(data)
             denom = 0.
             num = 0.
             for i in list(range(k_nearest_neighbors)):
