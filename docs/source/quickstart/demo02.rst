@@ -8,8 +8,9 @@ First we load the sample parameters and define our `Particle` object.
 
 .. doctest::
 
+   >>> from particlerouting.example_data import define_params as dp
    >>> import particlerouting as pr
-   >>> anugaparams = pr.example_data.define_params.make_anuga_params()
+   >>> anugaparams = dp.make_anuga_params()
    >>> particle = pr.particle_track.Particle(anugaparams)
 
 We can visualize the flow discharge components for this scenario from the loaded parameters. The full script used to produce the below figures is available :download:`here <../pyplots/quickstart/demo2_flow.py>`.
