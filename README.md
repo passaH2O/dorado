@@ -29,13 +29,13 @@ See the python scripts provided in the examples folder.
 Initial particle locations indicated by blue/green dots, active/evolving particle locations shown as red dots.
 
 ### Particles on a DeltaRCM Simulated Delta
-<div class="nav3" style="height:705px;" align="center">
-    <img src="docs/source/examples/images/example02/steady_deltarcm.gif" alt="Example" width="80%"></a>
+<div class="nav3" style="height:705px;">
+    <img src="docs/source/examples/images/example02/steady_deltarcm.gif" alt="Example" width="75%"></a>
 </div>
 
 ### Particles on an Unsteady ANUGA Flow Field of the Wax Lake Delta
-<div class="nav3" style="height:705px;" align="center">
-    <img src="docs/source/examples/images/waxlake.gif" alt="Example" width="70%"></a>
+<div class="nav3" style="height:705px;">
+    <img src="docs/source/examples/images/waxlake.gif" alt="Example" width="65%"></a>
 </div>
 
 ## Documentation
