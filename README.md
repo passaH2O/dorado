@@ -35,7 +35,7 @@ Initial particle locations indicated by blue/green dots, active/evolving particl
 
 ### Particles on an Unsteady ANUGA Flow Field of the Wax Lake Delta
 <div class="nav3" style="height:705px;">
-    <img src="docs/source/examples/images/waxlake.gif" alt="Example" width="60%"></a>
+    <img src="docs/source/examples/images/waxlake.gif" alt="Example" width="70%"></a>
 </div>
 
 ## Documentation
