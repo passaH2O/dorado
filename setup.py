@@ -11,7 +11,7 @@ setup(
     author_email = 'jayaram.hariharan@utexas.edu',
     url = 'https://github.com/',
     packages = find_packages(exclude=['*.tests']),
-    include_package_data= True,
+    package_data = {'' : ['*.txt', '*.npz']},
     long_description = 'See project webpage for details: https://github.com/',
     classifiers = ['Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3.6',
