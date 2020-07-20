@@ -8,8 +8,9 @@ First we load the sample parameters.
 
 .. doctest::
 
+    >>> from particlerouting.example_data import define_params as dp
     >>> import particlerouting as pr
-    >>> rcmparams = pr.example_data.define_params.make_rcm_params()
+    >>> rcmparams = dp.make_rcm_params()
 
 We can visualize the water depth for this scenario from the parameters. If you'd like to download this portion of the demo as a standalone script, it is available :download:`here <../pyplots/quickstart/demo1_depth.py>`.
 
