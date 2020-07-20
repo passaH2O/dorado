@@ -19,23 +19,23 @@ Lagrangian particle routing via weighted random walks.
 ### Installation:
 (tested on Ubuntu, Windows, and Mac)
 - Clone the repository
-- From the cloned folder, run `python setup.py install` to install most of package (will run into error related to Python2.7 retirement)
+- From the cloned folder, run `python setup.py install` to install most of package
 - Then run `pip install particlerouting` to finish installing the package
 
 ### Example Use:
 See the python scripts provided in the examples folder.
 
 ## Example Results:
-Initial particle locations indicated by blue dots, active/evolving particle locations shown as red dots.
+Initial particle locations indicated by blue/green dots, active/evolving particle locations shown as red dots.
 
 ### Particles on a DeltaRCM Simulated Delta
 <div class="nav3" style="height:705px;">
     <img src="docs/source/examples/images/example02/steady_deltarcm.gif" alt="Example" width="75%"></a>
 </div>
 
-### Particles on a ANUGA Hydro generated flow field
+### Particles on an Unsteady ANUGA Flow Field of the Wax Lake Delta
 <div class="nav3" style="height:705px;">
-    <img src="docs/source/examples/images/example01/steady_anuga.gif" alt="Example" width="75%"></a>
+    <img src="docs/source/examples/images/waxlake.gif" alt="Example" width="75%"></a>
 </div>
 
 ## Documentation
