@@ -1,7 +1,7 @@
 # ParticleRouting
 
 <div class="nav3" style="height:705px;">
-    <img src="docs/source/examples/images/logo.gif" alt="Particle routing on Lidar-derived bathymetry" width="75%"></a>
+    <img src="docs/source/examples/images/logo.gif" alt="Particle routing on Lidar-derived bathymetry" width="65%"></a>
 </div>
 
 v1.00
