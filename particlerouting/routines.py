@@ -20,7 +20,7 @@ import json
 # --------------------------------------------------------
 # Functions for running random walk model
 # --------------------------------------------------------
-def steady_plots(params, num_iter, folder_name, save_output=True):
+def steady_plots(params, num_iter, folder_name=None, save_output=True):
     """Automated particle movement in steady flow field.
 
     Function to automate plotting of particle movement over a steady flow
@@ -35,8 +35,8 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
         num_iter : `int`
             Number of iterations to move particles over
 
-        folder_name : `str`
-            String of folder name to put outputs in
+        folder_name : `str`, optional
+            Path to folder in which to save output plots.
 
         save_output : `bool`, optional
             Controls whether or not the output images/data are saved to disk.
@@ -58,12 +58,16 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
 
     # make directory to save the data
     if save_output:
-        try:
-            os.makedirs(os.getcwd() + '/' + folder_name)
-            os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
-            os.makedirs(os.getcwd() + '/' + folder_name + '/data')
-        except Exception:
-            print('Directories already exist')
+        if folder_name is None:
+            folder_name = os.getcwd()
+        if os.path.exists(folder_name):
+            print('Saving files in existing directory')
+        else:
+            os.makedirs(folder_name)
+        if not os.path.exists(folder_name+os.sep+'figs'):
+            os.makedirs(folder_name+os.sep+'figs')
+        if not os.path.exists(folder_name+os.sep+'data'):
+            os.makedirs(folder_name+os.sep+'data')
 
     walk_data = None  # Initialize object for function call
 
@@ -87,13 +91,13 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
             cbar.set_label('Water Depth [m]')
             ax.scatter(y0, x0, c='b', s=0.75)
             ax.scatter(yi, xi, c='r', s=0.75)
-            plt.savefig(os.getcwd()+'/'+folder_name +
-                        '/figs/output'+str(i)+'.png')
+            plt.savefig(folder_name+os.sep+
+                        'figs'+os.sep+'output'+str(i)+'.png')
             plt.close()
 
     if save_output:
         # save data as json text file - technically human readable
-        fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+        fpath = folder_name+os.sep+'data'+os.sep+'data.txt'
         json.dump(walk_data, open(fpath, 'w'))
 
         # example code to load the dictionary back from the output json file
@@ -104,7 +108,7 @@ def steady_plots(params, num_iter, folder_name, save_output=True):
 
 def unsteady_plots(params, num_steps, timestep,
                    output_base, output_type,
-                   folder_name):
+                   folder_name=None):
     """Automated particle movement in unsteady flow.
 
     Function to automate plotting of particle movement in an unsteady flow
@@ -135,8 +139,8 @@ def unsteady_plots(params, num_steps, timestep,
             'stage', 'qx', 'qy', or 'data', followed by timestep information
             (limited built-in support, may require modification)
 
-        folder_name : `str`
-            String of the desired output folder name
+        folder_name : `str`, optional
+            Path to folder in which to save output plots.
 
     **Outputs** :
 
@@ -149,12 +153,16 @@ def unsteady_plots(params, num_steps, timestep,
 
     """
     # make directory to save the data
-    try:
-        os.makedirs(os.getcwd() + '/' + folder_name)
-        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
-        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
-    except Exception:
-        print('Directories already exist')
+    if folder_name is None:
+        folder_name = os.getcwd()
+    if os.path.exists(folder_name):
+        print('Saving files in existing directory')
+    else:
+        os.makedirs(folder_name)
+    if not os.path.exists(folder_name+os.sep+'figs'):
+        os.makedirs(folder_name+os.sep+'figs')
+    if not os.path.exists(folder_name+os.sep+'data'):
+        os.makedirs(folder_name+os.sep+'data')
 
     # Create lists of depth, qx, qy files in the specified output_base folder
     depthlist = [x for x in os.listdir(output_base) if x.startswith('depth')]
@@ -228,11 +236,11 @@ def unsteady_plots(params, num_steps, timestep,
                             ax.get_position().height])
         cbar = plt.colorbar(im, cax=cax)
         cbar.set_label('Water Depth [m]')
-        plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png')
         plt.close()
 
     # save data as a json text file - technically human readable
-    fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+    fpath = folder_name+os.sep+'data'+os.sep+'data.txt'
     json.dump(walk_data, open(fpath, 'w'))
 
     # example code for loading the dict back from the output json file:
@@ -241,7 +249,7 @@ def unsteady_plots(params, num_steps, timestep,
     return walk_data
 
 
-def time_plots(params, num_iter, folder_name):
+def time_plots(params, num_iter, folder_name=None):
     """Steady flow plots with particle travel times visualized.
 
     Make plots with each particle's travel time visualized.
@@ -256,8 +264,8 @@ def time_plots(params, num_iter, folder_name):
         num_iter : `int`
             Number of iterations to move particles
 
-        folder_name : `str`
-            String of desired output folder name
+        folder_name : `str`, optional
+            Path to folder in which to save output plots.
 
     **Outputs** :
 
@@ -271,12 +279,16 @@ def time_plots(params, num_iter, folder_name):
     particle = Particle(params)
 
     # make directory to save the data
-    try:
-        os.makedirs(os.getcwd() + '/' + folder_name)
-        os.makedirs(os.getcwd() + '/' + folder_name + '/figs')
-        os.makedirs(os.getcwd() + '/' + folder_name + '/data')
-    except Exception:
-        print('Directories already exist')
+    if folder_name is None:
+        folder_name = os.getcwd()
+    if os.path.exists(folder_name):
+        print('Saving files in existing directory')
+    else:
+        os.makedirs(folder_name)
+    if not os.path.exists(folder_name+os.sep+'figs'):
+        os.makedirs(folder_name+os.sep+'figs')
+    if not os.path.exists(folder_name+os.sep+'data'):
+        os.makedirs(folder_name+os.sep+'data')
 
     walk_data = None  # Initialize list for function call
     # Iterate and save results
@@ -306,11 +318,11 @@ def time_plots(params, num_iter, folder_name):
         cax = divider.append_axes("bottom", size="5%", pad=0.5)
         cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
         cbar2.set_label('Water Depth [m]')
-        plt.savefig(os.getcwd()+'/'+folder_name+'/figs/output'+str(i)+'.png')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png')
         plt.close()
 
     # save data as a json text file - technically human readable
-    fpath = os.getcwd() + '/' + folder_name + '/data/data.txt'
+    fpath = folder_name+os.sep+'data'+os.sep+'data.txt'
     json.dump(walk_data, open(fpath, 'w'))
 
     # example code for loading the dict back from the output json file:
@@ -444,7 +456,7 @@ def plot_exposure_time(walk_data,
             List [] of floats containing the output of
             particle_track.exposure_time
 
-        folder_name : `str`
+        folder_name : `str`, optional
             Path to folder in which to save output plots.
 
         timedelta : `int or float`, optional
@@ -482,11 +494,20 @@ def plot_exposure_time(walk_data,
     else:
         timeunit = '[' + str(timedelta) + ' s]'
 
+    # Handle directories
     if folder_name is None:
         folder_name = os.getcwd()
+    if os.path.exists(folder_name):
+        print('Saving files in existing directory')
+    else:
+        os.makedirs(folder_name)
+    if not os.path.exists(folder_name+os.sep+'figs'):
+        os.makedirs(folder_name+os.sep+'figs')
+    if not os.path.exists(folder_name+os.sep+'data'):
+        os.makedirs(folder_name+os.sep+'data')
 
     # Save exposure times by particle ID
-    fpath = folder_name + '/exposure_times.txt'
+    fpath = folder_name+os.sep+'data'+os.sep+'exposure_times.txt'
     json.dump(exposure_times, open(fpath, 'w'))
     exposure_times = np.array(exposure_times)
 
@@ -522,7 +543,8 @@ def plot_exposure_time(walk_data,
         plt.ylabel('F(t) [-]')
         plt.xlim([0, end_time/timedelta])
         plt.ylim([0, 1])
-        plt.savefig(folder_name+'/Exact_CETD.png', bbox_inches='tight')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'Exact_CETD.png',
+                    bbox_inches='tight')
         plt.close()
 
     # Smooth out the CDF by making it regular in time.
@@ -542,7 +564,8 @@ def plot_exposure_time(walk_data,
     plt.xlim([0, end_time/timedelta])
     plt.ylim([0, 1])
     if save_output:
-        plt.savefig(folder_name+'/Smooth_CETD.png', bbox_inches='tight')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'Smooth_CETD.png',
+                    bbox_inches='tight')
 
     # Derive differential ETD from the CDF
     # Here we use 'linear' interpolation, because 'previous'
@@ -563,7 +586,8 @@ def plot_exposure_time(walk_data,
     plt.xlim([0, end_time/timedelta])
     plt.ylim(ymin=0)
     if save_output:
-        plt.savefig(folder_name+'/ETD.png', bbox_inches='tight')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'ETD.png',
+                    bbox_inches='tight')
 
 
 # Function to automate animation of the png outputs
@@ -606,7 +630,7 @@ def animate_plots(start_val, end_val, folder_name):
 
     def animate(i):
         # Read in picture
-        fname = os.getcwd() + '/' + folder_name + '/figs/output%d.png' % i
+        fname = folder_name+os.sep+'figs'+os.sep+'output%d.png' % i
 
         # [-1::-1], to invert the array
         # Otherwise it plots up-side down
@@ -633,7 +657,7 @@ def animate_plots(start_val, end_val, folder_name):
     writer = Writer(fps=5, codec="libx264", extra_args=['-pix_fmt', 'yuv420p'],
                     metadata=dict(artist='Me'), bitrate=-1)
 
-    anim.save(os.getcwd()+'/' + folder_name + '/animation.mp4', writer=writer,
+    anim.save(folder_name+os.sep+'animation.mp4', writer=writer,
               dpi=300)
 
 
