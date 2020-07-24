@@ -13,5 +13,5 @@ params.seed_xloc = list(range(5, 16))
 params.seed_yloc = list(range(48, 53))
 
 # then apply the unsteady_plots function and let it assign domain parameters
-unsteady_plots(params, 26, 75., 'unsteady_data',
-               'csv', 'unsteady_output')
+walk_data = unsteady_plots(params, 26, 75., 'unsteady_data',
+                           'csv', 'unsteady_output')
