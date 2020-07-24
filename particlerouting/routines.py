@@ -92,7 +92,8 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
             ax.scatter(y0, x0, c='b', s=0.75)
             ax.scatter(yi, xi, c='r', s=0.75)
             plt.savefig(folder_name+os.sep+
-                        'figs'+os.sep+'output'+str(i)+'.png')
+                        'figs'+os.sep+'output'+str(i)+'.png',
+                        bbox_inches='tight')
             plt.close()
 
     if save_output:
@@ -236,7 +237,8 @@ def unsteady_plots(params, num_steps, timestep,
                             ax.get_position().height])
         cbar = plt.colorbar(im, cax=cax)
         cbar.set_label('Water Depth [m]')
-        plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
+                    bbox_inches='tight')
         plt.close()
 
     # save data as a json text file - technically human readable
@@ -318,7 +320,8 @@ def time_plots(params, num_iter, folder_name=None):
         cax = divider.append_axes("bottom", size="5%", pad=0.5)
         cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
         cbar2.set_label('Water Depth [m]')
-        plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png')
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
+                    bbox_inches='tight')
         plt.close()
 
     # save data as a json text file - technically human readable
@@ -731,7 +734,7 @@ def draw_travel_path(depth, walk_data,
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.axis('scaled')
     plt.tight_layout()
-    plt.savefig(output_file)
+    plt.savefig(output_file, bbox_inches='tight')
     plt.close()
 
 
