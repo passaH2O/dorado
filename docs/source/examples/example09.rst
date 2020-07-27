@@ -36,9 +36,4 @@ We will seed 50 particles in the center of our artificial domain and then simula
 
 If we animate the particle travel information we will get the below plot.
 
-.. doctest::
-
-   >>> draw_travel_path(depth, all_walk_data, [0,1,2,3],
-   >>>                  'steady_anuga_example/data/travel_paths.png')
-
 .. image:: images/example09/random_walk.gif
