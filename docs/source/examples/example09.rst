@@ -3,17 +3,17 @@
 Example 9 - True Random Walk
 ============================
 
-`particlerouting` is fundamentally built on the concept of random walks. We can strip away the directed/weighted nature of the particle routing to return to a regular 2-D random walk process. This is what we will do in this example.
+`dorado` is fundamentally built on the concept of random walks. We can strip away the directed/weighted nature of the particle routing to return to a regular 2-D random walk process. This is what we will do in this example.
 
 Full example script available :download:`here <../../../examples/true_random_walk.py>`.
 
-First we will define our parameters for the unweighted random walk. To do this, we will simulate uniform flow depth, and provide no flow information. Then we will set all of our weighting parameters to 0.
+First we will define our parameters for the unweighted random walk. To do this, we will simulate a constant water depth, and provide no flow information. Then we will set all of our weighting parameters to 0.
 
 .. doctest::
 
    >>> import numpy as np
-   >>> from particlerouting import particle_track
-   >>> from particlerouting import routines
+   >>> from dorado import particle_track
+   >>> from dorado import routines
 
    >>> params = particle_track.params()
    >>> params.depth = np.ones((100, 100))

@@ -1,8 +1,8 @@
 [run]
-source = particlerouting
+source = dorado
 
 omit =
-    particlerouting/parallel_routing.py
-    particlerouting/routines.py
+    dorado/parallel_routing.py
+    dorado/routines.py
     *__init__*
-    particlerouting/example_data/define_params.py
+    dorado/example_data/define_params.py

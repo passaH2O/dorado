@@ -1,7 +1,7 @@
 """Plot for quickstart demo 1."""
 import matplotlib.pyplot as plt
-from particlerouting import routines
-from particlerouting.example_data.define_params import make_rcm_params
+from dorado import routines
+from dorado.example_data.define_params import make_rcm_params
 import numpy as np
 
 np.random.seed(1)  # fix random seed so example is always the same

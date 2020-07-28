@@ -7,11 +7,11 @@ User Guide
 Overview
 --------
 
-The basic workflow when using `particlerouting`, can be summarized in two steps.
+The basic workflow when using `dorado`, can be summarized in two steps.
 
 1. Initialize parameters using the `particle_track.params` class and provide information about the domain, where and how many particles are going to be seeded, and adjust any parameters as desired.
 
-2. Either use one of the high-level API procedures defined in `routines.py`, or define a particle using the `particle_track.Particle` and simulation particle evolution using either the `particle_track.run_iteration` method.
+2. Either use one of the high-level API procedures defined in `routines.py`, or define a particle using the `particle_track.Particle` and simulation particle evolution using the `particle_track.run_iteration` method.
 
 Here we will describe some of the functionality built into the high-level API as well as the options available at the lower-level.
 
@@ -23,10 +23,10 @@ Defining the parameters is require prior to doing any particle routing. Initiati
 
 .. doctest::
 
-   >>> import particlerouting.particle_track as pt
+   >>> import dorado.particle_track as pt
    >>> params = pt.params()
 
-After establishing the parameter class, information about the domain must be provided, as well as information about where the particles are going to be seeded and how many particles should be used. As `particlerouting` is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible however some values **must** be provided.
+After establishing the parameter class, information about the domain must be provided, as well as information about where the particles are going to be seeded and how many particles should be used. As `dorado` is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible however some values **must** be provided.
 
 Required Parameters
 ^^^^^^^^^^^^^^^^^^^
@@ -68,7 +68,7 @@ High-level functionality is provided in the `routines.py` script. Many of the ex
 * Plot the travel paths specified particles have taken
 * Plot the particle positions for a specified iteration or travel time
 
-For additional detail, either view the script itself (:download:`routines.py <../../../particlerouting/routines.py>`), or refer to the :ref:`apiref`.
+For additional detail, either view the script itself (:download:`routines.py <../../../dorado/routines.py>`), or refer to the :ref:`apiref`.
 
 The Lower-Level API
 -------------------
@@ -79,4 +79,4 @@ Lower-level functionality is provided in the `particle_track.py` script. At this
 * Function for calculating exposure time (and residence time) of particles in a defined region of interest
 * Assorted functions for transforming from real coordinate systems to the raster domain used for the particle routing
 
-For additional detail, either view the script itself (:download:`particle_track.py <../../../particlerouting/particle_track.py>`), or refer to the :ref:`apiref`.
+For additional detail, either view the script itself (:download:`particle_track.py <../../../dorado/particle_track.py>`), or refer to the :ref:`apiref`.

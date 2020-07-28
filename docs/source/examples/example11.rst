@@ -11,7 +11,7 @@ Shortened code for the synthetic channel creation will be provided, for the full
 
    >>> import numpy as np
    >>> import matplotlib.pyplot as plt
-   >>> import particlerouting.particle_track as pt
+   >>> import dorado.particle_track as pt
 
    >>> domain = np.zeros((100, 50))
    >>> depth[:, 10:40] = 1.0
@@ -23,7 +23,7 @@ In the 100 x 50 cell domain, we have a straight channel with flow from the top o
    :nowrap:
 
    \begin{eqnarray}
-   {\text{Exp. Time} = 59.5 \text{ cells} \times 50 \text{ m/cell} \div 10 \text{ m/s} = 297.5 \text{ seconds}}`.
+   {\text{Exp. Time} = 59.5 \text{ cells} \times 50 \text{ m/cell} \div 10 \text{ m/s} = 297.5 \text{ seconds}}.
    \end{eqnarray}
 
 With this in mind we will conduct two simulations, both using 500 tracer particles. In the first, we will set the travel time diffusion coefficient (`diff_coeff`) to 0, and in the second we will set it to 1.0 (a significant amount of added diffusivity).

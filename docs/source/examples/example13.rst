@@ -35,9 +35,9 @@ Import necessary dependencies
     %matplotlib inline
     from matplotlib import pyplot as plt
     import json
-    import particlerouting
-    from particlerouting import particle_track as pt
-    from particlerouting import routines
+    import dorado
+    from dorado import particle_track as pt
+    from dorado import routines
 
 
 Load in model outputs
@@ -101,7 +101,7 @@ Convert data and coordinates for particle routing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we have the data we need, we can convert it into the format
-needed by ``particlerouting``. This will include gridding the
+needed by ``dorado``. This will include gridding the
 hydrodynamic outputs and transforming our geospatial coordinates into
 “array index” coordinates.
 

@@ -6,7 +6,7 @@ import io
 import sys, os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
-from particlerouting import particle_track
+from dorado import particle_track
 import numpy as np
 
 # init some parameters

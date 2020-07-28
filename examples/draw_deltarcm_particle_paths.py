@@ -2,7 +2,7 @@
 # Can only be run after steady_deltarcm_particles.py has been successfully run
 import numpy as np
 import json
-from particlerouting.routines import draw_travel_path
+from dorado.routines import draw_travel_path
 
 # load the depth data
 data = np.load('ex_deltarcm_data.npz')

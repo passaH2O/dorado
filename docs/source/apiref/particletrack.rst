@@ -1,8 +1,8 @@
 .. _particletrack:
 
-particlerouting.particle_track
+dorado.particle_track
 ------------------------------
 
-.. automodule:: particlerouting.particle_track
+.. automodule:: dorado.particle_track
    :members:
    :special-members:

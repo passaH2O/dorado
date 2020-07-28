@@ -8,7 +8,7 @@ import os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
 import numpy as np
-from particlerouting.particle_tools import Tools
+from dorado.particle_tools import Tools
 
 # defining some of the geometric/walk values up top
 jwalk = np.array([[-1, -1, -1],

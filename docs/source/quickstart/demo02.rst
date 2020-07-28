@@ -2,14 +2,14 @@
 
 Demo 2 - Using Lower-Level Functionality
 ----------------------------------------
-In this demo, we show how particles can be placed on a gridded flow field generated using the `ANUGA <https://github.com/GeoscienceAustralia/anuga_core>`_ software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in :download:`particle_track.py <../../../particlerouting/particle_track.py>`.
+In this demo, we show how particles can be placed on a gridded flow field generated using the `ANUGA <https://github.com/GeoscienceAustralia/anuga_core>`_ software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in :download:`particle_track.py <../../../dorado/particle_track.py>`.
 
 First we load the sample parameters and define our `Particle` object.
 
 .. doctest::
 
-   >>> from particlerouting.example_data import define_params as dp
-   >>> import particlerouting as pr
+   >>> from dorado.example_data import define_params as dp
+   >>> import dorado as pr
    >>> anugaparams = dp.make_anuga_params()
    >>> particle = pr.particle_track.Particle(anugaparams)
 

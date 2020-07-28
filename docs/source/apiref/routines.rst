@@ -1,8 +1,8 @@
 .. _routines:
 
-particlerouting.routines
+dorado.routines
 ------------------------
 
-.. automodule:: particlerouting.routines
+.. automodule:: dorado.routines
    :members:
    :special-members:

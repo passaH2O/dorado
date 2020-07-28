@@ -21,7 +21,7 @@ Next we will do the parallel routing using 2 CPU cores using the `parallel_routi
 
 .. doctest::
 
-   >>> from particlerouting.parallel_routing import parallel_routing
+   >>> from dorado.parallel_routing import parallel_routing
    >>> par_result = parallel_routing(params, 50, 2)
 
 For comparison, we will the comparable serial process twice so that the proper number of particles are simulated.

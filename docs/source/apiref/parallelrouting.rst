@@ -1,8 +1,8 @@
 .. _parallelrouting:
 
-particlerouting.parallel_routing
+dorado.parallel_routing
 --------------------------------
 
-.. automodule:: particlerouting.parallel_routing
+.. automodule:: dorado.parallel_routing
    :members:
    :special-members:

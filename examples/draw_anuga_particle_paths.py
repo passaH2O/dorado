@@ -3,7 +3,7 @@
 import numpy as np
 import os
 import json
-from particlerouting.routines import draw_travel_path
+from dorado.routines import draw_travel_path
 
 ### load the depth data
 data = np.load('ex_anuga_data.npz')

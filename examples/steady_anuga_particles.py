@@ -1,8 +1,8 @@
 """Make an example of the workflow with gridded anuga output data."""
 
 import numpy as np
-from particlerouting.routines import steady_plots
-import particlerouting.particle_track as pt
+from dorado.routines import steady_plots
+import dorado.particle_track as pt
 
 # load some variables from a anuga output so stage is varied
 data = np.load('ex_anuga_data.npz')

@@ -14,14 +14,14 @@
 #
 import os
 import sys
-import particlerouting as pr
+import dorado as pr
 
 # add path to repo-head
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'particlerouting'
+project = 'dorado'
 copyright = '2020, J. Hariharan, K. Wright, P. Passalacqua'
 author = 'J. Hariharan, K. Wright, P. Passalacqua'
 
@@ -103,7 +103,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'particleroutingdoc'
+htmlhelp_basename = 'doradodoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -130,7 +130,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'particlerouting.tex', u'particlerouting Documentation',
+    (master_doc, 'dorado.tex', u'dorado Documentation',
      u'J. Hariharan', 'manual'),
 ]
 
@@ -140,7 +140,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'particlerouting', u'particlerouting Documentation',
+    (master_doc, 'dorado', u'dorado Documentation',
      [author], 1)
 ]
 
@@ -151,8 +151,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'particlerouting', u'particlerouting Documentation',
-     author, 'particlerouting', 'One line description of project.',
+    (master_doc, 'dorado', u'dorado Documentation',
+     author, 'dorado', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -182,7 +182,7 @@ autodoc_default_flags = ['members']
 
 # doctest
 doctest_global_setup = '''
-import particlerouting
+import dorado
 import numpy as np
 from matplotlib import pyplot as plt
 '''
@@ -195,5 +195,5 @@ plot_formats = ['png', ('hires.png', 300)]
 plot_pre_code = '''
 import numpy as np
 from matplotlib import pyplot as plt
-import particlerouting
+import dorado
 '''

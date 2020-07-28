@@ -1,10 +1,10 @@
 """Example of the workflow with gridded anuga output data"""
 
 import numpy as np
-import particlerouting.particle_track as pt
-from particlerouting.particle_track import params
-from particlerouting.routines import get_state
-from particlerouting.routines import plot_state
+import dorado.particle_track as pt
+from dorado.particle_track import params
+from dorado.routines import get_state
+from dorado.routines import plot_state
 import matplotlib.pyplot as plt
 
 # load some variables from a deltarcm output so stage is varied
@@ -33,7 +33,7 @@ params.dx = 10.
 params.theta = 1.0
 params.model = 'Anuga'
 
-### Apply the parameters to run the particle routing model
+# Apply the parameters to run the model
 particle = pt.Particle(params)
 np.random.seed(0)
 # run model until all particles have travelled for about 1.5 hours

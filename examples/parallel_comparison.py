@@ -2,11 +2,11 @@
 
 import numpy as np
 import time
-from particlerouting.parallel_routing import parallel_routing
+from dorado.parallel_routing import parallel_routing
 
 # for serial run comparison import the regular iterator
-from particlerouting.particle_track import Particle
-import particlerouting.particle_track as pt
+from dorado.particle_track import Particle
+import dorado.particle_track as pt
 
 # create params and then assign the parameters
 params = pt.params()

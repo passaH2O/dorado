@@ -6,15 +6,15 @@ Background
 
 Motivation
 ----------
-`particlerouting` was developed to provide an open-source and general method for routing passive tracer particles in a landscape scale flow field. Methods to simulate Lagrangian particle transport exist in adjacent fields and have been developed to solve problems at large scales [1]_ and at small scales [2]_. The popular Delft3D suite of modules contains a method for Lagrangian particle tracking called Delft3D-PART [3]_, however as part of the larger, complex Delft3D ecosystem, this code is harder to interrogate and understand directly.
+`dorado` was developed to provide an open-source and general method for routing passive tracer particles in a landscape scale flow field. Methods to simulate Lagrangian particle transport exist in adjacent fields and have been developed to solve problems at large scales [1]_ and at small scales [2]_. The popular Delft3D suite of modules contains a method for Lagrangian particle tracking called Delft3D-PART [3]_, however as part of the larger, complex Delft3D ecosystem, this code is harder to interrogate and understand directly.
 
-By developing `particlerouting` as a standalone python package, we hope to simplify the simulation of Lagrangian particle transport so that it may be applied to the results from any hydrodynamic simulation.
+By developing `dorado` as a standalone python package, we hope to simplify the simulation of Lagrangian particle transport so that it may be applied to the results from any hydrodynamic simulation.
 
 Theory
 ------
-Particle transport is simulated through the use of a weighted random walk framework [4]_. In particular, we apply methods used in the numerical model DeltaRCM [5]_ [6]_, to weight the random walk by the local water slopes and the water discharge components.
+Particle transport is simulated through the use of a weighted random walk framework [4]_. In particular, we apply methods similar to those used in the numerical model DeltaRCM [5]_ [6]_, to weight the random walk by the local water slopes and the water discharge components.
 
-`particlerouting` assumes a rectangular grid and routes particles in a D-8 fashion assuming that the potential future location of a given particle is one of the surrounding 8 cells.
+`dorado` assumes a rectangular grid and routes particles in a D-8 fashion assuming that the potential future location of a given particle is one of the surrounding 8 cells.
 
 The weights for the random walk are sensitive to 2 parameters, :math:`{\gamma}` and :math:`{\theta}`.
 
@@ -48,7 +48,7 @@ The travel time calculation is based on the effective distance the particle trav
 
      d_{eq} = \Delta \times \cos{\phi}
 
-The travel time (:math:`{T_t}`) is then calculated based on this effective distance (:math:`{d_{eq}}`) and the average of the inverted velocity values at the origin cell location (:math:`{o}`) and the new cell location (:math:`{i}`) for the particle. To re-introduce diffusivity lost due to the gridded scheme used in `particlerouting`, the travel time is also modulated by a user-specified diffusivity coefficient :math:`{dc}` which is multiplied by a sample from a uniform distribution centered at 0.
+The travel time (:math:`{T_t}`) is then calculated based on this effective distance (:math:`{d_{eq}}`) and the average of the inverted velocity values at the origin cell location (:math:`{o}`) and the new cell location (:math:`{i}`) for the particle. To re-introduce diffusivity lost due to the gridded scheme used in `dorado`, the travel time is also modulated by a user-specified diffusivity coefficient :math:`{dc}` which is multiplied by a sample from a uniform distribution centered at 0.
 
 .. math::
 

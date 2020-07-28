@@ -4,7 +4,7 @@
 API Reference
 =============
 
-Below are links to the API reference for each component of the `particlerouting` software.
+Below are links to the API reference for each component of the `dorado` software.
 
 .. toctree::
    :maxdepth: 2

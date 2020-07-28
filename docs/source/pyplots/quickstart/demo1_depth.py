@@ -1,6 +1,6 @@
 """Plot for quickstart demo 1."""
 import matplotlib.pyplot as plt
-from particlerouting.example_data.define_params import make_rcm_params
+from dorado.example_data.define_params import make_rcm_params
 
 params = make_rcm_params()
 fig = plt.figure()

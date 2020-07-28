@@ -12,8 +12,8 @@ First the variables from the DeltaRCM model must be loaded. The example data for
 .. doctest::
 
    >>> import numpy as np
-   >>> from particlerouting.routines import steady_plots
-   >>> from particlerouting.particle_track import params
+   >>> from dorado.routines import steady_plots
+   >>> from dorado.particle_track import params
    >>> data = np.load('ex_deltarcm_data.npz')
    >>> stage = data['stage']
    >>> depth = data['depth']

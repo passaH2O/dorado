@@ -6,8 +6,8 @@ import sys, os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
 import numpy as np
-import particlerouting.particle_track as pt
-from particlerouting.particle_track import Particle
+import dorado.particle_track as pt
+from dorado.particle_track import Particle
 
 # set up DeltaRCM test case
 rcm_data = np.load('tests/data/ex_deltarcm_data.npz')

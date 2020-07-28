@@ -1,6 +1,6 @@
 """Plot for quickstart demo 2."""
 import matplotlib.pyplot as plt
-from particlerouting.example_data.define_params import make_anuga_params
+from dorado.example_data.define_params import make_anuga_params
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 anugaparams = make_anuga_params()

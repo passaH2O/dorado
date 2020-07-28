@@ -1,7 +1,7 @@
 """Unsteady flow example using gridded anuga output data."""
 
-from particlerouting.routines import unsteady_plots
-import particlerouting.particle_track as pt
+from dorado.routines import unsteady_plots
+import dorado.particle_track as pt
 
 # initialize a parameters object
 params = pt.params()

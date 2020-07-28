@@ -14,8 +14,8 @@ to a true random walk.
 # particle movement on a steady flow field, and plotting particle locations.
 
 import numpy as np
-from particlerouting import particle_track
-from particlerouting import routines
+from dorado import particle_track
+from dorado import routines
 
 # Here we define the parameters for the particle routing. Since we are
 # simulating the generic random walk here, we set our water depth and stage to

@@ -13,7 +13,7 @@ First run :ref:`example01`, and then we can access and use the particle travel i
 
    >>> import numpy as np
    >>> import json
-   >>> from particlerouting.routines import draw_travel_path
+   >>> from dorado.routines import draw_travel_path
    >>> data = np.load('ex_anuga_data.npz')
    >>> depth = data['depth']
    >>> all_walk_data = json.load(open('steady_anuga_example/data/data.txt'))

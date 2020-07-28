@@ -1,7 +1,7 @@
 """Plot for quickstart demo 2 particle locations."""
 import matplotlib.pyplot as plt
-from particlerouting.example_data.define_params import make_anuga_params
-import particlerouting as pr
+from dorado.example_data.define_params import make_anuga_params
+import dorado as pr
 import numpy as np
 
 np.random.seed(1)  # make result consistent for docs

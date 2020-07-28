@@ -1,7 +1,7 @@
 """Example case for particle travel times in a straight channel."""
 import numpy as np
 import matplotlib.pyplot as plt
-import particlerouting.particle_track as pt
+import dorado.particle_track as pt
 
 # fix the random seed so it stays the same as weights change
 np.random.seed(1)

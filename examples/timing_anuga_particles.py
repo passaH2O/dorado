@@ -1,8 +1,8 @@
 """Example of the workflow with gridded anuga output data"""
 
 import numpy as np
-from particlerouting.routines import time_plots
-from particlerouting.particle_track import params
+from dorado.routines import time_plots
+from dorado.particle_track import params
 
 # load some variables from a deltarcm output so stage is varied
 data = np.load('ex_anuga_data.npz')

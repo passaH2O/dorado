@@ -12,14 +12,14 @@ First the variables from the ANUGA model must be loaded, the example data for th
 .. doctest::
 
    >>> import numpy as np
-   >>> from particlerouting.routines import steady_plots
-   >>> import particlerouting.particle_track as pt
+   >>> from dorado.routines import steady_plots
+   >>> import dorado.particle_track as pt
    >>> data = np.load('ex_anuga_data.npz')
    >>> depth = data['depth']
    >>> qx = data['qx']
    >>> qy = data['qy']
 
-Next the `particlerouting` parameter object must be defined and the domain as well as the particle properties must be established. For this example there is no defined stage data, so the depth values will be used instead.
+Next the `dorado` parameter object must be defined and the domain as well as the particle properties must be established. For this example there is no defined stage data, so the depth values will be used instead.
 
 .. doctest::
 

@@ -1,12 +1,12 @@
 import os
 from setuptools import setup, find_packages
-from particlerouting import __version__
+from dorado import __version__
 
 setup(
-    name = 'particlerouting',
+    name = 'dorado',
     version = __version__,
     license = 'MIT',
-    description = 'Lagrangian particle routing routine via weighted random walks',
+    description = 'dorado - Lagrangian particle routing routine via weighted random walks',
     author = 'J. Hariharan, K. Wright, P. Passalacqua',
     author_email = 'jayaram.hariharan@utexas.edu',
     url = 'https://github.com/',
@@ -18,5 +18,5 @@ setup(
                    'Programming Language :: Python :: 3.7',
                    'Programming Language :: Python :: 3.8'],
     install_requires = ['numpy','matplotlib','scipy',
-                        'future','tqdm']
+                        'future','tqdm'],
 )

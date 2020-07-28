@@ -1,8 +1,8 @@
 .. _particletools:
 
-particlerouting.particle_tools
+dorado.particle_tools
 ------------------------------
 
-.. automodule:: particlerouting.particle_tools
+.. automodule:: dorado.particle_tools
    :members:
    :special-members:
