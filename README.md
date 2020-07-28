@@ -1,5 +1,5 @@
 # dorado - Lagrangian particle routing
-
+![build](https://github.com/passaH2O/dorado/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/passaH2O/dorado/branch/master/graph/badge.svg?token=A4MWN4K1XJ)](https://codecov.io/gh/passaH2O/dorado)
 <div class="nav3" style="height:705px;">
     <img src="docs/source/examples/images/logo.gif" alt="Particle routing on Lidar-derived bathymetry" width="65%"></a>
 </div>
