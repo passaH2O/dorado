@@ -16,7 +16,7 @@ how users can adapt these codes to their use-case.
 Full example workbook available :download:`here <../../../examples/unstructured_grid_anuga.ipynb>`.
 
 To demonstrate this functionality, we make use of outputs from the
-hydrodynamic model `ANUGA <https://github.com/GeoscienceAustralia/anuga_core>`,
+hydrodynamic model `ANUGA <https://github.com/GeoscienceAustralia/anuga_core>`_,
 which solves the 2D shallow-water equations on a triangular mesh. We’ve
 extracted outputs from a previous example model run and included these
 as text files in the repository, so as to avoid importing any
