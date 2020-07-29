@@ -1,4 +1,4 @@
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 from . import particle_tools
 from . import parallel_routing
