@@ -11,7 +11,7 @@ v1.0.0
 
 dorado is a python package for simulating passive Lagrangian particle transport over gridded flow fields via a weighted random walk methdology.
 
-For user guides and detailed examples, refer to the [documentation](http://www.github.com).
+For user guides and detailed examples, refer to the [documentation](https://passah2o.github.io/dorado/index.html).
 
 ### Example Uses:
 
@@ -30,7 +30,7 @@ dorado supports Python 2.7 as well as Python 3.5+. To `pip` install via PyPI, ty
 
     pip install pydorado
 
-For additional installation options and instructions, refer to the [documentation](http://www.github.com).
+For additional installation options and instructions, refer to the [documentation](https://passah2o.github.io/dorado/install/index.html).
 
 ## Contributing
-We welcome contributions to the dorado project. Please open an issue or a pull request if there is functionality you would like to see or propose. Refer to our [contributing guide](http://github.com) for more information.
+We welcome contributions to the dorado project. Please open an issue or a pull request if there is functionality you would like to see or propose. Refer to our [contributing guide](https://passah2o.github.io/dorado/misc/contributing.html) for more information.
