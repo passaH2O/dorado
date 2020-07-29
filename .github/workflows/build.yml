@@ -100,11 +100,11 @@ jobs:
         echo $REF
         echo $EVENT_NAME
         echo ${{ github.event_name == 'push' }}
-        echo ${{ github.ref == 'refs/heads/develop' }}
-        echo ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+        echo ${{ github.ref == 'refs/heads/master' }}
+        echo ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.5
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_NAME: ${{ github.event_name }}
