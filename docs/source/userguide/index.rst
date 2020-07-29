@@ -31,7 +31,7 @@ After establishing the parameter class, information about the domain must be pro
 Required Parameters
 ^^^^^^^^^^^^^^^^^^^
 
-A brief description of the required parameters is listed below, for a comprehensive list, please refer to the :ref:`apiref`.
+A brief description of the required parameters is listed below, for a comprehensive list, please refer to the API: :ref:`particletrack`.
 
 - x and y coordinates for the particles to be seeded in (`seed_xloc` and `seed_yloc`)
 - the number of particles to simulate (`Np_tracer`)
@@ -47,7 +47,7 @@ A brief description of the required parameters is listed below, for a comprehens
 Optional Parameters
 ^^^^^^^^^^^^^^^^^^^
 
-For a list of the optional parameters, please see the :ref:`apiref`, these parameters include values related to the random walk weighting scheme, travel time calculations, and even the distance and direction assumptions related to the grid.
+For a list of the optional parameters, please see :ref:`particletrack`, these parameters include values related to the random walk weighting scheme, travel time calculations, and even the distance and direction assumptions related to the grid.
 
 The High-Level API
 ------------------
@@ -68,7 +68,7 @@ High-level functionality is provided in the `routines.py` script. Many of the ex
 * Plot the travel paths specified particles have taken
 * Plot the particle positions for a specified iteration or travel time
 
-For additional detail, either view the script itself (:download:`routines.py <../../../dorado/routines.py>`), or refer to the :ref:`apiref`.
+For additional detail, either view the script itself (:download:`routines.py <../../../dorado/routines.py>`), or refer to the API: :ref:`routines`.
 
 The Lower-Level API
 -------------------
@@ -79,4 +79,4 @@ Lower-level functionality is provided in the `particle_track.py` script. At this
 * Function for calculating exposure time (and residence time) of particles in a defined region of interest
 * Assorted functions for transforming from real coordinate systems to the raster domain used for the particle routing
 
-For additional detail, either view the script itself (:download:`particle_track.py <../../../dorado/particle_track.py>`), or refer to the :ref:`apiref`.
+For additional detail, either view the script itself (:download:`particle_track.py <../../../dorado/particle_track.py>`), or refer to the API: :ref:`particletrack`.

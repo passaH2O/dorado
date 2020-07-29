@@ -3,7 +3,7 @@
 Example 10 - Routing Particles in Parallel
 ==========================================
 
-.. note:: This functionality has only been tested on Linux-based OS.
+.. note:: This functionality has only been tested on UNIX-based systems.
 
 In this example, we will use the parallel routing functionality to distribute the particle routing procedure across multiple CPU cores. Then we will compare the time it takes to route particles in serial against the time it takes to route an equivalent number of particles on 2 CPU cores. To do this, we use the native `multiprocessing` library that is provided with Python.
 

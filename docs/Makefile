@@ -18,13 +18,10 @@ docs: test clean html
 
 
 clean :
-	rm -rf source/api/
-	rm -rf source/_autosummary/
 	rm -rf ../build/
 
 
 test : clean
-	@$(SPHINXBUILD) -b doctest "$(SOURCEDIR)" "$(BUILDDIR)"
 	@$(SPHINXBUILD) -b linkcheck "$(SOURCEDIR)" "$(BUILDDIR)"
 
 # Catch-all target: route all unknown targets to Sphinx using the new

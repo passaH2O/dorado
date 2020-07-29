@@ -2,7 +2,7 @@
 
 Demo 1- Using the High-Level API
 --------------------------------
-In this demo, we show how particles can be routed along a simulated river delta, example output is from the delta simulation model, `DeltaRCM <https://github.com/DeltaRCM/pyDeltaRCM_WMT>`_. To do this, we will be using one of the high-level API functions provided in :download:`routines.py <../../../dorado/routines.py>`.
+In this demo, we show how particles can be routed along a simulated river delta, example output is from the delta simulation model, `DeltaRCM <https://github.com/DeltaRCM/pyDeltaRCM>`_. To do this, we will be using one of the high-level API functions provided in :download:`routines.py <../../../dorado/routines.py>`.
 
 First we load the sample parameters.
 

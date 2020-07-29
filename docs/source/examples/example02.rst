@@ -3,7 +3,7 @@
 Example 2 - Particles in Steady Flow (DeltaRCM)
 ===============================================
 
-In this example, particles movement is simulated on a `DeltaRCM <https://github.com/DeltaRCM/pyDeltaRCM_WMT>`_ model output. In this case, we have a developed river delta, and are going to be seeding particles in one of the main channels.
+In this example, particles movement is simulated on a `DeltaRCM <https://github.com/DeltaRCM/pyDeltaRCM>`_ model output. In this case, we have a developed river delta, and are going to be seeding particles in one of the main channels.
 
 Full example script available :download:`here <../../../examples/steady_deltarcm_particles.py>`.
 

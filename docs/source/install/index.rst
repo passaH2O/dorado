@@ -4,26 +4,25 @@
 Installation Instructions
 =========================
 
-dorado is compatible with Python 2.7, 3.6, 3.7, and 3.8. There are only 4 dependencies: `numpy <https://numpy.org/install/>`_, `matplotlib <https://matplotlib.org/3.2.2/users/installing.html>`_, `scipy <https://scipy.org/install.html>`_, `future <https://python-future.org/>`_, and `tqdm <https://pypi.org/project/tqdm/>`_.
+dorado is compatible with Python 2.7, 3.6, 3.7, and 3.8. There are only 4 dependencies: `numpy <https://numpy.org/install/>`_, `matplotlib <https://matplotlib.org/3.2.2/users/installing.html>`_, `scipy <https://www.scipy.org/install.html>`_, `future <https://python-future.org/>`_, and `tqdm <https://pypi.org/project/tqdm/>`_.
 
 Installation via `pip`
 ----------------------
-.. note:: Not yet hosted on PyPI
 
-To `pip`-install this package, use the following command:
+To `pip`-install this package, first ensure that you have the dependencies listed above installed, and then use the following command:
 ::
 
-    $ pip install dorado
+    $ pip install pydorado
 
 
 Installation via `conda`
 ------------------------
-.. note:: Not yet hosted on conda-forge
+.. note:: Some users have experienced dependency incompatibilities when installing via conda.
 
 To `conda`-install this package, use the following command:
 ::
 
-    $ conda install -c conda-forge dorado
+    $ conda install -c elbeejay dorado
 
 
 Installation from source
