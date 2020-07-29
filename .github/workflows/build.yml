@@ -95,6 +95,7 @@ jobs:
     - name: Build and test documentation
       run: |
         (cd docs && make docs)
+        (cd docs && make html)
     - name: Debug
       run: |
         echo $REF
@@ -110,4 +111,4 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REF: ${{ github.ref }}
           BRANCH: gh-pages
-          FOLDER: docs/build
+          FOLDER: docs/build/html
