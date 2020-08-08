@@ -50,3 +50,11 @@ API Reference and Contributing Guidelines
    misc/license
    misc/contributing
    apiref/index
+
+
+Funding Acknowledgments
+#######################
+.. toctree::
+   :maxdepth: 1
+
+   misc/acknowledgments
