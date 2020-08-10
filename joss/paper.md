@@ -51,6 +51,6 @@ Particle travel times are back-calculated from their locations after routing by 
 
 We thank Nelson Tull for testing and providing feedback on the package. Thanks also to David Mohrig, Kathleen Wilson, Hima Hassenruck-Gudipati, Teresa Jarriel, Eric Prokocki, John Swartz, Shazzadur Rahman, and Andrew Moodie for their input and feedback during development.
 
-This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and NASA-###
+This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital-3 Program as part of the Delta-X mission.
 
 # References

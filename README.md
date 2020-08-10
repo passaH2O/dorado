@@ -34,4 +34,4 @@ For additional installation options and instructions, refer to the [documentatio
 We welcome contributions to the dorado project. Please open an issue or a pull request if there is functionality you would like to see or propose. Refer to our [contributing guide](https://passah2o.github.io/dorado/misc/contributing.html) for more information.
 
 ## Funding Acknowledgments
-This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and NASA-###.
+This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital-3 Program as part of the Delta-X mission.
