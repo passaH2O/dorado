@@ -3,7 +3,7 @@
 Parallel functionality using multiprocessing (included with Python).
 For local parallelization using CPU cores.
 
-Project Homepage: https://github.com/
+Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
