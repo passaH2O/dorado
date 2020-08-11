@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>User Guide &#8212; dorado 0.9.3 documentation</title>
+    <title>User Guide &#8212; dorado 1.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -37,7 +37,7 @@
 <span id="userguide"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>The basic workflow when using <cite>dorado</cite>, can be summarized in two steps.</p>
+<p>The basic workflow when using <cite>dorado</cite> can be summarized in two steps:</p>
 <ol class="arabic simple">
 <li><p>Initialize parameters using the <cite>particle_track.params</cite> class and provide information about the domain, where and how many particles are going to be seeded, and adjust any parameters as desired.</p></li>
 <li><p>Either use one of the high-level API procedures defined in <cite>routines.py</cite>, or define a particle using the <cite>particle_track.Particle</cite> and simulation particle evolution using the <cite>particle_track.run_iteration</cite> method.</p></li>
@@ -51,7 +51,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">params</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>After establishing the parameter class, information about the domain must be provided, as well as information about where the particles are going to be seeded and how many particles should be used. As <cite>dorado</cite> is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible however some values <strong>must</strong> be provided.</p>
+<p>After establishing the parameter class, information about the domain must be provided, as well as information about where the particles are going to be seeded and how many particles should be used. As <cite>dorado</cite> is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible, however some values <strong>must</strong> be provided.</p>
 <div class="section" id="required-parameters">
 <h3>Required Parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
 <p>A brief description of the required parameters is listed below, for a comprehensive list, please refer to the API: <a class="reference internal" href="../apiref/particletrack.html#particletrack"><span class="std std-ref">dorado.particle_track</span></a>.</p>
@@ -150,6 +150,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../misc/license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../misc/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apiref/index.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
 <div class="relations">

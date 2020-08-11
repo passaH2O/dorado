@@ -30,6 +30,6 @@ Now that the basic parameters have been established, we will apply the `unsteady
    >>> walk_data = unsteady_plots(params, 26, 75., 'unsteady_data',
    >>>                            'csv', 'unsteady_output')
 
-If you run the example, data and figures will be placed in a subdirectory called `unsteady_output`. Below, there is an animation of the particles moving on the varying flow field. We can see that when the flow is inverted our 'tide' pushes the particles back towards the inlet channel.
+If you run the example, data and figures will be placed in a subdirectory called `unsteady_output`. Below, there is an animation of the particles moving on the varying flow field. We can see that when the flow is inverted, our 'tide' pushes the particles back towards the inlet channel.
 
 .. image:: images/example12/unsteady_example.gif

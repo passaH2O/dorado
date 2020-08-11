@@ -7,7 +7,7 @@ User Guide
 Overview
 --------
 
-The basic workflow when using `dorado`, can be summarized in two steps.
+The basic workflow when using `dorado` can be summarized in two steps:
 
 1. Initialize parameters using the `particle_track.params` class and provide information about the domain, where and how many particles are going to be seeded, and adjust any parameters as desired.
 
@@ -26,7 +26,7 @@ Defining the parameters is require prior to doing any particle routing. Initiati
    >>> import dorado.particle_track as pt
    >>> params = pt.params()
 
-After establishing the parameter class, information about the domain must be provided, as well as information about where the particles are going to be seeded and how many particles should be used. As `dorado` is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible however some values **must** be provided.
+After establishing the parameter class, information about the domain must be provided, as well as information about where the particles are going to be seeded and how many particles should be used. As `dorado` is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible, however some values **must** be provided.
 
 Required Parameters
 ^^^^^^^^^^^^^^^^^^^

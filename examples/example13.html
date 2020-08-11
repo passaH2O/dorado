@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Example 13 - Using Unstructured Grids &#8212; dorado 0.9.3 documentation</title>
+    <title>Example 13 - Using Unstructured Grids &#8212; dorado 1.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -148,7 +148,7 @@ same size as our model’s extent. To use this function, we need to
 provide: - Our list of <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> (as tuples). - The unstructured
 data we want to be gridded (here we start with <code class="docutils literal notranslate"><span class="pre">depth</span></code>). - The desired
 grid size of the resulting rasters (here we’re using <img class="math" src="../_images/math/96fc100bed84677eaee925344911851cce8cdb01.png" alt="1 m"/>,
-because the test model was on very high-resolution lidar data). - The
+because the test model was on high-resolution lidar data). - The
 number of <img class="math" src="../_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> nearest neighbors to use in the interpolation. If
 <img class="math" src="../_images/math/e0c697f0cf4a4c09fb151f725bdc6e65c3be447c.png" alt="k=1"/>, we use only the nearest datapoint, whereas higher values
 (default is <img class="math" src="../_images/math/a60f3b4a3531f65bb5a1b11f886d291ff8ccaef5.png" alt="k=3"/>) interpolate the data into a smoother result.</p>
@@ -214,10 +214,10 @@ Otherwise, if you’re loading data from e.g. a GeoTIFF, the lower left
 corner will be stored in the .tif metadata and can be accessed by GIS
 software or gdalinfo (if the user has GDAL) - The dimensions of the
 raster, accessible via <code class="docutils literal notranslate"><span class="pre">np.shape(raster)</span></code> - The grid size of the
-raster (here <img class="math" src="../_images/math/3250cb5323c088f155c19d90b245821b2207b186.png" alt="1m"/>)</p>
+raster (here <img class="math" src="../_images/math/3250cb5323c088f155c19d90b245821b2207b186.png" alt="1m"/>).</p>
 <p><strong>Note:</strong> this coordinate transform flips the orientation of the unit
-vectors (i.e. <img class="math" src="../_images/math/da85f3cdb6e4f6d76e24acd89b0830548fa2b3cb.png" alt="y_{index} = x"/> and <img class="math" src="../_images/math/58f66904f1de73ad72ba528a6646c9bc09459aed.png" alt="x_{index} = -y"/>) as well
-as returning raster indices. This is convenient for the internal
+vectors (i.e. <img class="math" src="../_images/math/da85f3cdb6e4f6d76e24acd89b0830548fa2b3cb.png" alt="y_{index} = x"/> and <img class="math" src="../_images/math/58f66904f1de73ad72ba528a6646c9bc09459aed.png" alt="x_{index} = -y"/>) and
+returns raster indices. This is convenient for the internal
 functions of <code class="docutils literal notranslate"><span class="pre">particle_tools.py</span></code>, but may cause confusion with
 plotting or interpreting later if locations are not translated back into
 spatial coordinates. (Don’t worry, we will convert back later!)</p>
@@ -304,7 +304,7 @@ iterations and return the travel history to us in the <code class="docutils lite
 dict. This dict is organized into <code class="docutils literal notranslate"><span class="pre">['xinds']</span></code>, <code class="docutils literal notranslate"><span class="pre">['yinds']</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">['travel_times']</span></code>, which are then indexed by particle ID, and then
 finally iteration number. (e.g. <code class="docutils literal notranslate"><span class="pre">walk_data['xinds'][5][10]</span></code> will
-return the xindex for the 6th particle’s 11th iteration)</p>
+return the xindex for the 6th particle’s 11th iteration).</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using steady (time-invariant) plotting routine for 200 iterations</span>
 <span class="n">walk_data</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;unstructured_grid_anuga&#39;</span><span class="p">)</span>
 <span class="c1"># Outputs will be saved in the folder &#39;unstructured_grid_anuga&#39;</span>
@@ -339,7 +339,7 @@ number.</p>
 </pre></div>
 </div>
 <p><strong>Note:</strong> There exists an equivalent function, <code class="docutils literal notranslate"><span class="pre">get_time_state()</span></code>,
-which performs a similar function by slicing <code class="docutils literal notranslate"><span class="pre">walk_data</span></code> along a given
+which slices <code class="docutils literal notranslate"><span class="pre">walk_data</span></code> along a given
 travel time, in case there is interest in viewing the particles in sync.</p>
 <p>As a brief aside, the particle routing can also be run in an <em>unsteady</em>
 way, in which each particle continues taking steps until each has
@@ -349,7 +349,7 @@ up their propagation with an unsteady flow field that updates every so
 often (e.g. every 30 minutes). This can be done either with the
 <code class="docutils literal notranslate"><span class="pre">unsteady_plots()</span></code> routine, or by interacting with <code class="docutils literal notranslate"><span class="pre">run_iteration()</span></code>
 directly. The commented-out block of code below shows an example of what
-an unsteady case might look like had we used more timesteps from the
+an unsteady case might look like, had we used more timesteps from the
 model output.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Specify folder to save figures:</span>
 <span class="c1"># path2folder = &#39;place_to_save_figures&#39;</span>
@@ -442,8 +442,8 @@ difference being that if particles make multiple excursions into our
 ROI, all those times are counted.</p>
 <p><strong>Note:</strong> For a representative ETD, it is important to run a <em>lot</em> of
 particles. A large sample size is needed to obtain a realistic
-distribution (and smooth plots). Depending on the domain, I recommend at
-least <img class="math" src="../_images/math/e728045d42b977ff8bad7b2582b5ede1dd0b76bd.png" alt="O(10^3)"/></p>
+distribution (and smooth plots). Depending on the domain, we recommend at
+least <img class="math" src="../_images/math/e728045d42b977ff8bad7b2582b5ede1dd0b76bd.png" alt="O(10^3)"/>.</p>
 <p>First, let’s generate and visualize the ROI:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the array</span>
 <span class="n">regions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
@@ -535,6 +535,9 @@ capture the tail of the distribution.</p>
 <li class="toctree-l1"><a class="reference internal" href="../misc/license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../misc/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apiref/index.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
 <div class="relations">

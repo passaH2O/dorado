@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>RST-Rendered Paper &#8212; dorado 0.9.3 documentation</title>
+    <title>RST-Rendered Paper &#8212; dorado 1.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -34,7 +34,7 @@
   <div class="section" id="rst-rendered-paper">
 <span id="paperrst"></span><h1>RST-Rendered Paper<a class="headerlink" href="#rst-rendered-paper" title="Permalink to this headline">¶</a></h1>
 <hr class="docutils" />
-<p>title: ‘particlerouting: A Python package for simulating passive particle transport’
+<p>title: ‘dorado: A Python package for simulating passive particle transport in shallow-water flows’
 tags:</p>
 <ul class="simple">
 <li><p>Python</p></li>
@@ -43,19 +43,19 @@ tags:</p>
 <li><p>hydrodynamics
 authors:</p></li>
 <li><p>name: Jayaram Hariharan
-orcid: ?
+orcid: 0000-0002-1343-193X
 affiliation: 1</p></li>
 <li><p>name: Kyle Wright
-orcid: ?
+orcid: 0000-0001-5142-1786
 affiliation: 1</p></li>
 <li><p>name: Paola Passalacqua
-orcid: ?
+orcid: 0000-0002-4763-7231
 affiliation: 1
 affiliations:</p>
 <ul>
 <li><p>name: Department of Civil, Architectural and Environmental Engineering, The University of Texas at Austin
 index: 1
-date: 4 April 2020
+date: 8 August 2020
 bibliography: paper.bib</p></li>
 </ul>
 </li>
@@ -63,16 +63,32 @@ bibliography: paper.bib</p></li>
 <hr class="docutils" />
 <div class="section" id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Hydrodynamic simulations of flow through different landscapes are performed to answer a variety of questions including those related to the transport of nutrients, chemicals, fish, and sediment through waterways [add citations]. In this paper, we present an open-source Python package, ‘particlerouting’, which is designed to provide a simple and accessible method for researchers to simulate Lagrangian transport of individual particles in flow fields. The majority of hydrodynamics solvers such as Anuga [&#64;anuga], Delft3D [&#64;delft3d], Frehd [cite] and others, provide flow fields as output. With ‘particlerouting’, a method to place particles in these flow fields and observe their movement through the domain is provided.</p>
-<p>Existing particle tracking software contains complicated code structures [&#64;freshkiss3d; &#64;delft3d], is proprietary [&#64;fluent], or was developed to solve problems occurring at oceanic and atmospheric scales [&#64;Dagestad2018]. With ‘particletracking’, a weighted random walk is employed to simulate the movement of passive particles in a flow field. In doing so, this package fills the gap in the available methods for Lagrangian particle simulation by providing a simple and transparent framework which can be used to simulate particle movement on the output from any hydrodynamic model.</p>
+<p>Hydrodynamic simulations of flow through different landscapes are used to answer questions related to the transport of water, nutrients, pollutants, biota, and sediment through waterways [&#64;Duan2006; &#64;Rynne2016; &#64;Wild-Allen2016; &#64;Lauzon2018; &#64;Czuba2019]. In geophysical systems, such as rivers, estuaries, and deltas, hydrodynamic models typically solve the depth-integrated <a href="#id1"><span class="problematic" id="id2">``</span></a>shallow water” equations in an Eulerian reference frame, which is concerned with fluxes through a given region of space – examples of these solvers include ANUGA [&#64;anuga], Delft3D [&#64;delft3d], Frehd [&#64;Hodges2014] and others. However, the spatial and temporal characteristics of the movement of material through a landscape are often better understood using a Lagrangian reference frame [&#64;Doyle2009], which follows the movement of individual objects or parcels. In this paper, we present an open-source Python package, <em>dorado</em>, which provides a transparent and accessible method for researchers to simulate passive Lagrangian particle transport on top of Eulerian hydrodynamic solutions. This mixed Eulerian-Lagrangian methodology adapts the routing functionality from the popular numerical model DeltaRCM [&#64;Liang2015a; &#64;Liang2015] for use with the outputs of any shallow-water hydrodynamic solver.</p>
+</div>
+<div class="section" id="statement-of-need">
+<h2>Statement of Need<a class="headerlink" href="#statement-of-need" title="Permalink to this headline">¶</a></h2>
+<p>Existing particle tracking software typically contains complicated code structures [&#64;freshkiss3d; &#64;delft3d] with steep learning-curves, are proprietary [&#64;fluent], or were developed to solve problems at very different spatial scales [&#64;Yeung1989; &#64;Dagestad2018] than typical riverine applications. This package fills a gap in the available methods for Lagrangian particle simulation by providing a flexible, open, and transparent framework which can be used in conjunction with any landscape-2D hydrodynamic model. In addition, <em>dorado</em> comes with builtin pre-processing, analysis, and plotting functionality, including methods to compute the exposure time distribution of particles to specific sub-regions of the domain, which is often of interest in ecological applications [&#64;Kadlec2008].</p>
 </div>
 <div class="section" id="background">
 <h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
-<p>Particle transport in ‘particlerouting’ is simulated through the use of a weighted random walk framework [&#64;Pearson1905]. In particular, methods used in the numerical model DeltaRCM [&#64;Liang2015a; &#64;Liang2015] are applied to weight the random walk by the local water slopes and the water discharge components. The weights for the random walk are sensitive to 2 parameters, $gamma$ and $theta$. The $gamma$ parameter controls the proportional dependence of water surface slope and water discharge on the downstream direction. A $gamma$ of 0 means that the water slope is ignored when determining the downstream flow direction, and a $gamma$ of 1 means that the discharge values (the flow field) is ignored. The second weighting parameter, $theta$ modifies the routing weight for the random walk based on the local water depth value. The routing weights for each neighboring cell are calculated per [&#64;Liang2015a], using $w_i = frac{frac{1}{R_i} text{max} left(0, F cdot d_i right)}{Delta_i}$. The resistance value, $R_i$, is computed using the local water depth, $h_i$ and the parameter $theta$: $R_i = frac{1}{h_i^theta}$. When $theta$ is 0, then the local depth values are not impacting the weighting factor associated with each cell, as $theta$ gets larger, the local routing weights have an increasingly large dependence on the water depth of the neighboring cells. By altering the two parameters $gamma$ and $theta$, the user has control over the randomness with which the particles are routed.</p>
+<p><em>dorado</em> makes use of the weighted random walk framework [&#64;Pearson1905] to model particle transport as a stochastic Markovian process, using a grid-centric approach that takes into account local water inertial components and surface slopes, in a manner modeled after the numerical model DeltaRCM [&#64;Liang2015; &#64;Liang2015a]. The random walk routing weights are sensitive to two user-specified parameters, $gamma$ and $theta$. The $gamma$ parameter controls the proportional importance of water surface slope and water velocity on the downstream direction, which indirectly controls the diffusivity of the travel path. The second weighting parameter, $theta$, controls the resistance term and modifies the routing weights based on the local water depth value. By altering the two parameters $gamma$ and $theta$, the user has control over the randomness with which the particles are routed. For a full description of this methodology, see [&#64;Liang2015; &#64;Liang2015a] and the <em>dorado</em> documentation.</p>
+<p>Particle travel times are back-calculated from their locations after routing by accounting for the flow velocity, flow direction, and grid size. The time elapsed during each particle step is assumed to be proportional to the distance traveled in the direction of the mean flow, $d_{eq}$, which is equal to the step distance $Delta<em>i$ projected onto a unit vector oriented in the direction of the velocity field, $phi$, according to $d</em>{eq} = Delta_i cdot cos(phi)$. During a model iteration, each particle is allowed to progress a different length of time, depending on the velocity of the flow and the orientation of the step in relation to the mean flow direction. The travel time of each step is then modified according to a user-specified parameter, $D_c$, which acts as a dispersion coefficient.</p>
+<p><em>dorado</em> provides functions with which users can choose to sync up the particle evolution either by number of step iterations or by individual particle travel times. In addition, <em>dorado</em> includes several post-processing functions for computing and plotting the fraction of time particles spend <a href="#id3"><span class="problematic" id="id4">``</span></a>exposed” to a region of interest, otherwise known as the exposure time distribution (or residence time distribution, in steady flows) [&#64;Kadlec2008; &#64;Benjamin2013; &#64;Hiatt2018]. This travel time methodology has been tested against analytical solutions for a plug-flow reactor with dispersion [&#64;Benjamin2013], as well as against exposure time distributions from prior models of real systems [&#64;Hiatt2018], and performed well at reproducing the observed travel times in both systems. As with all Lagrangian methods involving finite samples of particles, we expect the travel time computations to struggle to reproduce heavy-tailed behavior observed in some systems [&#64;Zhang2012], and expect that <em>dorado</em> will perform most accurately in advection-dominated flows.</p>
+</div>
+<div class="section" id="functionality-and-ease-of-use">
+<h2>Functionality and Ease of Use<a class="headerlink" href="#functionality-and-ease-of-use" title="Permalink to this headline">¶</a></h2>
+<p><em>dorado</em> is designed to be able to handle both steady and unsteady hydrodynamic simulations. While the core functionality of <em>dorado</em> assumes that flow variables lie on a Cartesian grid of uniform grid size, the package can still be applied to unstructured hydrodynamic models through the use of built-in interpolation functions for gridding data. Due to the nature of the weighting scheme, model flow-fields must represent depth-averaged solutions (as vertical movement of particles is not considered). <em>dorado</em> supports current Python 3.x versions as well as the older 2.7 version, can be run on all major operating systems, and is dependent upon only a select few common scientific packages. To help new users, over a dozen examples are provided illustrating uses of the package with DeltaRCM and ANUGA model simulations conducted on real and synthetic datasets. The package is organized in four modules to help users and future contributors easily access and interact with the source code:</p>
+<ul class="simple">
+<li><p>‘particle_tools’: Contains internal functions and methods associated with the weighted random walk.</p></li>
+<li><p>‘particle_track’: Lower-level functionality where the <a href="#id5"><span class="problematic" id="id6">`</span></a>Particle’ class is defined and associated parameters for both the particle and the domain are set.</p></li>
+<li><p>‘routines’: Higher-level functions for common applications, designed to simplify use of the package.</p></li>
+<li><p>‘parallel_routing’: Parallel functionality which enables the user to distribute their particle routing commands across multiple CPU cores using Python’s built-in multiprocessing library.</p></li>
+</ul>
 </div>
 <div class="section" id="acknowledgements">
 <h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
-<p>We acknowledge contributions from</p>
+<p>We thank Nelson Tull for testing and providing feedback on the package. Thanks also to David Mohrig, Kathleen Wilson, Hima Hassenruck-Gudipati, Teresa Jarriel, Eric Prokocki, John Swartz, Shazzadur Rahman, and Andrew Moodie for their input and feedback during development.</p>
+<p>This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital-3 Program as part of the Delta-X mission.</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
@@ -114,6 +130,9 @@ bibliography: paper.bib</p></li>
 <li class="toctree-l1"><a class="reference internal" href="../misc/license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../misc/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apiref/index.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
 <div class="relations">
