@@ -2,7 +2,7 @@
 """
 Particle tools to manage the internal functions related to the routing.
 
-Project Homepage: https://github.com/
+Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
@@ -47,7 +47,7 @@ class Tools():
     do a single iteration of the particle transport (**run_iteration**)
 
     """
-    
+
     # random pick seeding location
     def random_pick_seed(self, choices, probs=None):
         """Randomly pick a number from array of choices.

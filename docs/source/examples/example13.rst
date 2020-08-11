@@ -134,7 +134,7 @@ same size as our model’s extent. To use this function, we need to
 provide: - Our list of ``coordinates`` (as tuples). - The unstructured
 data we want to be gridded (here we start with ``depth``). - The desired
 grid size of the resulting rasters (here we’re using :math:`1 m`,
-because the test model was on very high-resolution lidar data). - The
+because the test model was on high-resolution lidar data). - The
 number of :math:`k` nearest neighbors to use in the interpolation. If
 :math:`k=1`, we use only the nearest datapoint, whereas higher values
 (default is :math:`k=3`) interpolate the data into a smoother result.
@@ -218,11 +218,11 @@ Otherwise, if you’re loading data from e.g. a GeoTIFF, the lower left
 corner will be stored in the .tif metadata and can be accessed by GIS
 software or gdalinfo (if the user has GDAL) - The dimensions of the
 raster, accessible via ``np.shape(raster)`` - The grid size of the
-raster (here :math:`1m`)
+raster (here :math:`1m`).
 
 **Note:** this coordinate transform flips the orientation of the unit
-vectors (i.e. :math:`y_{index} = x` and :math:`x_{index} = -y`) as well
-as returning raster indices. This is convenient for the internal
+vectors (i.e. :math:`y_{index} = x` and :math:`x_{index} = -y`) and
+returns raster indices. This is convenient for the internal
 functions of ``particle_tools.py``, but may cause confusion with
 plotting or interpreting later if locations are not translated back into
 spatial coordinates. (Don’t worry, we will convert back later!)
@@ -323,7 +323,7 @@ iterations and return the travel history to us in the ``walk_data``
 dict. This dict is organized into ``['xinds']``, ``['yinds']``, and
 ``['travel_times']``, which are then indexed by particle ID, and then
 finally iteration number. (e.g. ``walk_data['xinds'][5][10]`` will
-return the xindex for the 6th particle’s 11th iteration)
+return the xindex for the 6th particle’s 11th iteration).
 
 .. code:: ipython
 
@@ -371,7 +371,7 @@ number.
 
 
 **Note:** There exists an equivalent function, ``get_time_state()``,
-which performs a similar function by slicing ``walk_data`` along a given
+which slices ``walk_data`` along a given
 travel time, in case there is interest in viewing the particles in sync.
 
 As a brief aside, the particle routing can also be run in an *unsteady*
@@ -382,7 +382,7 @@ up their propagation with an unsteady flow field that updates every so
 often (e.g. every 30 minutes). This can be done either with the
 ``unsteady_plots()`` routine, or by interacting with ``run_iteration()``
 directly. The commented-out block of code below shows an example of what
-an unsteady case might look like had we used more timesteps from the
+an unsteady case might look like, had we used more timesteps from the
 model output.
 
 .. code:: ipython
@@ -485,8 +485,8 @@ ROI, all those times are counted.
 
 **Note:** For a representative ETD, it is important to run a *lot* of
 particles. A large sample size is needed to obtain a realistic
-distribution (and smooth plots). Depending on the domain, I recommend at
-least :math:`O(10^3)`
+distribution (and smooth plots). Depending on the domain, we recommend at
+least :math:`O(10^3)`.
 
 First, let’s generate and visualize the ROI:
 

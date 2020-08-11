@@ -7,8 +7,6 @@
     <img src="docs/source/examples/images/logo.gif" alt="Particle routing on Lidar-derived bathymetry" width="65%"></a>
 </div>
 
-v1.0.0
-
 dorado is a Python package for simulating passive Lagrangian particle transport over flow-fields from any 2D shallow-water hydrodynamic model using a weighted random walk methodology.
 
 For user guides and detailed examples, refer to the [documentation](https://passah2o.github.io/dorado/index.html).
@@ -34,3 +32,6 @@ For additional installation options and instructions, refer to the [documentatio
 
 ## Contributing
 We welcome contributions to the dorado project. Please open an issue or a pull request if there is functionality you would like to see or propose. Refer to our [contributing guide](https://passah2o.github.io/dorado/misc/contributing.html) for more information.
+
+## Funding Acknowledgments
+This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital-3 Program as part of the Delta-X mission.

@@ -6,7 +6,7 @@ Particle class for managing the definition of particle attributes and
 parameters of the domain as well as iterative movement of the particles
 through the domain.
 
-Project Homepage: https://github.com/
+Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range
