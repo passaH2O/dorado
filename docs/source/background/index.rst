@@ -22,7 +22,7 @@ Particle transport is simulated through the use of a weighted random walk framew
 
 The weights for the random walk are sensitive to 2 parameters, :math:`{\gamma}` and :math:`{\theta}`.
 
-The routing direction (F*) is the estimate of the local downstream of the flow [5]. This direction F* is comprised of :math:`{F_{sfc}}`, and :math:`{F_{int}}`, calculated based on the water surface gradient and the discharge respectively. The proportional combination of these directional components is dictated by the parameter :math:`{\gamma}`:
+The routing direction (F*) is the estimate of the local downstream of the flow [5]_. This direction F* is comprised of :math:`{F_{sfc}}`, and :math:`{F_{int}}`, calculated based on the water surface gradient and the discharge respectively. The proportional combination of these directional components is dictated by the parameter :math:`{\gamma}`:
 
 .. math::
 
