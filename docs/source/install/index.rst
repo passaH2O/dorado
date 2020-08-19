@@ -39,6 +39,16 @@ Installation from source
 
 to install the dorado package.
 
+3. You can test your installation using `pytest`. To do this, first install pytest by running the following from the command line:
+::
+
+   $ pip install pytest
+
+Then to run the unit tests, type the following from the cloned (or extracted) folder:
+::
+
+   $ pytest
+
 
 Editable installation from source
 ---------------------------------
@@ -48,3 +58,8 @@ If you'd prefer an "editable" install (meaning that any modifications you make t
    $ pip install -r requirements.txt
 
    $ pip install -e .
+
+The unit tests can be run (after installing `pytest` as indicated above) by typing:
+::
+
+   $ pytest
