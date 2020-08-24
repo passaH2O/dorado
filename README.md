@@ -24,7 +24,9 @@ For user guides and detailed examples, refer to the [documentation](https://pass
 </div>
 
 ## Installation:
-dorado supports Python 2.7 as well as Python 3.5+. For the full distribution including examples, clone this repository using `git clone` and run `python setup.py install` from the cloned directory. For a lightweight distribution including just the core functionality, use `pip` to install via PyPI:
+dorado supports Python 2.7 as well as Python 3.5+. For the full distribution including examples, clone this repository using `git clone` and run `python setup.py install` from the cloned directory. To test this "full" installation, you must first install `pytest` via `pip install pytest`. Then from the cloned directory the command `pytest` can be run to ensure that your installed distribution passes all of the unit tests.
+
+For a lightweight distribution including just the core functionality, use `pip` to install via PyPI:
 
     pip install pydorado
 
@@ -34,4 +36,4 @@ For additional installation options and instructions, refer to the [documentatio
 We welcome contributions to the dorado project. Please open an issue or a pull request if there is functionality you would like to see or propose. Refer to our [contributing guide](https://passah2o.github.io/dorado/misc/contributing.html) for more information.
 
 ## Funding Acknowledgments
-This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital-3 Program as part of the Delta-X mission.
+This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital (EVS) award 17-EVS3-17_1-0009 in support of the DELTA-X project.
