@@ -65,6 +65,14 @@
 </pre></div>
 </div>
 <p>to install the dorado package.</p>
+<p>3. You can test your installation using <cite>pytest</cite>. To do this, first install pytest by running the following from the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install pytest
+</pre></div>
+</div>
+<p>Then to run the unit tests, type the following from the cloned (or extracted) folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
+</pre></div>
+</div>
 </div>
 <div class="section" id="editable-installation-from-source">
 <h2>Editable installation from source<a class="headerlink" href="#editable-installation-from-source" title="Permalink to this headline">¶</a></h2>
@@ -72,6 +80,10 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -r requirements.txt
 
 $ pip install -e .
+</pre></div>
+</div>
+<p>The unit tests can be run (after installing <cite>pytest</cite> as indicated above) by typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
 </pre></div>
 </div>
 </div>

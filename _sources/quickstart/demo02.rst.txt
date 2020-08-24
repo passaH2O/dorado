@@ -28,7 +28,7 @@ We can visualize the flow discharge components for this scenario from the loaded
 
 .. plot:: quickstart/demo2_flow.py
 
-Now let's route 50 particles with a target travel time of 2100 seconds. We will then visualize the final positions of the particles and display the final travel times associated with each of the particles to see how close they are to the target of 2100 seconds. Note that the `particlerouting` method of routing particles in discrete grid cells limits the precision which can be achieved in travel time values as the particles can only be located at the center of grid cells. The full script to produce the below figure and output is available :download:`here <../pyplots/quickstart/demo2.py>`.
+Now let's route 50 particles with a target travel time of 2100 seconds. We will then visualize the final positions of the particles and display the final travel times associated with each of the particles to see how close they are to the target of 2100 seconds. Note that the `dorado` method of routing particles in discrete grid cells limits the precision which can be achieved in travel time values as the particles can only be located at the center of grid cells. The full script to produce the below figure and output is available :download:`here <../pyplots/quickstart/demo2.py>`.
 
 .. doctest::
 
