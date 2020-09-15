@@ -64,7 +64,7 @@ References
 ----------
 .. [1] Dagestad, K.-F., Röhrs, J., Breivik, Ø., and Ådlandsvik, B.: OpenDrift v1.0: a generic framework for trajectory modelling, Geosci. Model Dev., 11, 1405-1420, https://doi.org/10.5194/gmd-11-1405-2018, 2018.
 
-.. [2] ANGE Team, Freshkiss3D home page. Available at: https://freshkiss3d.gforge.inria.fr/
+.. [2] ANGE Team, Freshkiss3D home page. Available at: https://freshkiss3d.gitlabpages.inria.fr/freshkiss3d/
 
 .. [3] Hydraulics, D. (2007). Delft3D-PART user manual version 2.13. WL| Delft Hydraulics, Delft.
 
