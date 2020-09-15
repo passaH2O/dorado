@@ -15,16 +15,6 @@ To `pip`-install this package, first ensure that you have the dependencies liste
     $ pip install pydorado
 
 
-Installation via `conda`
-------------------------
-.. note:: Some users have experienced dependency incompatibilities when installing via conda.
-
-To `conda`-install this package, use the following command:
-::
-
-    $ conda install -c elbeejay dorado
-
-
 Installation from source
 ------------------------
 1. Clone (or download) the repository
