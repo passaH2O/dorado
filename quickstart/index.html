@@ -38,10 +38,16 @@
 <p>Quick guide to using the <cite>dorado</cite> package using the 2 built-in sample datasets. The first demo provides an example of how to use the high-level API, while the second shows how functions can be accessed at a lower-level.</p>
 <div class="section" id="demo-1-using-the-high-level-api">
 <h2>Demo 1- Using the High-Level API<a class="headerlink" href="#demo-1-using-the-high-level-api" title="Permalink to this headline">¶</a></h2>
-<p>In this demo, we show how particles can be routed along a simulated river delta, example output is from the delta simulation model, <a class="reference external" href="https://github.com/DeltaRCM/pyDeltaRCM">DeltaRCM</a>. To do this, we will be using one of the high-level API functions provided in <a class="reference download internal" download="" href="../_downloads/c64c267b8ed7f241b80fee2a01fd3c5f/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>.</p>
+<p>In this demo, we show how particles can be routed along a simulated river delta, example output is from the delta simulation model, <a class="reference external" href="https://github.com/DeltaRCM/pyDeltaRCM">DeltaRCM</a>.
+To do this, we will be using one of the high-level API functions provided in <a class="reference download internal" download="" href="../_downloads/c64c267b8ed7f241b80fee2a01fd3c5f/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>.
+A set of 50 particles will be seeded in the main channel of the synthetic delta.
+Then using information about the water depths and flow rates in the delta, the particles will be allowed to travel downstream.
+River deltas are distributary networks, and so the particles will not all travel along the same channels.
+By using a tool like <cite>dorado</cite>, simulated particles can help us answer questions related to hydrological connectivity and nutrient residence times in deltaic systems.</p>
 <p>First we load the sample parameters.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span> <span class="k">as</span> <span class="nn">pr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rcmparams</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_rcm_params</span><span class="p">()</span>
 </pre></div>
 </div>
