@@ -6,6 +6,16 @@ Examples
 
 Examples of the high-level API functionality are provided here. These examples range from simple particle routing with a flow field, to measuring exposure time distributions for particle transport in a specified region. If your use case extends beyond the scenarios explored in these examples, we recommend using the `routines.py` script to help you design your own functions based on the lower-level methods in `particle_track.py`.
 
+.. Note::
+    To run :ref:`example12`, you must be in the "examples" directory. Pathing
+    to the data for that example is relative to the working directory and
+    assumes you are in the "examples" directory.
+
+    Similarly, for :ref:`example03`, :ref:`example07`, and :ref:`example08`
+    these must be run from the same location (same directory) from which you
+    ran the prerequisite example (e.g. :ref:`example02` must be run before
+    :ref:`example03`)
+
 .. toctree::
    :maxdepth: 1
 
