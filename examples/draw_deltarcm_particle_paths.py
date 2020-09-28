@@ -2,6 +2,7 @@
 # Can only be run after steady_deltarcm_particles.py has been successfully run
 import numpy as np
 import json
+import os
 import os.path
 from dorado.routines import draw_travel_path
 
