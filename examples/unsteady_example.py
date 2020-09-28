@@ -1,4 +1,5 @@
 """Unsteady flow example using gridded anuga output data."""
+# Note: This example must be run from within the 'examples' directory!!!
 
 from dorado.routines import unsteady_plots
 import dorado.particle_track as pt

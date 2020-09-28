@@ -1,11 +1,14 @@
 """Make an example of the workflow with deltarcm output data."""
 
 import numpy as np
+import os.path
 from dorado.routines import steady_plots
 from dorado.particle_track import params
 
 # load some variables from a deltarcm output so stage is varied
-data = np.load('ex_deltarcm_data.npz')
+f_path = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(f_path, 'ex_deltarcm_data.npz')
+data = np.load(data_path)
 
 # pull depth and stage from that data
 stage = data['stage']
