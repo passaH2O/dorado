@@ -24,7 +24,7 @@ from dorado import routines
 # theta and gamma are set to 0.
 
 # create params and then assign the parameters
-params = particle_track.params()
+params = particle_track.modelParams()
 
 # define the params variables
 params.depth = np.ones((100, 100))

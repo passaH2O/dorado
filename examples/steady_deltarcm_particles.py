@@ -3,7 +3,7 @@
 import numpy as np
 import os.path
 from dorado.routines import steady_plots
-from dorado.particle_track import params
+from dorado.particle_track import modelParams
 
 # load some variables from a deltarcm output so stage is varied
 f_path = os.path.abspath(os.path.dirname(__file__))
@@ -15,7 +15,7 @@ stage = data['stage']
 depth = data['depth']
 
 # create params and then assign the parameters
-params = params()
+params = modelParams()
 
 # define the params variables
 params.stage = stage

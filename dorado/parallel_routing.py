@@ -20,13 +20,13 @@ from multiprocessing import Pool
 def run_iter(params):
     """Wrapper run script for the particle iterations.
 
-    Uses params class to define a *Particle* and does iterations of the
-    particle. Requires a new params variable : *params.num_iter* to define the
-    number of iterations to route the particles for.
+    Uses modelParams class to define a *Particle* and does iterations of the
+    particle. Requires a new modelParams variable : *modelParams.num_iter* to
+    define the number of iterations to route the particles for.
 
     **Inputs** :
 
-        params : `obj`
+        params : :obj:`modelParams`
             Class with all the parameters for the particle routing
 
     **Outputs** :
@@ -91,7 +91,7 @@ def parallel_routing(params, num_iter, num_cores):
 
     **Inputs** :
 
-        params : `obj`
+        params : :obj:`modelParams`
             Normal parameters for the particles in a class
 
         num_iter : `int`

@@ -33,7 +33,7 @@ target_row = 70
 expected_time = 297.5
 
 # assign particle parameters
-params = pt.params()
+params = pt.modelParams()
 params.depth = depth
 params.stage = stage
 params.u = u

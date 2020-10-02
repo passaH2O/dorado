@@ -3,7 +3,7 @@
 import numpy as np
 import os.path
 from dorado.routines import time_plots
-from dorado.particle_track import params
+from dorado.particle_track import modelParams
 
 # load some variables from an anuga output so stage is varied
 f_path = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +16,7 @@ qx = data['qx']
 qy = data['qy']
 
 # create params and then assign the parameters
-params = params()
+params = modelParams()
 
 # define the params variables
 params.depth = depth

@@ -3,7 +3,7 @@
 import numpy as np
 import os.path
 import dorado.particle_track as pt
-from dorado.particle_track import params
+from dorado.particle_track import modelParams
 from dorado.routines import get_state
 from dorado.routines import plot_state
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ qx = data['qx']
 qy = data['qy']
 
 # create params and then assign the parameters
-params = params()
+params = modelParams()
 
 # define the params variables
 params.depth = depth

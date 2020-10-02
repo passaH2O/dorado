@@ -16,7 +16,7 @@ qx = data['qx']
 qy = data['qy']
 
 # create the parameters object and then assign the values
-params = pt.params()
+params = pt.modelParams()
 
 # define the params variables
 params.stage = depth  # for this example we don't have stage data

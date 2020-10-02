@@ -5,7 +5,7 @@ from dorado.routines import unsteady_plots
 import dorado.particle_track as pt
 
 # initialize a parameters object
-params = pt.params()
+params = pt.modelParams()
 
 # give params information not contained in the grid
 params.dx = 5.

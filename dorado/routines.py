@@ -29,7 +29,7 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
 
     **Inputs** :
 
-        params : `obj`
+        params : :obj:`modelParams`
             Class of parameter values for the particles
 
         num_iter : `int`
@@ -122,7 +122,7 @@ def unsteady_plots(params, num_steps, timestep,
 
     **Inputs** :
 
-        params : `obj`
+        params : :obj:`modelParams`
             Class of particle parameter values
 
         num_steps : `int`
@@ -260,7 +260,7 @@ def time_plots(params, num_iter, folder_name=None):
 
     **Inputs** :
 
-        params : `obj`
+        params : :obj:`modelParams`
             Parameters for the particle
 
         num_iter : `int`
@@ -745,8 +745,8 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
 
         grid : `numpy.ndarray`
             A 2-D grid upon which the particles will be plotted. Examples of
-            grids that might be nice to use are `params.depth`, `params.stage`,
-            `params.topography`.
+            grids that might be nice to use are `modelParams.depth`,
+            `modelParams.stage`, `modelParams.topography`.
 
         walk_data : `dict`
             The dictionary with the particle information. This is the output

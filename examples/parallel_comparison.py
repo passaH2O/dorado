@@ -10,7 +10,7 @@ from dorado.particle_track import Particle
 import dorado.particle_track as pt
 
 # create params and then assign the parameters
-params = pt.params()
+params = pt.modelParams()
 
 # load some variables from an anuga output so stage is varied
 f_path = os.path.abspath(os.path.dirname(__file__))

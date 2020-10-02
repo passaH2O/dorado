@@ -18,10 +18,10 @@ from tqdm import tqdm
 from .particle_tools import Tools
 
 
-class params:
+class modelParams:
     """Parameter class with attributes and grid particles will be routed on.
 
-    The parameters class, `params`, must be populated with user-defined
+    The parameters class, `modelParams`, must be populated with user-defined
     attributes of the grid the particles will be modeled on.
 
     **Required Parameters:**
@@ -105,12 +105,13 @@ class params:
             used to route the particles. Default value is False.
 
     This list of expected parameter values can also be obtained by querying the
-    class attributes with `dir(params)`, `params.__dict__`, or `vars(params)`.
+    class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
+    `vars(modelParams)`.
 
     """
 
     def __init__(self):
-        """Create the expected variables for the params class.
+        """Create the expected variables for the modelParams class.
 
         Variables are initialized as NoneType they need to be assigned by the
         user. Due to the wide variety of data formats produced by differeny
@@ -136,8 +137,8 @@ class Particle(Tools):
     def __init__(self, params):
         """Check input parameters and assign default values where/if needed.
 
-        Methods require a class of parameters (:obj:`params`) to be passed to
-        the Particles class. e.g. particle = Particles(params)
+        Methods require a class of parameters (:obj:`modelParams`) to be passed
+        to the Particles class. e.g. particle = Particles(modelParams)
 
         Initialization tries to assign each value from the parameter class,
         otherwise an error is raised or default values are assigned when
@@ -147,27 +148,28 @@ class Particle(Tools):
         # REQUIRED PARAMETERS #
         # Define the seeding locations as list of x and y locations
         if getattr(params, 'seed_xloc', None) is None:
-            raise ValueError("No tracer seeding x-locations (params.seed_xloc)"
-                             " have been defined")
+            raise ValueError("No tracer seeding x-locations"
+                             " (modelParams.seed_xloc) have been defined")
         else:
             self.seed_xloc = params.seed_xloc
 
         if getattr(params, 'seed_yloc', None) is None:
-            raise ValueError("No tracer seeding y-locations (params.seed_yloc)"
-                             " have been defined")
+            raise ValueError("No tracer seeding y-locations"
+                             " (modelParams.seed_yloc) have been defined")
         else:
             self.seed_yloc = params.seed_yloc
 
         # Define the number of tracers to be simulated
         if getattr(params, 'Np_tracer', None) is None:
-            raise ValueError("Number of tracer particles (params.Np_tracer)"
-                             " has not been defined")
+            raise ValueError("Number of tracer particles"
+                             " (modelParams.Np_tracer) has not been defined")
         else:
             self.Np_tracer = params.Np_tracer
 
         # Define the length along one cell face (assuming square cells)
         if getattr(params, 'dx', None) is None:
-            raise ValueError("Length of cell face (params.dx) is undefined")
+            raise ValueError("Length of cell face (modelParams.dx) is"
+                             " undefined")
         else:
             self.dx = params.dx
 
@@ -697,7 +699,7 @@ def exposure_time(walk_data,
             Output of a previous function call to run_iteration.
 
         region_of_interest : `int array`
-            Binary array the same size as input arrays in params class
+            Binary array the same size as input arrays in modelParams class
             with 1's everywhere inside the region in which we want to
             measure exposure time, and 0's everywhere else.
 
