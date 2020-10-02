@@ -95,6 +95,7 @@ jobs:
         pip install -e .
     - name: Run examples
       run: |
+        export DISPLAY=:0.0
         python examples/steady_anuga_particles.py
         python examples/steady_deltarcm_particles.py
         python examples/steepest_descent_deltarcm.py
