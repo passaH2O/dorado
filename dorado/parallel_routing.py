@@ -12,7 +12,7 @@ import sys
 import os
 import re
 import string
-from .particle_track import Particle
+from .particle_track import Particles
 from multiprocessing import Pool
 
 
@@ -36,7 +36,7 @@ def run_iter(params):
             details same as input previous_walk_data
 
     """
-    particle = Particle(params)
+    particle = Particles(params)
     all_walk = None
     # do iterations
     for i in list(range(0, params.num_iter)):
