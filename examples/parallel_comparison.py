@@ -6,7 +6,7 @@ import time
 from dorado.parallel_routing import parallel_routing
 
 # for serial run comparison import the regular iterator
-from dorado.particle_track import Particle
+from dorado.particle_track import Particles
 import dorado.particle_track as pt
 
 # create params and then assign the parameters
@@ -50,7 +50,7 @@ start_serial_time = time.time()
 # do twice to match number of particles parallel is doing
 for z in list(range(0, 2)):
     all_walk = None  # initialize walk data list
-    particle = Particle(params)
+    particle = Particles(params)
     # do 50 iterations to match parallel
     for i in list(range(0, 50)):
         all_walk = particle.run_iteration(previous_walk_data=all_walk)

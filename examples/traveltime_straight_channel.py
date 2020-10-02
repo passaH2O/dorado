@@ -67,7 +67,7 @@ for dc in range(0, 2):
         params.diff_coeff = 1.0
 
     # make particle
-    particle = pt.Particle(params)
+    particle = pt.Particles(params)
 
     # walk it
     walk_data = None

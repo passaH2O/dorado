@@ -37,7 +37,7 @@ params.theta = 1.0
 params.model = 'Anuga'
 
 # Apply the parameters to run the model
-particle = pt.Particle(params)
+particle = pt.Particles(params)
 np.random.seed(0)
 # run model until all particles have travelled for about 1.5 hours
 walk_data = particle.run_iteration(target_time=2100)

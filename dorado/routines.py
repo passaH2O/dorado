@@ -6,7 +6,7 @@ Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range
-from .particle_track import Particle
+from .particle_track import Particles
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
@@ -54,7 +54,7 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
 
     """
     # define the particle
-    particle = Particle(params)
+    particle = Particles(params)
 
     # make directory to save the data
     if save_output:
@@ -215,8 +215,8 @@ def unsteady_plots(params, num_steps, timestep,
             raise ValueError('Output datatype/structure unsupported, modify'
                              ' the output reading portion of the code')
 
-        # then define the particle class and continue
-        particle = Particle(params)
+        # then define the particles class and continue
+        particle = Particles(params)
 
         walk_data = particle.run_iteration(previous_walk_data=walk_data,
                                            target_time=target_times[i])
@@ -278,7 +278,7 @@ def time_plots(params, num_iter, folder_name=None):
 
     """
     # define the particle
-    particle = Particle(params)
+    particle = Particles(params)
 
     # make directory to save the data
     if folder_name is None:

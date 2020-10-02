@@ -131,7 +131,7 @@ class modelParams:
         self.v = None
 
 
-class Particle(Tools):
+class Particles(Tools):
     """Class for the particle(s) that is(are) going to be routed."""
 
     def __init__(self, params):

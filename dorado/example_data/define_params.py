@@ -8,7 +8,7 @@ from .. import particle_track as pt
 def make_rcm_params():
     """Function to make the example RCM parameters."""
 
-    params = pt.params()
+    params = pt.modelParams()
     path = os.path.join(os.path.dirname(__file__), 'ex_deltarcm_data.npz')
     data = np.load(path)
     # pull depth and stage from that data
@@ -35,7 +35,7 @@ def make_rcm_params():
 def make_anuga_params():
     """Function to make the example ANUGA parameters."""
 
-    params = pt.params()
+    params = pt.modelParams()
     path = os.path.join(os.path.dirname(__file__), 'ex_anuga_data.npz')
     data = np.load(path)
     # pull depth and stage from that data
