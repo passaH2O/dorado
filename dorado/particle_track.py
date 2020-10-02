@@ -15,7 +15,7 @@ import numpy as np
 import scipy
 from scipy import interpolate
 from tqdm import tqdm
-from .lagrangian_walker import Tools
+import dorado.lagrangian_walker as lw
 
 
 class modelParams:
@@ -131,7 +131,7 @@ class modelParams:
         self.v = None
 
 
-class Particles(Tools):
+class Particles():
     """Class for the particle(s) that is(are) going to be routed."""
 
     def __init__(self, params):
@@ -478,11 +478,11 @@ class Particles(Tools):
             # if start locations not defined, then randomly assign them
             if start_xindices is None:
                 # set starting x-index for all tracers
-                start_xindices = [self.random_pick_seed(self.seed_xloc) for x
+                start_xindices = [lw.random_pick_seed(self.seed_xloc) for x
                                   in list(range(self.Np_tracer))]
             if start_yindices is None:
                 # set starting y-index for all tracers
-                start_yindices = [self.random_pick_seed(self.seed_yloc) for x
+                start_yindices = [lw.random_pick_seed(self.seed_yloc) for x
                                   in list(range(self.Np_tracer))]
             # initialize travel times list
             if start_times is None:
@@ -501,8 +501,8 @@ class Particles(Tools):
         # Do the particle movement
         if target_time is None:
             # If we're not aiming for a specific time, step the particles
-            new_inds, travel_times = self.particle_stepper(start_pairs,
-                                                           start_times)
+            new_inds, travel_times = lw.particle_stepper(self, start_pairs,
+                                                         start_times)
 
             for ii in list(range(self.Np_tracer)):
                 # Don't duplicate location
@@ -540,7 +540,7 @@ class Particles(Tools):
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times = self.particle_stepper(
+                        new_inds, travel_times = lw.particle_stepper(self,
                                                     [[all_xinds[ii][-1],
                                                       all_yinds[ii][-1]]],
                                                     [all_times[ii][-1]])
