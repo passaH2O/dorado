@@ -75,7 +75,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [2.7, 3.7]
+        python-version: [3.7]
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
@@ -95,7 +95,6 @@ jobs:
         pip install -e .
     - name: Run examples
       run: |
-        export DISPLAY=:0.0
         python examples/steady_anuga_particles.py
         python examples/steady_deltarcm_particles.py
         python examples/steepest_descent_deltarcm.py
