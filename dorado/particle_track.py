@@ -15,7 +15,7 @@ import numpy as np
 import scipy
 from scipy import interpolate
 from tqdm import tqdm
-from .particle_tools import Tools
+from .lagrangian_walker import Tools
 
 
 class modelParams:
