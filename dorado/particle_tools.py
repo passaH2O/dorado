@@ -339,8 +339,8 @@ class Tools():
         return idx
 
     # single iteration of particle movement
-    def single_iteration(self, current_inds, travel_times):
-        """Calculate a single iteration of particle movement.
+    def particle_stepper(self, current_inds, travel_times):
+        """Step particles a single iteration.
 
         **Inputs** :
 

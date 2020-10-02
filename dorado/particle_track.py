@@ -500,8 +500,8 @@ class Particles(Tools):
 
         # Do the particle movement
         if target_time is None:
-            # If we're not aiming for a specific time, run a single iteration
-            new_inds, travel_times = self.single_iteration(start_pairs,
+            # If we're not aiming for a specific time, step the particles
+            new_inds, travel_times = self.particle_stepper(start_pairs,
                                                            start_times)
 
             for ii in list(range(self.Np_tracer)):
@@ -540,7 +540,7 @@ class Particles(Tools):
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times = self.single_iteration(
+                        new_inds, travel_times = self.particle_stepper(
                                                     [[all_xinds[ii][-1],
                                                       all_yinds[ii][-1]]],
                                                     [all_times[ii][-1]])
