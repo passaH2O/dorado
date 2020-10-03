@@ -39,8 +39,10 @@ params.model = 'Anuga'
 # Apply the parameters to run the model
 particle = pt.Particles(params)
 np.random.seed(0)
+# generate particles
+init_walk_data = particle.generate_particles()
 # run model until all particles have travelled for about 1.5 hours
-walk_data = particle.run_iteration(target_time=2100)
+walk_data = particle.run_iteration(init_walk_data, target_time=2100)
 _, _, finaltimes = get_state(walk_data, iteration=-1)
 
 plot_state(params.depth, walk_data, iteration=0, c='b')
