@@ -49,8 +49,8 @@ print('start serial')
 start_serial_time = time.time()
 # do twice to match number of particles parallel is doing
 for z in list(range(0, 2)):
-    all_walk = particle.generate_particles()  # initialize walk data list
     particle = Particles(params)
+    all_walk = particle.generate_particles()  # initialize walk data list
     # do 50 iterations to match parallel
     for i in list(range(0, 50)):
         all_walk = particle.run_iteration(init_walk_data=all_walk)
