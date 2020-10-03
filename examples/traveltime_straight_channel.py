@@ -70,9 +70,9 @@ for dc in range(0, 2):
     particle = pt.Particles(params)
 
     # walk it
-    walk_data = None
+    walk_data = particle.generate_particles()
     for i in list(range(0, num_iter)):
-        walk_data = particle.run_iteration(previous_walk_data=walk_data)
+        walk_data = particle.run_iteration(init_walk_data=walk_data)
 
     # get travel times associated with particles when they are at coord x=70
     # use the exposure_time function to measure this
