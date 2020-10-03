@@ -32,11 +32,11 @@ def test_few_steps_RCM():
     # defining / initializing
     particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
-    all_walk_data = None # init the walk data
+    all_walk_data = particle.generate_particles() # init the walk data
 
     # 3 iterations
     for i in list(range(0,3)):
-        all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data)
+        all_walk_data = particle.run_iteration(init_walk_data=all_walk_data)
 
     # make assertions
     # check initial position and travel time
@@ -60,11 +60,11 @@ def test_set_time_RCM_previousdata():
     particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
 
-    # iterate once to generate previous walk data
-    all_walk_data = particle.run_iteration()
+    # generate the particles
+    all_walk_data = particle.generate_particles()
 
     # set time
-    all_walk_data = particle.run_iteration(previous_walk_data=all_walk_data,
+    all_walk_data = particle.run_iteration(init_walk_data=all_walk_data,
                                            target_time=5e6)
     # make assertions
     # check initial position and travel time
@@ -89,8 +89,11 @@ def test_set_time_RCM():
     particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
 
+    # generate particles
+    init_walk_data = particle.generate_particles()
+
     # set time
-    all_walk_data = particle.run_iteration(target_time=5e6)
+    all_walk_data = particle.run_iteration(init_walk_data, target_time=5e6)
 
     # make assertions
     # check initial position and travel time
@@ -129,11 +132,11 @@ def test_few_steps_anuga():
     # defining / initializing
     an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
-    all_walk_data = None # init the walk data
+    all_walk_data = an_particle.generate_particles() # init the walk data
 
     # 3 iterations
     for i in list(range(0,3)):
-        all_walk_data = an_particle.run_iteration(previous_walk_data=all_walk_data)
+        all_walk_data = an_particle.run_iteration(init_walk_data=all_walk_data)
 
     # make assertions
     # check initial position and travel time
@@ -156,11 +159,11 @@ def test_boundary_anuga():
     # defining / initializing
     an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
-    all_walk_data = None # init the walk data
+    all_walk_data = an_particle.generate_particles() # init the walk data
 
     # 20 iterations
     for i in list(range(0, 20)):
-        all_walk_data = an_particle.run_iteration(previous_walk_data=all_walk_data)
+        all_walk_data = an_particle.run_iteration(init_walk_data=all_walk_data)
 
     # make assertions
     # check initial position and travel time
@@ -182,8 +185,12 @@ def test_boundary_travel_time_anuga():
     an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
 
+    # generate particles
+    init_walk_data = an_particle.generate_particles()
+
     # set target time for iterations
-    all_walk_data = an_particle.run_iteration(target_time=1000.0)
+    all_walk_data = an_particle.run_iteration(init_walk_data,
+                                              target_time=1000.0)
 
     # make assertions
     # check initial position and travel time

@@ -37,10 +37,10 @@ def run_iter(params):
 
     """
     particle = Particles(params)
-    all_walk = None
+    all_walk = particle.generate_particles()
     # do iterations
     for i in list(range(0, params.num_iter)):
-        all_walk = particle.run_iteration(previous_walk_data=all_walk)
+        all_walk = particle.run_iteration(init_walk_data=all_walk)
 
     return all_walk
 

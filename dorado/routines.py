@@ -69,12 +69,12 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
         if not os.path.exists(folder_name+os.sep+'data'):
             os.makedirs(folder_name+os.sep+'data')
 
-    walk_data = None  # Initialize object for function call
+    walk_data = particle.generate_particles()
 
     # Iterate and save results
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
-        walk_data = particle.run_iteration(previous_walk_data=walk_data)
+        walk_data = particle.run_iteration(init_walk_data=walk_data)
         if save_output:
             x0, y0, t0 = get_state(walk_data, 0)
             xi, yi, ti = get_state(walk_data)
@@ -91,7 +91,7 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
             cbar.set_label('Water Depth [m]')
             ax.scatter(y0, x0, c='b', s=0.75)
             ax.scatter(yi, xi, c='r', s=0.75)
-            plt.savefig(folder_name+os.sep+
+            plt.savefig(folder_name+os.sep +
                         'figs'+os.sep+'output'+str(i)+'.png',
                         bbox_inches='tight')
             plt.close()
@@ -185,7 +185,6 @@ def unsteady_plots(params, num_steps, timestep,
 
     # Create vector of target times
     target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
-    walk_data = None
     # Iterate through model timesteps
     for i in tqdm(list(range(0, num_steps)), ascii=True):
         # load depth, stage, qx, qy for this timestep
@@ -217,8 +216,13 @@ def unsteady_plots(params, num_steps, timestep,
 
         # then define the particles class and continue
         particle = Particles(params)
+        # generator is a bit different depending on whether any particles exist
+        if i == 0:
+            walk_data = particle.generate_particles()
+        else:
+            walk_data = particle.generate_particles(previous_walk_data=walk_data)
 
-        walk_data = particle.run_iteration(previous_walk_data=walk_data,
+        walk_data = particle.run_iteration(init_walk_data=walk_data,
                                            target_time=target_times[i])
 
         x0, y0, t0 = get_state(walk_data, 0)
@@ -292,11 +296,11 @@ def time_plots(params, num_iter, folder_name=None):
     if not os.path.exists(folder_name+os.sep+'data'):
         os.makedirs(folder_name+os.sep+'data')
 
-    walk_data = None  # Initialize list for function call
+    walk_data = particle.generate_particles()  # generate particles
     # Iterate and save results
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
-        walk_data = particle.run_iteration(previous_walk_data=walk_data)
+        walk_data = particle.run_iteration(init_walk_data=walk_data)
 
         # collect latest travel times
         x0, y0, t0 = get_state(walk_data, 0)
