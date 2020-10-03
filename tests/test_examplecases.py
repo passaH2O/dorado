@@ -7,11 +7,11 @@ sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
 import numpy as np
 import dorado.particle_track as pt
-from dorado.particle_track import Particle
+from dorado.particle_track import Particles
 
 # set up DeltaRCM test case
 rcm_data = np.load('tests/data/ex_deltarcm_data.npz')
-params = pt.params()
+params = pt.modelParams()
 params.stage = rcm_data['stage']
 params.depth = rcm_data['depth']
 # just do one particle in a set location for this test
@@ -30,7 +30,7 @@ def test_few_steps_RCM():
     Test running a few steps
     '''
     # defining / initializing
-    particle = Particle(params) # define the particle
+    particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
     all_walk_data = None # init the walk data
 
@@ -57,7 +57,7 @@ def test_set_time_RCM_previousdata():
     Test setting a time target when using old walk data
     '''
     # defining / initializing
-    particle = Particle(params) # define the particle
+    particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
 
     # iterate once to generate previous walk data
@@ -86,7 +86,7 @@ def test_set_time_RCM():
     Test setting a time target
     '''
     # defining / initializing
-    particle = Particle(params) # define the particle
+    particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
 
     # set time
@@ -108,7 +108,7 @@ def test_set_time_RCM():
 
 # set up anuga test case - going to use subset of domain
 an_data = np.load('tests/data/ex_anuga_data.npz')
-an_params = pt.params()
+an_params = pt.modelParams()
 an_params.stage = an_data['depth'][40:61,40:61] # just using depth here
 an_params.depth = an_data['depth'][40:61,40:61]
 # just do one particle in a set location for this test
@@ -127,7 +127,7 @@ def test_few_steps_anuga():
     Test running a few steps
     '''
     # defining / initializing
-    an_particle = Particle(an_params) # define the particle
+    an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
     all_walk_data = None # init the walk data
 
@@ -148,17 +148,18 @@ def test_few_steps_anuga():
                                                               5.27901,
                                                               7.83891])
 
+
 def test_boundary_anuga():
     '''
     Test running into the boundary
     '''
     # defining / initializing
-    an_particle = Particle(an_params) # define the particle
+    an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
     all_walk_data = None # init the walk data
 
     # 20 iterations
-    for i in list(range(0,20)):
+    for i in list(range(0, 20)):
         all_walk_data = an_particle.run_iteration(previous_walk_data=all_walk_data)
 
     # make assertions
@@ -178,7 +179,7 @@ def test_boundary_travel_time_anuga():
     Test running into the boundary and not reaching travel time target
     '''
     # defining / initializing
-    an_particle = Particle(an_params) # define the particle
+    an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
 
     # set target time for iterations

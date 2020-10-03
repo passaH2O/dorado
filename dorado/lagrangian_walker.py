@@ -223,7 +223,6 @@ def calc_travel_times(Particles, new_cell, ind, new_ind, dist):
         trav_time = 0.5*projected_dist*(1/old_vel + 1/new_vel)*(1+diff)
     else:
         trav_time = 0  # particle did not move
-
     return trav_time
 
 

@@ -24,7 +24,7 @@ params.qx = np.zeros((3,3))
 params.qy = np.ones((3,3))
 params.theta = 1
 params.model = 'DeltaRCM'
-particle = particle_track.Particle(params)
+particle = particle_track.Particles(params)
 
 # testing of the Particle __init__ functionality
 def test_xseed():
@@ -60,12 +60,12 @@ def test_theta():
 
 def test_neg_diffcoeff():
     params.diff_coeff = -1.0
-    particle = particle_track.Particle(params)
+    particle = particle_track.Particles(params)
     assert particle.diff_coeff == 0.0
 
 def test_big_diffcoeff():
     params.diff_coeff = 3.0
-    particle = particle_track.Particle(params)
+    particle = particle_track.Particles(params)
     assert particle.diff_coeff == 3.0
 
 def test_dry_depth():
@@ -102,12 +102,12 @@ def test_steep():
 def test_steep_true():
     params.diff_coeff = 'invalid'
     params.steepest_descent = True
-    particle = particle_track.Particle(params)
+    particle = particle_track.Particles(params)
     assert particle.steepest_descent == True
 
 def test_steep_other():
     params.steepest_descent = 'other'
-    particle = particle_track.Particle(params)
+    particle = particle_track.Particles(params)
     assert particle.steepest_descent == False
 
 # testing of the run_iteration function
@@ -147,7 +147,7 @@ def test_travel_time_given():
 
 def test_init_params():
     # test initialization of params class
-    params = particle_track.params()
+    params = particle_track.modelParams()
     # make assertions
     assert params.seed_xloc is None
     assert params.seed_yloc is None
@@ -179,24 +179,24 @@ class TestValueErrors:
     """
 
     def test_seedx(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         # expect ValueError
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_seedy(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         # expect ValueError
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_seedx_none(self):
         class pobj():
             pass
         params = pobj
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_seedy_none(self):
         class pobj():
@@ -204,44 +204,44 @@ class TestValueErrors:
         params = pobj
         params.seed_xloc = [1]
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_num_tracers(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_dx(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_broken_depth(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
         params.dx = 1
         params.depth = 'badstring'
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_missing_depth(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
         params.dx = 1
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_depth_via_stage_topo(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -250,12 +250,12 @@ class TestValueErrors:
         params.topography = np.zeros((3,3))
         params.u = np.ones((3,3))
         params.v = np.ones((3,3))
-        particle = particle_track.Particle(params)
+        particle = particle_track.Particles(params)
         # should work so make assertion
         assert np.all(particle.depth == params.stage-params.topography)
 
     def test_depth_via_stage_topo_broken(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -263,10 +263,10 @@ class TestValueErrors:
         params.stage = 'badstring'
         params.topography = np.zeros((3,3))
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_stage_broken(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -274,10 +274,10 @@ class TestValueErrors:
         params.stage = 'badstring'
         params.depth = np.ones((3,3))
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_stage_via_depth_topo(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -287,13 +287,13 @@ class TestValueErrors:
         params.depth[0,0] = 0
         params.u = np.ones((3,3))
         params.v = np.ones((3,3))
-        particle = particle_track.Particle(params)
+        particle = particle_track.Particles(params)
         # should work so make assertion
         assert np.isnan(particle.stage[0,0]) == True
         assert particle.stage[1,1] == 1.
 
     def test_stage_via_depth_topo_broken(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -303,10 +303,10 @@ class TestValueErrors:
         params.u = np.ones((3,3))
         params.v = np.ones((3,3))
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_missing_stage(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -315,10 +315,10 @@ class TestValueErrors:
         params.u = np.ones((3,3))
         params.v = np.ones((3,3))
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_rcm_model_uv(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -328,7 +328,7 @@ class TestValueErrors:
         params.u = np.ones((3,3))
         params.v = np.ones((3,3))
         params.model = 'DeltaRCM'
-        particle = particle_track.Particle(params)
+        particle = particle_track.Particles(params)
         # should work so make assertion
         assert np.all(particle.v == params.v)
         assert np.all(particle.u == params.u)
@@ -336,7 +336,7 @@ class TestValueErrors:
         assert np.all(particle.qy == params.v*params.depth)
 
     def test_rcm_model_uv_broken(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -346,10 +346,10 @@ class TestValueErrors:
         params.u = np.ones((3,3))
         params.model = 'DeltaRCM'
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
     def test_model_q(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -358,7 +358,7 @@ class TestValueErrors:
         params.topography = np.zeros((3,3))
         params.qx = np.ones((3,3))
         params.qy = np.ones((3,3))
-        particle = particle_track.Particle(params)
+        particle = particle_track.Particles(params)
         # should work so make assertion
         assert np.all(particle.v == particle.qy*particle.depth/(particle.depth**2+1e-8))
         assert np.all(particle.u == particle.qx*particle.depth/(particle.depth**2+1e-8))
@@ -366,7 +366,7 @@ class TestValueErrors:
         assert np.all(particle.qy == params.qx)
 
     def test_model_uv_broken(self):
-        params = particle_track.params()
+        params = particle_track.modelParams()
         params.seed_xloc = [1]
         params.seed_yloc = [1]
         params.Np_tracer = 1
@@ -375,7 +375,7 @@ class TestValueErrors:
         params.topography = np.zeros((3,3))
         params.u = np.ones((3,3))
         with pytest.raises(ValueError):
-            particle = particle_track.Particle(params)
+            particle = particle_track.Particles(params)
 
 
 def test_coord2ind():
