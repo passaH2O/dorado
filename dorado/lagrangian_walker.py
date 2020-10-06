@@ -46,8 +46,8 @@ def get_weight(Particles, ind):
 
     **Inputs** :
 
-        Particles : :obj:`Particles`
-            A :obj:`dorado.Particles` object
+        Particles : :obj:`dorado.particle_track.Particles`
+            A :obj:`dorado.particle_track.Particles` object
 
         ind : `tuple`
             Tuple (x,y) with the current location indices
@@ -180,8 +180,8 @@ def calc_travel_times(Particles, new_cell, ind, new_ind, dist):
 
     **Inputs** :
 
-        Particles : :obj:`Particles`
-            A :obj:`dorado.Particles` object
+        Particles : :obj:`dorado.particle_track.Particles`
+            A :obj:`dorado.particle_track.Particles` object
 
         new_cell : `int`
             Integer 1-8 indicating new location in D-8 way
@@ -332,8 +332,8 @@ def particle_stepper(Particles, current_inds, travel_times):
 
     **Inputs** :
 
-        Particles: :obj:`Particles`
-            A :obj:`dorado.Particles` object.
+        Particles: :obj:`dorado.particle_track.Particles`
+            A :obj:`dorado.particle_track.Particles` object.
 
         current_inds : `list`
             List of tuples of the current particle (x,y) locations in space

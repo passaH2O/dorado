@@ -21,7 +21,8 @@ import dorado.lagrangian_walker as lw
 class modelParams:
     """Parameter class with attributes and grid particles will be routed on.
 
-    The parameters class, `modelParams`, must be populated with user-defined
+    The parameters class, :obj:`dorado.particle_track.modelParams`,
+    must be populated with user-defined
     attributes of the grid the particles will be modeled on.
 
     **Required Parameters:**
@@ -123,7 +124,8 @@ class Particles():
     def __init__(self, params):
         """Check input parameters and assign default values where/if needed.
 
-        Methods require a class of parameters (:obj:`modelParams`) to be passed
+        Methods require a class of parameters
+        (:obj:`dorado.particle_track.modelParams`) to be passed
         to the Particles class. e.g. particle = Particles(modelParams)
 
         Initialization tries to assign each value from the parameter class,
@@ -391,16 +393,18 @@ class Particles():
                            previous_walk_data=None):
         """Generate a set of particles in defined locations.
 
-        After a :obj:`Particles` class has been initialized, this function
-        can be called to create some particles within a given region. If
-        particles are to be seeded in different groupings in different
-        regions, this function can be called multiple times in succession
-        prior to moving them via :obj:`run_iteration`.
+        After a :obj:`dorado.particle_track.Particles` class has been
+        initialized, this function can be called to create some particles
+        within a given region. If particles are to be seeded in different
+        groupings in different regions, this function can be called multiple
+        times in succession prior to moving them via
+        :obj:`dorado.particle_track.run_iteration`.
 
-        Walk data is stored within :obj:`Particles` as `Particles.walk_data`
-        so if this method is called in succession, even without the
-        `previous_walk_data` flag, the new particle seed locations will be
-        appended to the `walk_data` attribute of :obj:`Particles`.
+        Walk data is stored within :obj:`dorado.particle_track.Particles` as
+        `Particles.walk_data` so if this method is called in succession, even
+        without the `previous_walk_data` flag, the new particle seed locations
+        will be appended to the `walk_data` attribute of
+        :obj:`dorado.particle_track.Particles`.
 
         **Inputs** :
 
@@ -660,7 +664,7 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
 
     This function does input type checking and either succeeds or returns
     an error if the types provided cannot be converted to those that we
-    expect in :obj:`generate_particles()`.
+    expect in :obj:`dorado.particle_track.generate_particles()`.
 
     **Inputs** :
 

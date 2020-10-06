@@ -15,7 +15,7 @@ First we will define our parameters for the unweighted random walk. To do this, 
    >>> from dorado import particle_track
    >>> from dorado import routines
 
-   >>> params = particle_track.params()
+   >>> params = particle_track.modelParams()
    >>> params.depth = np.ones((100, 100))
    >>> params.stage = np.ones((100, 100))
    >>> params.qx = np.zeros_like(params.depth)
@@ -23,16 +23,20 @@ First we will define our parameters for the unweighted random walk. To do this, 
    >>> params.theta = 0.0
    >>> params.gamma = 0.0
    >>> params.dx = 50.
+   >>> params.model = 'None'
 
-We will seed 50 particles in the center of our artificial domain and then simulate their movement using the `steady_plots` routine.
+We will initialize the :obj:`dorado.particle_track.Particles` class, seed 50 particles in the center of our artificial domain, and then simulate their movement using the `steady_plots` routine.
 
 .. doctest::
 
-   >>> params.seed_xloc = list(range(45, 56))
-   >>> params.seed_yloc = list(range(45, 56))
-   >>> params.Np_tracer = 50
-   >>> params.model = 'None'
-   >>> walk_data = routines.steady_plots(params, 50, 'true_random_walk')
+   >>> seed_xloc = list(range(45, 56))
+   >>> seed_yloc = list(range(45, 56))
+   >>> Np_tracer = 50
+
+   >>> particles = particle_track.Particles(params)
+   >>> particles.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+
+   >>> walk_data = routines.steady_plots(particles, 50, 'true_random_walk')
 
 If we animate the particle travel information we will get the below plot.
 

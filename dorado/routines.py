@@ -31,7 +31,7 @@ def steady_plots(particle, num_iter,
 
     **Inputs** :
 
-        particle : :obj:`particle_track.Particles`
+        particle : :obj:`dorado.particle_track.Particles`
             An initialized :obj:`particle_track.Particles` object with some
             generated particles.
 
@@ -120,7 +120,7 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
 
     **Inputs** :
 
-        params : :obj:`modelParams`
+        params : :obj:`dorado.particle_track.modelParams`
             Class of particle parameter values
 
         num_steps : `int`
@@ -264,7 +264,7 @@ def time_plots(particle, num_iter, folder_name=None):
 
     **Inputs** :
 
-        particle : :obj:`particle_track.Particles`
+        particle : :obj:`dorado.particle_track.Particles`
             An initialized :obj:`particle_track.Particles` object with some
             generated particles.
 
@@ -746,13 +746,15 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
 
         grid : `numpy.ndarray`
             A 2-D grid upon which the particles will be plotted. Examples of
-            grids that might be nice to use are `modelParams.depth`,
-            `modelParams.stage`, `modelParams.topography`.
+            grids that might be nice to use are
+            `dorado.particle_track.modelParams.depth`,
+            `dorado.particle_track.modelParams.stage`,
+            `dorado.particle_track.modelParams.topography`.
 
         walk_data : `dict`
             The dictionary with the particle information. This is the output
             from one of the other routines or the
-            :obj:particle_track.run_iteration() function.
+            :obj:dorado.particle_track.run_iteration() function.
 
         iteration : `int`, optional
             Iteration number at which to plot the particles. Default is -1,
