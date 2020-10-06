@@ -24,7 +24,7 @@ qy = data['qy']
 
 # define the params variables
 params.depth = depth
-params.stage = depth  # use depth as proxy for stage in this example
+params.stage = np.copy(depth)  # use depth as proxy for stage in this example
 params.qx = qx
 params.qy = qy
 params.dx = 50.

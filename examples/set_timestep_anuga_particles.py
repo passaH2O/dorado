@@ -22,7 +22,7 @@ params = pt.modelParams()
 
 # define the params variables
 params.depth = depth
-params.stage = depth  # using depth as standin for stage parameter
+params.stage = np.copy(depth)  # using depth as standin for stage parameter
 params.qx = qx
 params.qy = qy
 # smaller cell size than the other examples to tighten the range of

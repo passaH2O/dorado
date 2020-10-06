@@ -19,7 +19,7 @@ qy = data['qy']
 params = pt.modelParams()
 
 # define the params variables
-params.stage = depth  # for this example we don't have stage data
+params.stage = np.copy(depth)  # for this example we don't have stage data
 params.depth = depth
 params.qx = qx
 params.qy = qy
