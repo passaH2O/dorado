@@ -7,6 +7,7 @@ Project Homepage: https://github.com/passaH2O/dorado
 from __future__ import division, print_function, absolute_import
 from builtins import range
 from .particle_track import Particles
+from .particle_track import modelParams
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
@@ -20,7 +21,8 @@ import json
 # --------------------------------------------------------
 # Functions for running random walk model
 # --------------------------------------------------------
-def steady_plots(params, num_iter, folder_name=None, save_output=True):
+def steady_plots(particle, num_iter,
+                 folder_name=None, save_output=True):
     """Automated particle movement in steady flow field.
 
     Function to automate plotting of particle movement over a steady flow
@@ -29,8 +31,9 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
 
     **Inputs** :
 
-        params : :obj:`modelParams`
-            Class of parameter values for the particles
+        particle : :obj:`particle_track.Particles`
+            An initialized :obj:`particle_track.Particles` object with some
+            generated particles.
 
         num_iter : `int`
             Number of iterations to move particles over
@@ -53,9 +56,6 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
         ('human-readable') text file.
 
     """
-    # define the particle
-    particle = Particles(params)
-
     # make directory to save the data
     if save_output:
         if folder_name is None:
@@ -69,19 +69,17 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
         if not os.path.exists(folder_name+os.sep+'data'):
             os.makedirs(folder_name+os.sep+'data')
 
-    walk_data = particle.generate_particles()
-
     # Iterate and save results
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
-        walk_data = particle.run_iteration(init_walk_data=walk_data)
+        walk_data = particle.run_iteration()
         if save_output:
             x0, y0, t0 = get_state(walk_data, 0)
             xi, yi, ti = get_state(walk_data)
 
             fig = plt.figure(dpi=200)
             ax = fig.add_subplot(111)
-            im = ax.imshow(params.depth)
+            im = ax.imshow(particle.depth)
             plt.title('Depth - Particle Iteration ' + str(i))
             cax = fig.add_axes([ax.get_position().x1+0.01,
                                 ax.get_position().y0,
@@ -107,7 +105,7 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
     return walk_data
 
 
-def unsteady_plots(params, num_steps, timestep,
+def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
                    output_base, output_type,
                    folder_name=None):
     """Automated particle movement in unsteady flow.
@@ -153,6 +151,9 @@ def unsteady_plots(params, num_steps, timestep,
         and travel times as a json text file.
 
     """
+    # init params
+    params = modelParams()
+    params.dx = dx
     # make directory to save the data
     if folder_name is None:
         folder_name = os.getcwd()
@@ -216,14 +217,13 @@ def unsteady_plots(params, num_steps, timestep,
 
         # then define the particles class and continue
         particle = Particles(params)
-        # generator is a bit different depending on whether any particles exist
+        # generate some particles
         if i == 0:
-            walk_data = particle.generate_particles()
+            particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
         else:
-            walk_data = particle.generate_particles(previous_walk_data=walk_data)
+            particle.generate_particles(0, [], [], 'random', walk_data)
 
-        walk_data = particle.run_iteration(init_walk_data=walk_data,
-                                           target_time=target_times[i])
+        walk_data = particle.run_iteration(target_time=target_times[i])
 
         x0, y0, t0 = get_state(walk_data, 0)
         xi, yi, ti = get_state(walk_data)

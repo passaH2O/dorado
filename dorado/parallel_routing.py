@@ -37,10 +37,11 @@ def run_iter(params):
 
     """
     particle = Particles(params)
-    all_walk = particle.generate_particles()
+    particle.generate_particles(params.Np_tracer, params.seed_xloc,
+                                params.seed_yloc)
     # do iterations
     for i in list(range(0, params.num_iter)):
-        all_walk = particle.run_iteration(init_walk_data=all_walk)
+        all_walk = particle.run_iteration()
 
     return all_walk
 
