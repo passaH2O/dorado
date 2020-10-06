@@ -39,9 +39,6 @@ params.stage = stage
 params.u = u
 params.v = v
 params.dx = dx
-params.Np_tracer = Np_tracer
-params.seed_xloc = seed_xloc
-params.seed_yloc = seed_yloc
 
 # set-up figure
 plt.figure()
@@ -70,9 +67,9 @@ for dc in range(0, 2):
     particle = pt.Particles(params)
 
     # walk it
-    walk_data = particle.generate_particles()
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     for i in list(range(0, num_iter)):
-        walk_data = particle.run_iteration(init_walk_data=walk_data)
+        walk_data = particle.run_iteration()
 
     # get travel times associated with particles when they are at coord x=70
     # use the exposure_time function to measure this

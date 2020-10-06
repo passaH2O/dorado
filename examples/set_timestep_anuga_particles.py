@@ -3,7 +3,6 @@
 import numpy as np
 import os.path
 import dorado.particle_track as pt
-from dorado.particle_track import modelParams
 from dorado.routines import get_state
 from dorado.routines import plot_state
 import matplotlib.pyplot as plt
@@ -19,30 +18,31 @@ qx = data['qx']
 qy = data['qy']
 
 # create params and then assign the parameters
-params = modelParams()
+params = pt.modelParams()
 
 # define the params variables
 params.depth = depth
 params.stage = depth  # using depth as standin for stage parameter
 params.qx = qx
 params.qy = qy
-
-params.seed_xloc = list(range(20, 30))
-params.seed_yloc = list(range(48, 53))
-params.Np_tracer = 50
 # smaller cell size than the other examples to tighten the range of
 # travel time values that are obtained (aka increase travel time resolution)
 params.dx = 10.
 params.theta = 1.0
 params.model = 'Anuga'
 
+# particle info
+seed_xloc = list(range(20, 30))
+seed_yloc = list(range(48, 53))
+Np_tracer = 50
+
 # Apply the parameters to run the model
 particle = pt.Particles(params)
 np.random.seed(0)
 # generate particles
-init_walk_data = particle.generate_particles()
+particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
 # run model until all particles have travelled for about 1.5 hours
-walk_data = particle.run_iteration(init_walk_data, target_time=2100)
+walk_data = particle.run_iteration(target_time=2100)
 _, _, finaltimes = get_state(walk_data, iteration=-1)
 
 plot_state(params.depth, walk_data, iteration=0, c='b')

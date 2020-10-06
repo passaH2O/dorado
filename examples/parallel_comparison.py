@@ -27,13 +27,14 @@ params.depth = depth
 params.stage = depth  # use depth as proxy for stage in this example
 params.qx = qx
 params.qy = qy
-
-params.seed_xloc = list(range(20, 30))
-params.seed_yloc = list(range(48, 53))
-params.Np_tracer = 200
 params.dx = 50.
 params.theta = 1.0
 params.model = 'Anuga'
+
+# for parallel routing we define the particle information in params
+params.seed_xloc = list(range(20, 30))
+params.seed_yloc = list(range(48, 53))
+params.Np_tracer = 200
 
 # Apply the parameters to run the particle routing model
 
@@ -50,10 +51,11 @@ start_serial_time = time.time()
 # do twice to match number of particles parallel is doing
 for z in list(range(0, 2)):
     particle = Particles(params)
-    all_walk = particle.generate_particles()  # initialize walk data list
+    particle.generate_particles(params.Np_tracer, params.seed_xloc,
+                                params.seed_yloc)
     # do 50 iterations to match parallel
     for i in list(range(0, 50)):
-        all_walk = particle.run_iteration(init_walk_data=all_walk)
+        all_walk = particle.run_iteration()
 
 # get time
 serial_time = time.time() - start_serial_time

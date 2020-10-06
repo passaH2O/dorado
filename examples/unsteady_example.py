@@ -2,17 +2,14 @@
 # Note: This example must be run from within the 'examples' directory!!!
 
 from dorado.routines import unsteady_plots
-import dorado.particle_track as pt
 
-# initialize a parameters object
-params = pt.modelParams()
-
-# give params information not contained in the grid
-params.dx = 5.
-params.Np_tracer = 50
-params.seed_xloc = list(range(5, 16))
-params.seed_yloc = list(range(48, 53))
+# set info not contained in saved data
+dx = 5.
+Np_tracer = 50
+seed_xloc = list(range(5, 16))
+seed_yloc = list(range(48, 53))
 
 # then apply the unsteady_plots function and let it assign domain parameters
-walk_data = unsteady_plots(params, 26, 75., 'unsteady_data',
+walk_data = unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc,
+                           26, 75., 'unsteady_data',
                            'csv', 'unsteady_output')
