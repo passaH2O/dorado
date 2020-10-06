@@ -36,6 +36,10 @@
   <div class="section" id="example-12-unsteady-flow-fields">
 <span id="example12"></span><h1>Example 12 - Unsteady Flow Fields<a class="headerlink" href="#example-12-unsteady-flow-fields" title="Permalink to this headline">¶</a></h1>
 <p>In this example we will revisit the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> model domain we looked at in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>. This time, however, we will be routing our particles in an unsteady flow field, using the data contained in the <cite>examples/example_data</cite> subdirectory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This example must be run from the “examples” directory.</p>
+</div>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/3983a6958c0d0b898930fcdf65aa9669/unsteady_example.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>First we have to load our modules and define the parameter items that are related to the cell size and the particle attributes (number, initial location).</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.routines</span> <span class="kn">import</span> <span class="n">unsteady_plots</span>

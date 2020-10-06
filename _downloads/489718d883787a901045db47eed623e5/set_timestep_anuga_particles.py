@@ -1,14 +1,17 @@
-"""Example of the workflow with gridded anuga output data"""
+"""Example of the workflow with gridded anuga output data."""
 
 import numpy as np
+import os.path
 import dorado.particle_track as pt
 from dorado.particle_track import params
 from dorado.routines import get_state
 from dorado.routines import plot_state
 import matplotlib.pyplot as plt
 
-# load some variables from a deltarcm output so stage is varied
-data = np.load('ex_anuga_data.npz')
+# load some variables from an anuga output so stage is varied
+f_path = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(f_path, 'ex_anuga_data.npz')
+data = np.load(data_path)
 
 # pull depth and stage from that data
 depth = data['depth']

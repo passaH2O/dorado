@@ -7,7 +7,7 @@ In this example we will demonstrate how to use the built-in animation functional
 
 To use the `animate_plots()` function, you must have installed the `ffmpeg <https://matplotlib.org/3.2.2/users/installing.html>`_ image writer.
 
-If you have run the previous example (:ref:`example02`), then you can run the following from the "examples/" folder and generate an animation similar to the one shown below.
+If you have run the previous example (:ref:`example02`), then you can run the following and generate an animation similar to the one shown below.
 
 Full example script available :download:`here <../../../examples/animate_deltarcm_particles.py>`.
 

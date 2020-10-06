@@ -5,6 +5,9 @@ Example 12 - Unsteady Flow Fields
 
 In this example we will revisit the `ANUGA <https://github.com/GeoscienceAustralia/anuga_core>`_ model domain we looked at in :ref:`example01`. This time, however, we will be routing our particles in an unsteady flow field, using the data contained in the `examples/example_data` subdirectory.
 
+.. Note::
+   This example must be run from the "examples" directory.
+
 Full example script available :download:`here <../../../examples/unsteady_example.py>`.
 
 First we have to load our modules and define the parameter items that are related to the cell size and the particle attributes (number, initial location).
