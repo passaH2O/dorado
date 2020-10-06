@@ -14,11 +14,11 @@ rcm_data = np.load('tests/data/ex_deltarcm_data.npz')
 params = pt.modelParams()
 params.stage = rcm_data['stage']
 params.depth = rcm_data['depth']
-# just do one particle in a set location for this test
-params.seed_xloc = [16]
-params.seed_yloc = [140]
-params.Np_tracer = 1
 params.dx = 50.
+# just do one particle in a set location for this test
+seed_xloc = [16]
+seed_yloc = [140]
+Np_tracer = 1
 # no discharge data so use 0s as substitute
 params.qx = np.zeros_like(params.depth)
 params.qy = np.zeros_like(params.depth)
@@ -32,7 +32,8 @@ def test_few_steps_RCM():
     # defining / initializing
     particle = Particles(params) # define the particle
     np.random.seed(0) # fix the random seed
-    all_walk_data = particle.generate_particles() # init the walk data
+    all_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
+                                                seed_yloc) # init the walk data
 
     # 3 iterations
     for i in list(range(0,3)):
@@ -40,8 +41,8 @@ def test_few_steps_RCM():
 
     # make assertions
     # check initial position and travel time
-    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
-    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
     assert all_walk_data['travel_times'][0][0] == 0.0
     # check all positions and times
     assert pytest.approx(all_walk_data['xinds'][0] == [16, 17, 18, 19])
@@ -61,15 +62,16 @@ def test_set_time_RCM_previousdata():
     np.random.seed(0) # fix the random seed
 
     # generate the particles
-    all_walk_data = particle.generate_particles()
+    all_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
+                                                seed_yloc) # init the walk data
 
     # set time
     all_walk_data = particle.run_iteration(init_walk_data=all_walk_data,
                                            target_time=5e6)
     # make assertions
     # check initial position and travel time
-    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
-    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
     assert all_walk_data['travel_times'][0][0] == 0.0
     # check all positions and times
     assert pytest.approx(all_walk_data['xinds'][0] == [16, 17, 18, 19, 20])
@@ -90,15 +92,16 @@ def test_set_time_RCM():
     np.random.seed(0) # fix the random seed
 
     # generate particles
-    init_walk_data = particle.generate_particles()
+    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
+                                                seed_yloc) # init the walk data
 
     # set time
     all_walk_data = particle.run_iteration(init_walk_data, target_time=5e6)
 
     # make assertions
     # check initial position and travel time
-    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
-    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
     assert all_walk_data['travel_times'][0][0] == 0.0
     # check all positions and times
     assert pytest.approx(all_walk_data['xinds'][0] == [16, 17, 18, 19, 20])
@@ -115,9 +118,9 @@ an_params = pt.modelParams()
 an_params.stage = an_data['depth'][40:61,40:61] # just using depth here
 an_params.depth = an_data['depth'][40:61,40:61]
 # just do one particle in a set location for this test
-an_params.seed_xloc = [5]
-an_params.seed_yloc = [10]
-an_params.Np_tracer = 1
+seed_xloc = [5]
+seed_yloc = [10]
+Np_tracer = 1
 an_params.dx = 50.
 # no discharge data so use 0s as substitute
 an_params.qx = an_data['qx'][40:61,40:61]
@@ -132,7 +135,8 @@ def test_few_steps_anuga():
     # defining / initializing
     an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
-    all_walk_data = an_particle.generate_particles() # init the walk data
+    all_walk_data = an_particle.generate_particles(Np_tracer, seed_xloc,
+                                                seed_yloc) # init the walk data
 
     # 3 iterations
     for i in list(range(0,3)):
@@ -140,8 +144,8 @@ def test_few_steps_anuga():
 
     # make assertions
     # check initial position and travel time
-    assert all_walk_data['xinds'][0][0] == an_params.seed_xloc[0]
-    assert all_walk_data['yinds'][0][0] == an_params.seed_yloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
     assert all_walk_data['travel_times'][0][0] == 0.0
     # check all positions and times
     assert pytest.approx(all_walk_data['xinds'][0] == [5, 6, 7, 8])
@@ -159,7 +163,8 @@ def test_boundary_anuga():
     # defining / initializing
     an_particle = Particles(an_params) # define the particle
     np.random.seed(0) # fix the random seed
-    all_walk_data = an_particle.generate_particles() # init the walk data
+    all_walk_data = an_particle.generate_particles(Np_tracer, seed_xloc,
+                                                seed_yloc) # init the walk data
 
     # 20 iterations
     for i in list(range(0, 20)):
@@ -167,8 +172,8 @@ def test_boundary_anuga():
 
     # make assertions
     # check initial position and travel time
-    assert all_walk_data['xinds'][0][0] == an_params.seed_xloc[0]
-    assert all_walk_data['yinds'][0][0] == an_params.seed_yloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
     assert all_walk_data['travel_times'][0][0] == 0.0
     # particle reaches boundary after 18 iterations
     # data shouldn't be recorded after boundary is reached
@@ -186,7 +191,8 @@ def test_boundary_travel_time_anuga():
     np.random.seed(0) # fix the random seed
 
     # generate particles
-    init_walk_data = an_particle.generate_particles()
+    init_walk_data = an_particle.generate_particles(Np_tracer, seed_xloc,
+                                                seed_yloc) # init the walk data
 
     # set target time for iterations
     all_walk_data = an_particle.run_iteration(init_walk_data,
@@ -194,8 +200,8 @@ def test_boundary_travel_time_anuga():
 
     # make assertions
     # check initial position and travel time
-    assert all_walk_data['xinds'][0][0] == an_params.seed_xloc[0]
-    assert all_walk_data['yinds'][0][0] == an_params.seed_yloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
     assert all_walk_data['travel_times'][0][0] == 0.0
     # particle reaches boundary after 18 iterations
     # data shouldn't be recorded after boundary is reached

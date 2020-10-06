@@ -93,17 +93,6 @@ class modelParams:
             weighted random walk. If True, then the highest weighted cells are
             used to route the particles. Default value is False.
 
-        seed_xloc : `list`
-            List of x-coordinates over which to initially distribute the
-            particles
-
-        seed_yloc : `list`
-            List of y-coordinates over which to initially distribute the
-            particles
-
-        Np_tracer : `int`
-            Number of particles to use
-
     This list of expected parameter values can also be obtained by querying the
     class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
     `vars(modelParams)`.
@@ -126,10 +115,6 @@ class modelParams:
         self.qy = None
         self.u = None
         self.v = None
-        # initialize Np_tracer, seed_xloc, and seed_yloc in case
-        self.Np_tracer = None
-        self.seed_xloc = None
-        self.seed_yloc = None
 
 
 class Particles():
@@ -386,21 +371,15 @@ class Particles():
                                     [pi, 0, 0],
                                     [5*pi/4, 3*pi/2, 7*pi/4]])
 
-        # load in Np_tracer, seed_xloc and seed_yloc if they exist
-        if getattr(params, 'seed_xloc', None) is not None:
-            self.seed_xloc = params.seed_xloc
-
-        if getattr(params, 'seed_yloc', None) is not None:
-            self.seed_yloc = params.seed_yloc
-
-        if getattr(params, 'Np_tracer', None) is not None:
-            self.Np_tracer = params.Np_tracer
+        # initialize number of particles as 0
+        self.Np_tracer = 0
 
     # generate a group of particles in a set of initial locations
     def generate_particles(self,
-                           Np_tracer=None,
-                           seed_xloc=None,
-                           seed_yloc=None,
+                           Np_tracer,
+                           seed_xloc,
+                           seed_yloc,
+                           method='random',
                            previous_walk_data=None):
         """Generate a set of particles in defined locations.
 
@@ -412,26 +391,29 @@ class Particles():
 
         **Inputs** :
 
-            Np_tracer : `int`, optional
-                Number of particles to generate. If unspecified, we check
-                `self` to see if they were defined as part of modelParams.
+            Np_tracer : `int`
+                Number of particles to generate.
 
-            seed_xloc : `list`, optional
+            seed_xloc : `list`
                 List of x-coordinates over which to initially distribute the
-                particles. If unspecified, we check
-                `self` to see if they were defined as part of modelParams.
+                particles.
 
-            seed_yloc : `list`, optional
+            seed_yloc : `list`
                 List of y-coordinates over which to initially distribute the
-                particles If unspecified, we check
-                `self` to see if they were defined as part of modelParams.
+                particles.
 
-            previous_walk_data : `dict`
+            method : `str`, optional
+                Specify the type of particle generation you wish to use.
+                Current options are 'random' and 'exact' for seeding particles
+                either randomly across a set of points, or exactly at a set
+                of defined locations. If unspecified, the default is 'random'.
+
+            previous_walk_data : `dict`, optional
                 Dictionary of all prior x locations, y locations, and travel
                 times. Order of indices is
                 previous_walk_data[field][particle][iter], where e.g.
                 ['travel_times'][5][10] is the travel time of the 5th particle
-                at the 10th iteration
+                at the 10th iteration.
 
         **Outputs** :
 
@@ -439,29 +421,41 @@ class Particles():
                 Dictionary of initial x and y locations and travel times.
 
         """
-        # check self if Np_tracer, seed_xloc, seed_yloc unspecified
-        if Np_tracer is None:
-            Np_tracer = self.Np_tracer
-            self.Np_tracer = 0  # reset this to 0 so it can be assigned later
-        if seed_xloc is None:
-            seed_xloc = self.seed_xloc
-        if seed_yloc is None:
-            seed_yloc = self.seed_yloc
-
         # if the values in self are invalid the input checked will catch them
         # do input type checking
         Np_tracer, seed_xloc, seed_yloc = gen_input_check(Np_tracer,
                                                           seed_xloc,
-                                                          seed_yloc)
+                                                          seed_yloc,
+                                                          method)
+
         init_walk_data = dict()  # create init_walk_data dictionary
 
-        # create the new start indices based on x, y locations and np_tracer
-        new_start_xindices = [lw.random_pick_seed(seed_xloc) for x
-                              in list(range(Np_tracer))]
-        new_start_yindices = [lw.random_pick_seed(seed_yloc) for x
-                              in list(range(Np_tracer))]
         # initialize new travel times list
         new_start_times = [0.]*Np_tracer
+
+        if method == 'random':
+            # create random start indices based on x, y locations and np_tracer
+            new_start_xindices = [lw.random_pick_seed(seed_xloc) for x
+                                  in list(range(Np_tracer))]
+            new_start_yindices = [lw.random_pick_seed(seed_yloc) for x
+                                  in list(range(Np_tracer))]
+
+        elif method == 'exact':
+            # step through seed lists to create exact list of start locations
+            # if number of particles exceeds length of seed lists, loop back
+            # to beginning of the seed lists and continue from there
+            Np_to_seed = Np_tracer
+            new_start_xindices = []
+            new_start_yindices = []
+            while Np_to_seed > 0:
+                for i in range(0, len(seed_xloc)):
+                    # condition if we run out of particles within this loop
+                    if Np_to_seed <= 0:
+                        break
+                    # otherwise keep on seeding
+                    new_start_xindices = new_start_xindices + seed_xloc[i]
+                    new_start_yindices = new_start_yindices + seed_yloc[i]
+                    Np_to_seed -= 1  # reduce number of particles left to seed
 
         # Now initialize vectors that will create the structured list
         new_xinds = [[new_start_xindices[i]] for i in
@@ -490,7 +484,8 @@ class Particles():
             start_times = new_times
 
         # determine the new total number of particles we have now
-        self.Np_tracer = self.Np_tracer + Np_tracer
+        # additive in the event we are running the generate multiple times
+        self.Np_tracer += Np_tracer
 
         # store information in the init_walk_data dictionary and return it
         init_walk_data['xinds'] = start_xindices
@@ -629,7 +624,7 @@ class Particles():
         return all_walk_data
 
 
-def gen_input_check(Np_tracer, seed_xloc, seed_yloc):
+def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
     """Check the inputs provided to :obj:`generate_particles()`.
 
     This function does input type checking and either succeeds or returns
@@ -648,6 +643,9 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc):
         seed_yloc : `list`
             List of y-coordinates over which to initially distribute the
             particles
+
+        method : `str`, optional
+            Type of particle generation to use, either 'random' or 'exact'.
 
     **Outputs** :
 
@@ -678,6 +676,11 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc):
             seed_yloc = list(seed_yloc)
         except Exception:
             raise TypeError("seed_yloc input type was not a list.")
+    if isinstance(method, str) is False:
+        raise TypeError('Method provided was not a string.')
+    elif method not in ['random', 'exact']:
+        raise ValueError('Method input is not a valid method, must be'
+                         ' "random" or "exact".')
 
     return Np_tracer, seed_xloc, seed_yloc
 

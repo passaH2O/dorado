@@ -14,9 +14,9 @@ class pobj():
     pass
 
 params = pobj
-params.seed_xloc = [1]
-params.seed_yloc = [1]
-params.Np_tracer = 1
+seed_xloc = [1]
+seed_yloc = [1]
+Np_tracer = 1
 params.dx = 1
 params.depth = np.ones((3,3))
 params.stage = np.ones((3,3))
@@ -27,15 +27,6 @@ params.model = 'DeltaRCM'
 particle = particle_track.Particles(params)
 
 # testing of the Particle __init__ functionality
-def test_xseed():
-    assert particle.seed_xloc == params.seed_xloc
-
-def test_yseed():
-    assert particle.seed_yloc == params.seed_yloc
-
-def test_Np_tracer():
-    assert particle.Np_tracer == params.Np_tracer
-
 def test_dx():
     assert particle.dx == params.dx
 
@@ -112,30 +103,26 @@ def test_steep_other():
 
 # testing of the run_iteration function
 def test_start_pairs_X():
-    init_walk_data = particle.generate_particles()
+    particle = particle_track.Particles(params)
+    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
+                                                 seed_yloc)
     all_walk_data = particle.run_iteration(init_walk_data)
-    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
+    assert all_walk_data['xinds'][0][0] == seed_xloc[0]
 
 def test_start_pairs_Y():
-    init_walk_data = particle.generate_particles()
+    particle = particle_track.Particles(params)
+    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
+                                                 seed_yloc)
     all_walk_data = particle.run_iteration(init_walk_data)
-    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
-
-def test_start_pairs_X2():
-    init_walk_data = particle.generate_particles(seed_xloc=params.seed_xloc)
-    all_walk_data = particle.run_iteration(init_walk_data)
-    assert all_walk_data['xinds'][0][0] == params.seed_xloc[0]
-
-def test_start_pairs_Y2():
-    init_walk_data = particle.generate_particles(seed_yloc=params.seed_yloc)
-    all_walk_data = particle.run_iteration(init_walk_data)
-    assert all_walk_data['yinds'][0][0] == params.seed_yloc[0]
+    assert all_walk_data['yinds'][0][0] == seed_yloc[0]
 
 def test_travel_time():
     # Particle doesn't travel in the 3x3 space due to the 'sticky' edge
     # conditions so check that travel time is 0 and particle hasn't moved
+    particle = particle_track.Particles(params)
     np.random.seed(0)
-    init_walk_data = particle.generate_particles()
+    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
+                                                 seed_yloc)
     all_walk_data = particle.run_iteration(init_walk_data)
     assert all_walk_data['xinds'][0][0] == 1
     assert all_walk_data['yinds'][0][0] == 1
@@ -145,9 +132,6 @@ def test_init_params():
     # test initialization of params class
     params = particle_track.modelParams()
     # make assertions
-    assert params.seed_xloc is None
-    assert params.seed_yloc is None
-    assert params.Np_tracer is None
     assert params.dx is None
     assert params.depth is None
     assert params.stage is None
@@ -159,8 +143,10 @@ def test_init_params():
 
 def test_previous_walk_data():
     # test of loading previously defined walk data
+    particle = particle_track.Particles(params)
     np.random.seed(0)
-    old_init = particle.generate_particles()
+    old_init = particle.generate_particles(Np_tracer, seed_xloc,
+                                           seed_yloc)
     old_walk_data = particle.run_iteration(old_init)
     # try to do another walk - test just makes sure code doesn't break
     np.random.seed(0)
