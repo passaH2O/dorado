@@ -38,4 +38,4 @@ particles.generate_particles(Np_tracer, seed_xloc, seed_yloc)
 
 # Apply the parameters to run the particle routing model
 # using steady (time-invariant) plotting routine
-time_plots(params, 50, 'timing_anuga_example')
+time_plots(particles, 50, 'timing_anuga_example')

@@ -255,7 +255,7 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     return walk_data
 
 
-def time_plots(params, num_iter, folder_name=None):
+def time_plots(particle, num_iter, folder_name=None):
     """Steady flow plots with particle travel times visualized.
 
     Make plots with each particle's travel time visualized.
@@ -264,8 +264,9 @@ def time_plots(params, num_iter, folder_name=None):
 
     **Inputs** :
 
-        params : :obj:`modelParams`
-            Parameters for the particle
+        particle : :obj:`particle_track.Particles`
+            An initialized :obj:`particle_track.Particles` object with some
+            generated particles.
 
         num_iter : `int`
             Number of iterations to move particles
@@ -281,9 +282,6 @@ def time_plots(params, num_iter, folder_name=None):
         Saves plots and data for each iteration
 
     """
-    # define the particle
-    particle = Particles(params)
-
     # make directory to save the data
     if folder_name is None:
         folder_name = os.getcwd()
@@ -296,11 +294,10 @@ def time_plots(params, num_iter, folder_name=None):
     if not os.path.exists(folder_name+os.sep+'data'):
         os.makedirs(folder_name+os.sep+'data')
 
-    walk_data = particle.generate_particles()  # generate particles
     # Iterate and save results
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
-        walk_data = particle.run_iteration(init_walk_data=walk_data)
+        walk_data = particle.run_iteration()
 
         # collect latest travel times
         x0, y0, t0 = get_state(walk_data, 0)
@@ -319,7 +316,7 @@ def time_plots(params, num_iter, folder_name=None):
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(sc, cax=cax)
         cbar.set_label('Particle Travel Times [s]')
-        im = ax.imshow(params.depth)
+        im = ax.imshow(particle.depth)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("bottom", size="5%", pad=0.5)
         cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
