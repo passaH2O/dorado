@@ -1,6 +1,7 @@
 """Make an example of the workflow with gridded Anuga output data."""
 
 import numpy as np
+import os.path
 import time
 from dorado.parallel_routing import parallel_routing
 
@@ -11,8 +12,10 @@ import dorado.particle_track as pt
 # create params and then assign the parameters
 params = pt.params()
 
-# load some variables from a deltarcm output so stage is varied
-data = np.load('ex_anuga_data.npz')
+# load some variables from an anuga output so stage is varied
+f_path = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(f_path, 'ex_anuga_data.npz')
+data = np.load(data_path)
 
 # pull depth and stage from that data
 depth = data['depth']

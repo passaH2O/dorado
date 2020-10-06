@@ -1,11 +1,14 @@
 """Make an example of the workflow with gridded anuga output data."""
 
 import numpy as np
+import os.path
 from dorado.routines import steady_plots
 import dorado.particle_track as pt
 
 # load some variables from a anuga output so stage is varied
-data = np.load('ex_anuga_data.npz')
+f_path = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(f_path, 'ex_anuga_data.npz')
+data = np.load(data_path)
 
 # pull depth and stage from that data
 depth = data['depth']

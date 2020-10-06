@@ -2,10 +2,14 @@
 # Can only be run after steady_deltarcm_particles.py has been successfully run
 import numpy as np
 import json
+import os
+import os.path
 from dorado.routines import draw_travel_path
 
 # load the depth data
-data = np.load('ex_deltarcm_data.npz')
+f_path = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(f_path, 'ex_deltarcm_data.npz')
+data = np.load(data_path)
 depth = data['depth']
 
 # load the walk data
