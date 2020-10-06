@@ -1,6 +1,7 @@
 from __future__ import division, print_function, absolute_import
 from builtins import range, map
 from math import floor, sqrt, pi
+import copy
 import pytest
 import io
 import sys, os
@@ -24,6 +25,7 @@ params.qx = np.zeros((3,3))
 params.qy = np.ones((3,3))
 params.theta = 1
 params.model = 'DeltaRCM'
+goodparams = copy.deepcopy(params)  # don't corrupt these good parameters
 particle = particle_track.Particles(params)
 
 # testing of the Particle __init__ functionality
@@ -106,15 +108,24 @@ def test_start_pairs_X():
     particle = particle_track.Particles(params)
     init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
                                                  seed_yloc)
-    all_walk_data = particle.run_iteration(init_walk_data)
+    all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0][0] == seed_xloc[0]
 
 def test_start_pairs_Y():
     particle = particle_track.Particles(params)
     init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
                                                  seed_yloc)
-    all_walk_data = particle.run_iteration(init_walk_data)
+    all_walk_data = particle.run_iteration()
     assert all_walk_data['yinds'][0][0] == seed_yloc[0]
+
+def test_exact_locations():
+    num_ps = 2
+    particle = particle_track.Particles(params)
+    init_walk_data = particle.generate_particles(num_ps, seed_xloc, seed_yloc,
+                                                 method='exact')
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data['xinds'][0] == seed_xloc
+    assert all_walk_data['yinds'][0] == seed_yloc
 
 def test_travel_time():
     # Particle doesn't travel in the 3x3 space due to the 'sticky' edge
@@ -123,7 +134,7 @@ def test_travel_time():
     np.random.seed(0)
     init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
                                                  seed_yloc)
-    all_walk_data = particle.run_iteration(init_walk_data)
+    all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0][0] == 1
     assert all_walk_data['yinds'][0][0] == 1
     assert all_walk_data['travel_times'][0][0] == 0.0
@@ -147,13 +158,57 @@ def test_previous_walk_data():
     np.random.seed(0)
     old_init = particle.generate_particles(Np_tracer, seed_xloc,
                                            seed_yloc)
-    old_walk_data = particle.run_iteration(old_init)
+    old_walk_data = particle.run_iteration()
     # try to do another walk - test just makes sure code doesn't break
     np.random.seed(0)
-    all_walk_data = particle.run_iteration(init_walk_data=old_walk_data)
+    all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0][0] == 1
     assert all_walk_data['yinds'][0][0] == 1
     assert all_walk_data['travel_times'][0][0] == 0.0
+
+
+def test_generate_twice():
+    # test ability to generate particles multiple times
+    particle = particle_track.Particles(params)
+    np.random.seed(0)
+    old_init = particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    old_init = particle.generate_particles(Np_tracer, seed_xloc, seed_yloc,
+                                           previous_walk_data=old_init)
+    old_walk_data = particle.run_iteration()
+    # try to do another walk - test just makes sure code doesn't break
+    np.random.seed(0)
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data['xinds'][0][0] == 1
+    assert all_walk_data['yinds'][0][0] == 1
+    assert all_walk_data['travel_times'][0][0] == 0.0
+    assert len(all_walk_data['xinds']) == 2
+
+
+def test_use_walk_data():
+    # use walk data without using the generator function
+    particle1 = particle_track.Particles(params)
+    np.random.seed(0)
+    old_init = particle1.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    old_init = particle1.generate_particles(Np_tracer, seed_xloc, seed_yloc,
+                                            previous_walk_data=old_init)
+    old_walk_data = particle1.run_iteration()
+    # create new particles class and try to use that old walk data
+    particle2 = particle_track.Particles(params)
+    particle2.generate_particles(0, [], [], previous_walk_data=old_walk_data)
+    all_walk_data = particle2.run_iteration()
+    assert all_walk_data['xinds'][0][0] == 1
+    assert all_walk_data['yinds'][0][0] == 1
+    assert all_walk_data['travel_times'][0][0] == 0.0
+    assert len(all_walk_data['xinds']) == 2
+
+
+def test_manual_reset():
+    # test resetting walk data
+    particle = particle_track.Particles(params)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    assert particle.walk_data['xinds'][0][0] == 1
+    particle.clear_walk_data()
+    assert (particle.walk_data is None) is True
 
 
 class TestValueErrors:
@@ -360,6 +415,46 @@ class TestValueErrors:
         with pytest.raises(ValueError):
             particle = particle_track.Particles(params)
 
+    def test_bad_Np_tracer(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(TypeError):
+            particle.generate_particles('invalid', seed_xloc, seed_yloc)
+
+    def test_bad_seed_xloc(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(TypeError):
+            particle.generate_particles(1, 'invalid', seed_yloc)
+
+    def test_bad_seed_yloc(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(TypeError):
+            particle.generate_particles(1, seed_xloc, 'invalid')
+
+    def test_bad_method(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(ValueError):
+            particle.generate_particles(1, seed_xloc, seed_yloc, method='bad')
+
+    def test_invalid_method(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(TypeError):
+            particle.generate_particles(1, seed_xloc, seed_yloc, method=5)
+
+    def test_unstruct2grid_break(self):
+        coords = [(10.5, 10.1),
+                  (10.1, 15.1),
+                  (15.2, 20.2)]
+        quantity = [1, 2]
+        cellsize = 1.0
+        with pytest.raises(ValueError):
+            particle_track.unstruct2grid(coords, quantity, cellsize,
+                                         k_nearest_neighbors=1)
+
+    def test_no_initialized_particles(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(ValueError):
+            particle.run_iteration()
+            
 
 def test_coord2ind():
     coords = [(10, 10),

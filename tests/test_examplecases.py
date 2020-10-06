@@ -37,7 +37,7 @@ def test_few_steps_RCM():
 
     # 3 iterations
     for i in list(range(0,3)):
-        all_walk_data = particle.run_iteration(init_walk_data=all_walk_data)
+        all_walk_data = particle.run_iteration()
 
     # make assertions
     # check initial position and travel time
@@ -66,8 +66,7 @@ def test_set_time_RCM_previousdata():
                                                 seed_yloc) # init the walk data
 
     # set time
-    all_walk_data = particle.run_iteration(init_walk_data=all_walk_data,
-                                           target_time=5e6)
+    all_walk_data = particle.run_iteration(target_time=5e6)
     # make assertions
     # check initial position and travel time
     assert all_walk_data['xinds'][0][0] == seed_xloc[0]
@@ -96,7 +95,7 @@ def test_set_time_RCM():
                                                 seed_yloc) # init the walk data
 
     # set time
-    all_walk_data = particle.run_iteration(init_walk_data, target_time=5e6)
+    all_walk_data = particle.run_iteration(target_time=5e6)
 
     # make assertions
     # check initial position and travel time
@@ -140,7 +139,7 @@ def test_few_steps_anuga():
 
     # 3 iterations
     for i in list(range(0,3)):
-        all_walk_data = an_particle.run_iteration(init_walk_data=all_walk_data)
+        all_walk_data = an_particle.run_iteration()
 
     # make assertions
     # check initial position and travel time
@@ -168,7 +167,7 @@ def test_boundary_anuga():
 
     # 20 iterations
     for i in list(range(0, 20)):
-        all_walk_data = an_particle.run_iteration(init_walk_data=all_walk_data)
+        all_walk_data = an_particle.run_iteration()
 
     # make assertions
     # check initial position and travel time
@@ -195,8 +194,7 @@ def test_boundary_travel_time_anuga():
                                                 seed_yloc) # init the walk data
 
     # set target time for iterations
-    all_walk_data = an_particle.run_iteration(init_walk_data,
-                                              target_time=1000.0)
+    all_walk_data = an_particle.run_iteration(target_time=1000.0)
 
     # make assertions
     # check initial position and travel time
