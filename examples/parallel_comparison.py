@@ -31,17 +31,18 @@ params.dx = 50.
 params.theta = 1.0
 params.model = 'Anuga'
 
-# for parallel routing we define the particle information in params
-params.seed_xloc = list(range(20, 30))
-params.seed_yloc = list(range(48, 53))
-params.Np_tracer = 200
+# for parallel routing we define the particle information
+seed_xloc = list(range(20, 30))
+seed_yloc = list(range(48, 53))
+Np_tracer = 200
 
 # Apply the parameters to run the particle routing model
 
 # use 2 cores to route in parallel
 print('start parallel')
 start_par_time = time.time()
-par_result = parallel_routing(params, 50, 2)
+particles = Particles(params)
+par_result = parallel_routing(particles, 50, Np_tracer, seed_xloc, seed_yloc, 2)
 par_time = time.time() - start_par_time
 print('end parallel')
 
@@ -51,8 +52,7 @@ start_serial_time = time.time()
 # do twice to match number of particles parallel is doing
 for z in list(range(0, 2)):
     particle = Particles(params)
-    particle.generate_particles(params.Np_tracer, params.seed_xloc,
-                                params.seed_yloc)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     # do 50 iterations to match parallel
     for i in list(range(0, 50)):
         all_walk = particle.run_iteration()
