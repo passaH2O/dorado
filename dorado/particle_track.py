@@ -696,21 +696,26 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
             particles
 
     """
-    if isinstance(Np_tracer, int) is False:
-        try:
-            Np_tracer = int(Np_tracer)
-        except Exception:
-            raise TypeError("Np_tracer input type was not int.")
-    if isinstance(seed_xloc, list) is False:
-        try:
-            seed_xloc = [int(x) for x in list(seed_xloc)]
-        except Exception:
-            raise TypeError("seed_xloc input type was not a list.")
-    if isinstance(seed_yloc, list) is False:
-        try:
-            seed_yloc = [int(y) for y in list(seed_yloc)]
-        except Exception:
-            raise TypeError("seed_yloc input type was not a list.")
+    try:
+        Np_tracer = int(Np_tracer)
+    except Exception:
+        raise TypeError("Np_tracer input type was not int.")
+    try:
+        # try to flatten if this is an array that is multi-dimensional
+        if len(np.shape(seed_xloc)) > 1:
+            seed_xloc = seed_xloc.flatten()
+        # try to coerce into a list
+        seed_xloc = [int(x) for x in list(seed_xloc)]
+    except Exception:
+        raise TypeError("seed_xloc input type was not a list.")
+    try:
+        # try to flatten if this is an array that is multi-dimensional
+        if len(np.shape(seed_yloc)) > 1:
+            seed_yloc = seed_yloc.flatten()
+        # try to coerce into a list
+        seed_yloc = [int(y) for y in list(seed_yloc)]
+    except Exception:
+        raise TypeError("seed_yloc input type was not a list.")
     if isinstance(method, str) is False:
         raise TypeError('Method provided was not a string.')
     elif method not in ['random', 'exact']:
