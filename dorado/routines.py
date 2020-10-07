@@ -120,8 +120,19 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
 
     **Inputs** :
 
-        params : :obj:`dorado.particle_track.modelParams`
-            Class of particle parameter values
+        dx : `float`
+            Length of a cell face
+
+        Np_tracer : `int`
+            Number of particles to generate.
+
+        seed_xloc : `list`
+            List of x-coordinates over which to initially distribute the
+            particles.
+
+        seed_yloc : `list`
+            List of y-coordinates over which to initially distribute the
+            particles.
 
         num_steps : `int`
             Number of model timesteps being covered
