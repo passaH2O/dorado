@@ -484,6 +484,19 @@ class Particles():
         start_yindices = new_yinds
         start_times = new_times
 
+        if self.walk_data is not None:
+            # if there is walk_data from a previous call to the generator,
+            # or from simulating particle transport previously, then we want
+            # to keep it and append the new data to it
+            internal_xinds = self.walk_data['xinds']
+            internal_yinds = self.walk_data['xinds']
+            internal_times = self.walk_data['travel_times']
+
+            # combine internal and new lists of particle information
+            start_xindices = internal_xinds + start_xindices
+            start_yindices = internal_yinds + start_yindices
+            start_times = internal_times + start_times
+
         if previous_walk_data is not None:
             # If the generator has been run before, or if new
             # particles are going to be added to a set of pre-existing
@@ -497,19 +510,6 @@ class Particles():
             start_xindices = prev_xinds + start_xindices
             start_yindices = prev_yinds + start_yindices
             start_times = prev_times + start_times
-
-        if self.walk_data is not None:
-            # if there is walk_data from a previous call to the generator,
-            # or from simulating particle transport previously, then we want
-            # to keep it and append the new data to it
-            internal_xinds = self.walk_data['xinds']
-            internal_yinds = self.walk_data['xinds']
-            internal_times = self.walk_data['travel_times']
-
-            # combine internal and new lists of particle information
-            start_xindices = internal_xinds + start_xindices
-            start_yindices = internal_yinds + start_yindices
-            start_times = internal_times + start_times
 
         # determine the new total number of particles we have now
         # additive in the event we are running the generate multiple times
