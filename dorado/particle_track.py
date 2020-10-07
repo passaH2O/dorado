@@ -489,7 +489,7 @@ class Particles():
             # or from simulating particle transport previously, then we want
             # to keep it and append the new data to it
             internal_xinds = self.walk_data['xinds']
-            internal_yinds = self.walk_data['xinds']
+            internal_yinds = self.walk_data['yinds']
             internal_times = self.walk_data['travel_times']
 
             # combine internal and new lists of particle information
