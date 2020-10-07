@@ -106,23 +106,20 @@ def test_steep_other():
 # testing of the run_iteration function
 def test_start_pairs_X():
     particle = particle_track.Particles(params)
-    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
-                                                 seed_yloc)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0][0] == seed_xloc[0]
 
 def test_start_pairs_Y():
     particle = particle_track.Particles(params)
-    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
-                                                 seed_yloc)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     all_walk_data = particle.run_iteration()
     assert all_walk_data['yinds'][0][0] == seed_yloc[0]
 
 def test_exact_locations():
     num_ps = 2
     particle = particle_track.Particles(params)
-    init_walk_data = particle.generate_particles(num_ps, seed_xloc, seed_yloc,
-                                                 method='exact')
+    particle.generate_particles(num_ps, seed_xloc, seed_yloc, method='exact')
     all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0] == seed_xloc
     assert all_walk_data['yinds'][0] == seed_yloc
@@ -132,8 +129,7 @@ def test_travel_time():
     # conditions so check that travel time is 0 and particle hasn't moved
     particle = particle_track.Particles(params)
     np.random.seed(0)
-    init_walk_data = particle.generate_particles(Np_tracer, seed_xloc,
-                                                 seed_yloc)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0][0] == 1
     assert all_walk_data['yinds'][0][0] == 1
@@ -156,8 +152,7 @@ def test_previous_walk_data():
     # test of loading previously defined walk data
     particle = particle_track.Particles(params)
     np.random.seed(0)
-    old_init = particle.generate_particles(Np_tracer, seed_xloc,
-                                           seed_yloc)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     old_walk_data = particle.run_iteration()
     # try to do another walk - test just makes sure code doesn't break
     np.random.seed(0)
@@ -188,9 +183,8 @@ def test_use_walk_data():
     # use walk data without using the generator function
     particle1 = particle_track.Particles(params)
     np.random.seed(0)
-    old_init = particle1.generate_particles(Np_tracer, seed_xloc, seed_yloc)
-    old_init = particle1.generate_particles(Np_tracer, seed_xloc, seed_yloc,
-                                            previous_walk_data=old_init)
+    particle1.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    particle1.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     old_walk_data = particle1.run_iteration()
     # create new particles class and try to use that old walk data
     particle2 = particle_track.Particles(params)
@@ -454,7 +448,7 @@ class TestValueErrors:
         particle = particle_track.Particles(goodparams)
         with pytest.raises(ValueError):
             particle.run_iteration()
-            
+
 
 def test_coord2ind():
     coords = [(10, 10),
