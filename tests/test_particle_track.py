@@ -211,17 +211,11 @@ class TestValueErrors:
 
     def test_dx(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         with pytest.raises(ValueError):
             particle = particle_track.Particles(params)
 
     def test_broken_depth(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.depth = 'badstring'
         with pytest.raises(ValueError):
@@ -229,18 +223,12 @@ class TestValueErrors:
 
     def test_missing_depth(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         with pytest.raises(ValueError):
             particle = particle_track.Particles(params)
 
     def test_depth_via_stage_topo(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.stage = np.ones((3,3))
         params.topography = np.zeros((3,3))
@@ -252,9 +240,6 @@ class TestValueErrors:
 
     def test_depth_via_stage_topo_broken(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.stage = 'badstring'
         params.topography = np.zeros((3,3))
@@ -263,9 +248,6 @@ class TestValueErrors:
 
     def test_stage_broken(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.stage = 'badstring'
         params.depth = np.ones((3,3))
@@ -274,9 +256,6 @@ class TestValueErrors:
 
     def test_stage_via_depth_topo(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.topography = np.zeros((3,3))
         params.depth = np.ones((3,3))
@@ -290,9 +269,6 @@ class TestValueErrors:
 
     def test_stage_via_depth_topo_broken(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.topography = 'badstring'
         params.depth = np.ones((3,3))
@@ -303,9 +279,6 @@ class TestValueErrors:
 
     def test_missing_stage(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.depth = np.ones((3,3))
         params.u = np.ones((3,3))
@@ -315,9 +288,6 @@ class TestValueErrors:
 
     def test_rcm_model_uv(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.depth = np.ones((3,3))
         params.topography = np.zeros((3,3))
@@ -333,9 +303,6 @@ class TestValueErrors:
 
     def test_rcm_model_uv_broken(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.depth = np.ones((3,3))
         params.topography = np.zeros((3,3))
@@ -346,9 +313,6 @@ class TestValueErrors:
 
     def test_model_q(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.depth = np.ones((3,3))
         params.topography = np.zeros((3,3))
@@ -363,9 +327,6 @@ class TestValueErrors:
 
     def test_model_uv_broken(self):
         params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        params.Np_tracer = 1
         params.dx = 1
         params.depth = np.ones((3,3))
         params.topography = np.zeros((3,3))
