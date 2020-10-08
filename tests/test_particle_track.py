@@ -166,9 +166,8 @@ def test_generate_twice():
     # test ability to generate particles multiple times
     particle = particle_track.Particles(params)
     np.random.seed(0)
-    old_init = particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
-    old_init = particle.generate_particles(Np_tracer, seed_xloc, seed_yloc,
-                                           previous_walk_data=old_init)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     old_walk_data = particle.run_iteration()
     # try to do another walk - test just makes sure code doesn't break
     np.random.seed(0)
@@ -209,41 +208,6 @@ class TestValueErrors:
     """
     Catching the ValueErrors and edge cases
     """
-
-    def test_seedx(self):
-        params = particle_track.modelParams()
-        # expect ValueError
-        with pytest.raises(ValueError):
-            particle = particle_track.Particles(params)
-
-    def test_seedy(self):
-        params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        # expect ValueError
-        with pytest.raises(ValueError):
-            particle = particle_track.Particles(params)
-
-    def test_seedx_none(self):
-        class pobj():
-            pass
-        params = pobj
-        with pytest.raises(ValueError):
-            particle = particle_track.Particles(params)
-
-    def test_seedy_none(self):
-        class pobj():
-            pass
-        params = pobj
-        params.seed_xloc = [1]
-        with pytest.raises(ValueError):
-            particle = particle_track.Particles(params)
-
-    def test_num_tracers(self):
-        params = particle_track.modelParams()
-        params.seed_xloc = [1]
-        params.seed_yloc = [1]
-        with pytest.raises(ValueError):
-            particle = particle_track.Particles(params)
 
     def test_dx(self):
         params = particle_track.modelParams()

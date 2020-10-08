@@ -9,7 +9,7 @@ Overview
 
 The basic workflow when using `dorado` can be summarized in three steps:
 
-1. Initialize the parameters class (:obj:`dorado.particle_track.modelParams`) for parameters related to the grid (model domain). This includes information about the water depths, flow fields, and grid cell sizes.
+1. Initialize the parameters class (:obj:`dorado.particle_track.modelParams`) for parameters related to the grid (model domain). This includes information about flow fields, grid cell size, and tuning parameters for the random walk.
 
 2. Initialize a :obj:`dorado.particle_track.Particles` class and generate a set of particles to be routed. A built in `particle_generator()` function is available to help with particle generation.
 
