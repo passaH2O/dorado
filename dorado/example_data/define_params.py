@@ -47,7 +47,7 @@ def make_anuga_params():
     qx = data['qx']
     qy = data['qy']
     # define the params variables
-    params.stage = depth
+    params.stage = np.copy(depth)
     params.depth = depth
     params.qx = qx
     params.qy = qy
