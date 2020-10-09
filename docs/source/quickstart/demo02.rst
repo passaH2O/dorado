@@ -8,8 +8,9 @@ First we load the grid parameters for this example. The longer :ref:`examples` p
 
 .. doctest::
 
-   >>> from dorado.example_data import define_params as dp
+   >>> import dorado
    >>> import dorado.particle_track as pt
+   >>> from dorado.example_data import define_params as dp
    >>> anugaparams = dp.make_anuga_params()
 
 We can visualize the flow discharge components for this scenario from the loaded parameters. The full script used to produce the below figures is available :download:`here <../pyplots/quickstart/demo2_flow.py>`.
@@ -27,8 +28,7 @@ We can visualize the flow discharge components for this scenario from the loaded
 
 .. plot:: quickstart/demo2_flow.py
 
-Now let's route 50 particles with a target travel time of 2100 seconds. To do this, we first will need to define an instance of the :obj:`dorado.particle_track.Particles` class. Then we will generate
-a set of 50 particles to be routed. Finally we will actually move the particles
+Now let's route 50 particles with a target travel time of 2100 seconds. To do this, we first will need to define an instance of the :obj:`dorado.particle_track.Particles` class. Then we will generate a set of 50 particles to be routed. Finally we will actually move the particles
 until the target travel time of 2100 seconds is reached.
 
 We will then visualize the final positions of the particles and display the final travel times associated with each of the particles to see how close they are to the target of 2100 seconds.
@@ -51,8 +51,8 @@ The full script to produce the below figure and output is available :download:`h
    >>> walk_data = particles.run_iteration(target_time=2100)
 
    # plotting
-   >>> pr.routines.plot_state(particles.depth, walk_data, iteration=0, c='b')
-   >>> pr.routines.plot_state(particles.depth, walk_data, iteration=-1, c='r')
+   >>> dorado.routines.plot_state(particles.depth, walk_data, iteration=0, c='b')
+   >>> dorado.routines.plot_state(particles.depth, walk_data, iteration=-1, c='r')
    >>> plt.title('Initial and Final Particle Locations')
    >>> plt.show()
 
@@ -60,9 +60,7 @@ The full script to produce the below figure and output is available :download:`h
 
 .. doctest::
 
-   >>> finaltimes = []
-   >>> for i in list(range(0, particles.Np_tracer)):
-   >>>    finaltimes.append(walk_data['travel_times'][i][-1])
+   >>> _, _, finaltimes = dorado.routines.get_state(walk_data)
    >>> print('List of particle travel times for final particle locations: ' +
    >>>       str(np.round(finaltimes)))
 

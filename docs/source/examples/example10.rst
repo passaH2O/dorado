@@ -28,15 +28,13 @@ Next we will do the parallel routing using 2 CPU cores using the `parallel_routi
    >>> par_result = parallel_routing(particles, 50, Np_tracer, seed_xloc,
                                      seed_yloc, 2)
 
-For comparison, we will the comparable serial process twice so that the proper number of particles are simulated.
+For comparison, we will run the comparable serial process twice so that the same number of particles are simulated.
 
 .. doctest::
 
    >>> for z in list(range(0, 2)):
-   >>>    all_walk = None  # initialize walk data list
-   >>>    particle = Particle(params)
-   >>>    particle.generate_particles(Np_tracer, seed_xloc)
-   >>>                                seed_yloc
+   >>>    particle = Particles(params)
+   >>>    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
    >>>    for i in list(range(0, 50)):
    >>>        all_walk = particle.run_iteration()
 

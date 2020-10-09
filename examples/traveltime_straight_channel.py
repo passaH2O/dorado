@@ -56,7 +56,7 @@ plt.show()
 
 # do the routing twice, once without any diffusivity added to the travel times
 # (diff_coeff==0) then a second time with significant diffusion (diff_coeff==1)
-for dc in range(0, 2):
+for dc in list(range(0, 2)):
     # set diff_coeff
     if dc == 0:
         params.diff_coeff = 0.0
