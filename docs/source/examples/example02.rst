@@ -13,7 +13,7 @@ First the variables from the DeltaRCM model must be loaded. The example data for
 
    >>> import numpy as np
    >>> from dorado.routines import steady_plots
-   >>> from dorado.particle_track import params
+   >>> from dorado.particle_track as pt
    >>> data = np.load('ex_deltarcm_data.npz')
    >>> stage = data['stage']
    >>> depth = data['depth']
@@ -22,12 +22,9 @@ Now we will create the parameter class and assign attributes to it.
 
 .. doctest::
 
-   >>> params = params()
+   >>> params = pt.modelParams()
    >>> params.stage = stage
    >>> params.depth = depth
-   >>> params.seed_xloc = list(range(15, 17))
-   >>> params.seed_yloc = list(range(137, 140))
-   >>> params.Np_tracer = 50
    >>> params.dx = 50.
    >>> params.model = 'DeltaRCM'
 
@@ -38,10 +35,20 @@ In this example case we haven't packaged any flow data, so we are going to see h
    >>> params.qx = np.zeros(np.shape(params.depth))
    >>> params.qy = np.zeros(np.shape(params.depth))
 
-Now that the parameters have all been defined, we will route the particles for 50 iterations. An animation of this output is provided below.
+Now that the parameters have all been defined, we will define the particles class and generate a set of particles.
 
 .. doctest::
 
-   >>> walk_data = steady_plots(params, 50, 'steady_deltarcm_example')
+   >>> seed_xloc = list(range(15, 17))
+   >>> seed_yloc = list(range(137, 140))
+   >>> Np_tracer = 50
+   >>> particles = pt.Particles(params)
+   >>> particles.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+
+we will route the particles for 50 iterations. An animation of this output is provided below.
+
+.. doctest::
+
+   >>> walk_data = steady_plots(particles, 50, 'steady_deltarcm_example')
 
 .. image:: images/example02/steady_deltarcm.gif

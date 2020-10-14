@@ -33,15 +33,12 @@ target_row = 70
 expected_time = 297.5
 
 # assign particle parameters
-params = pt.params()
+params = pt.modelParams()
 params.depth = depth
 params.stage = stage
 params.u = u
 params.v = v
 params.dx = dx
-params.Np_tracer = Np_tracer
-params.seed_xloc = seed_xloc
-params.seed_yloc = seed_yloc
 
 # set-up figure
 plt.figure()
@@ -59,7 +56,7 @@ plt.show()
 
 # do the routing twice, once without any diffusivity added to the travel times
 # (diff_coeff==0) then a second time with significant diffusion (diff_coeff==1)
-for dc in range(0, 2):
+for dc in list(range(0, 2)):
     # set diff_coeff
     if dc == 0:
         params.diff_coeff = 0.0
@@ -67,12 +64,12 @@ for dc in range(0, 2):
         params.diff_coeff = 1.0
 
     # make particle
-    particle = pt.Particle(params)
+    particle = pt.Particles(params)
 
     # walk it
-    walk_data = None
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
     for i in list(range(0, num_iter)):
-        walk_data = particle.run_iteration(previous_walk_data=walk_data)
+        walk_data = particle.run_iteration()
 
     # get travel times associated with particles when they are at coord x=70
     # use the exposure_time function to measure this

@@ -12,22 +12,23 @@ import sys
 import os
 import re
 import string
-from .particle_track import Particle
 from multiprocessing import Pool
 
 
 # convert run script into a function that returns a single dictionary 'data'
-def run_iter(params):
+def run_iter(pobj):
     """Wrapper run script for the particle iterations.
 
-    Uses params class to define a *Particle* and does iterations of the
-    particle. Requires a new params variable : *params.num_iter* to define the
-    number of iterations to route the particles for.
+    This is an internal function that should not be called directly. Rather it
+    is wrapped by the `parallel_routing` function and mapped to the CPU cores
+    to allow for particle routing in parallel. Uses a small `parallel_obj`
+    class to hold a bunch of attributes and do the particle generation and
+    routing.
 
     **Inputs** :
 
-        params : `obj`
-            Class with all the parameters for the particle routing
+        pobj : :obj:`parallel_obj`
+            Special parallel object.
 
     **Outputs** :
 
@@ -36,11 +37,11 @@ def run_iter(params):
             details same as input previous_walk_data
 
     """
-    particle = Particle(params)
-    all_walk = None
+    pobj.particles.generate_particles(pobj.Np_tracer, pobj.seed_xloc,
+                                      pobj.seed_yloc)
     # do iterations
-    for i in list(range(0, params.num_iter)):
-        all_walk = particle.run_iteration(previous_walk_data=all_walk)
+    for i in list(range(0, pobj.num_iter)):
+        all_walk = pobj.particles.run_iteration()
 
     return all_walk
 
@@ -83,7 +84,25 @@ def combine_result(par_result):
     return single_result
 
 
-def parallel_routing(params, num_iter, num_cores):
+class parallel_obj:
+    """
+    Empty class to hold parallel parameters.
+
+    This is an internal class used by `parallel_routing` that never needs to be
+    defined outside of that function.
+    """
+
+    def __init__(self):
+        """Initialize attributes."""
+        parallel_obj.particles = None
+        parallel_obj.num_iter = None
+        parallel_obj.Np_tracer = None
+        parallel_obj.seed_xloc = None
+        parallel_obj.seed_yloc = None
+
+
+def parallel_routing(particles, num_iter, Np_tracer, seed_xloc, seed_yloc,
+                     num_cores):
     """Do the parallel routing of particles.
 
     Function to do parallel routing of particles. Does this by duplicating the
@@ -91,11 +110,23 @@ def parallel_routing(params, num_iter, num_cores):
 
     **Inputs** :
 
-        params : `obj`
-            Normal parameters for the particles in a class
+        particle : :obj:`dorado.particle_track.Particles`
+            An initialized :obj:`particle_track.Particles` object with some
+            generated particles.
 
         num_iter : `int`
             Number of iterations to route particles for
+
+        Np_tracer : `int`
+            Number of particles to generate.
+
+        seed_xloc : `list`
+            List of x-coordinates over which to initially distribute the
+            particles.
+
+        seed_yloc : `list`
+            List of y-coordinates over which to initially distribute the
+            particles.
 
         num_cores : `int`
             Number of processors/cores to use for parallel part
@@ -107,16 +138,20 @@ def parallel_routing(params, num_iter, num_cores):
             and travel times for each particle computed by that process/core
 
     """
-    # assign number of iterations to the params class
-    params.num_iter = num_iter
+    # make parallel object to assign to function
+    pobj = parallel_obj
+    pobj.particles = particles
+    pobj.num_iter = num_iter
+    pobj.Np_tracer = Np_tracer
+    pobj.seed_xloc = seed_xloc
+    pobj.seed_yloc = seed_yloc
 
-    # make params list to apply to map function
-    params_list = [params]
-    params_list = params_list * num_cores
+    # define list to pass to actual function that will be mapped to in parallel
+    p_list = [pobj] * num_cores
 
     # create the parallel pool and run the process
     p = Pool(processes=num_cores)
-    par_result = p.map(run_iter, params_list)
+    par_result = p.map(run_iter, p_list)
     p.terminate()
 
     return par_result

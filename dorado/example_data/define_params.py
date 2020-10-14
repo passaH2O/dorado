@@ -5,10 +5,10 @@ import numpy as np
 from .. import particle_track as pt
 
 
-def make_rcm_params():
-    """Function to make the example RCM parameters."""
+def make_rcm_particles():
+    """Function to make the example RCM particles."""
 
-    params = pt.params()
+    params = pt.modelParams()
     path = os.path.join(os.path.dirname(__file__), 'ex_deltarcm_data.npz')
     data = np.load(path)
     # pull depth and stage from that data
@@ -17,9 +17,6 @@ def make_rcm_params():
     # define the params variables
     params.stage = stage
     params.depth = depth
-    params.seed_xloc = list(range(15, 17))
-    params.seed_yloc = list(range(137, 140))
-    params.Np_tracer = 50
     params.dx = 50.
     # don't have any discharge data so we use zeros in place of it
     # weighting scheme uses both discharge and depth so can still weight
@@ -29,13 +26,20 @@ def make_rcm_params():
     params.theta = 1.0
     params.model = 'DeltaRCM'  # say that our inputs are from DeltaRCM
 
-    return params
+    seed_xloc = list(range(15, 17))
+    seed_yloc = list(range(137, 140))
+    Np_tracer = 50
+
+    particles = pt.Particles(params)
+    particles.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+
+    return particles
 
 
 def make_anuga_params():
     """Function to make the example ANUGA parameters."""
 
-    params = pt.params()
+    params = pt.modelParams()
     path = os.path.join(os.path.dirname(__file__), 'ex_anuga_data.npz')
     data = np.load(path)
     # pull depth and stage from that data
@@ -43,13 +47,10 @@ def make_anuga_params():
     qx = data['qx']
     qy = data['qy']
     # define the params variables
-    params.stage = depth
+    params.stage = np.copy(depth)
     params.depth = depth
     params.qx = qx
     params.qy = qy
-    params.seed_xloc = list(range(20, 30))
-    params.seed_yloc = list(range(48, 53))
-    params.Np_tracer = 50
     params.dx = 10.
     params.theta = 1.0
     params.model = 'Anuga'

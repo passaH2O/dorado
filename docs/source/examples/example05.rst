@@ -7,11 +7,11 @@ In this example we will revisit the `ANUGA <https://github.com/GeoscienceAustral
 
 Full example script available :download:`here <../../../examples/timing_anuga_particles.py>`.
 
-After loading the data and establishing the parameters in the same way we did in :ref:`example01`, we will invoke the `time_plots` method from the `routines.py` code.
+After loading the data and establishing the parameters and the particles in the same way we did in :ref:`example01`, we will invoke the `time_plots` method from the `routines.py` code.
 
 .. doctest::
 
-   >>> time_plots(params, 50, 'timing_anuga_example')
+   >>> time_plots(particles, 50, 'timing_anuga_example')
 
 In the animation the actual particle travel times are tough to see as the colorbar limits continually update, however if you run this script, you can look at the individual frames in the 'timing_anuga_example/figs' folder that will be created. The general idea is that the red particles have traveled for a longer time than the blue ones.
 
