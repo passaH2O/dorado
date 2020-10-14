@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Example 13 - Using Unstructured Grids &#8212; dorado 1.0.0 documentation</title>
+    <title>Example 13 - Using Unstructured Grids &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -62,8 +62,7 @@ demonstrating how we extracted the input files for use in this workbook.</p>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">dorado</span>
-<span class="kn">from</span> <span class="nn">dorado</span> <span class="kn">import</span> <span class="n">particle_track</span> <span class="k">as</span> <span class="n">pt</span>
-<span class="kn">from</span> <span class="nn">dorado</span> <span class="kn">import</span> <span class="n">routines</span>
+<span class="kn">import</span> <span class="nn">dorado.particle_track</span> <span class="k">as</span> <span class="nn">pt</span>
 </pre></div>
 </div>
 </div>
@@ -256,27 +255,17 @@ of either meters or decimal degrees.</p>
 <h2>Set up particle routing parameters<a class="headerlink" href="#set-up-particle-routing-parameters" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have pre-converted the input data we need, let’s set up the
 particle routing to be run. We do this using the
-<code class="docutils literal notranslate"><span class="pre">particle_track.params</span></code> class, in which we populate the attributes to
-suit our application. This includes the gridded hydrodynamic outputs
-from above, the seed location, and other features of our particle
-application (e.g. grid size <code class="docutils literal notranslate"><span class="pre">dx</span></code>, number of particles <code class="docutils literal notranslate"><span class="pre">Np_tracer</span></code>,
-coefficients of the random walk).</p>
+<code class="docutils literal notranslate"><span class="pre">particle_track.modelParams</span></code> class, in which we populate the attributes to
+suit our application. This includes the gridded hydrodynamic outputs from
+above, the grid size <code class="docutils literal notranslate"><span class="pre">dx</span></code>, and tuning parameters which influence our random walk.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the parameters object and then assign the values</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">params</span><span class="p">()</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
 
-<span class="c1"># Populate the params variables</span>
+<span class="c1"># Populate the params attributes</span>
 <span class="n">params</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="n">stage</span>
 <span class="n">params</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
 <span class="n">params</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="n">qx</span>
 <span class="n">params</span><span class="o">.</span><span class="n">qy</span> <span class="o">=</span> <span class="n">qy</span>
-
-<span class="c1"># Now we in the region +/- 1 cell of the seed location we computed earlier</span>
-<span class="c1"># Note that &quot;xloc&quot; and &quot;yloc&quot; are x and y in the particle coordinate system!</span>
-<span class="n">params</span><span class="o">.</span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="p">[</span><span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">params</span><span class="o">.</span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="p">[</span><span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="c1"># For this example, we model 50 particles:</span>
-<span class="n">params</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">50</span>
 
 <span class="c1"># Other choices/parameters</span>
 <span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.</span> <span class="c1"># Grid size</span>
@@ -288,6 +277,34 @@ coefficients of the random walk).</p>
 <p>In this application, we are using the default values for the parameters
 of the random walk (<code class="docutils literal notranslate"><span class="pre">gamma</span></code>, <code class="docutils literal notranslate"><span class="pre">theta</span></code>, <code class="docutils literal notranslate"><span class="pre">diff_coeff</span></code>). I encourage
 you to play with these weights and see how your solution is affected.</p>
+</div>
+<div class="section" id="generate-particles">
+<h2>Generate particles<a class="headerlink" href="#generate-particles" title="Permalink to this headline">¶</a></h2>
+<p>Now we instantiate the <code class="docutils literal notranslate"><span class="pre">particle_track.Particles</span></code> class, and generate
+some particles to be routed. Here we are using the <code class="docutils literal notranslate"><span class="pre">'random'</span></code> method
+to generate particles, which seeds them randomly within a specified region.
+If we knew exactly where we wanted particles, we could call the
+<code class="docutils literal notranslate"><span class="pre">'exact'</span></code> method instead.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Now we seed in the region +/- 1 cell of the seed location we computed earlier</span>
+<span class="c1"># Note that &quot;xloc&quot; and &quot;yloc&quot; are x and y in the particle coordinate system!</span>
+<span class="n">params</span><span class="o">.</span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="p">[</span><span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">params</span><span class="o">.</span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="p">[</span><span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seedind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># For this example, we model 50 particles:</span>
+<span class="n">params</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Initialize particles and generate particles</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">particles</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Theta</span> <span class="n">parameter</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">using</span> <span class="mf">1.0</span>
+<span class="n">Gamma</span> <span class="n">parameter</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">using</span> <span class="mf">0.05</span>
+<span class="n">Diffusion</span> <span class="n">coefficient</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">using</span> <span class="mf">0.2</span>
+<span class="n">Cell</span> <span class="n">Types</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">Estimating</span> <span class="kn">from</span> <span class="nn">depth</span>
+<span class="n">Using</span> <span class="n">weighted</span> <span class="n">random</span> <span class="n">walk</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="run-the-particle-routing">
 <h2>Run the particle routing<a class="headerlink" href="#run-the-particle-routing" title="Permalink to this headline">¶</a></h2>
@@ -305,20 +322,15 @@ dict. This dict is organized into <code class="docutils literal notranslate"><sp
 <code class="docutils literal notranslate"><span class="pre">['travel_times']</span></code>, which are then indexed by particle ID, and then
 finally iteration number. (e.g. <code class="docutils literal notranslate"><span class="pre">walk_data['xinds'][5][10]</span></code> will
 return the xindex for the 6th particle’s 11th iteration).</p>
+<p>Note that, while this function returns a <code class="docutils literal notranslate"><span class="pre">walk_data</span></code> dictionary, this
+information is also stored as an attribute of the particles class,
+accessible via <code class="docutils literal notranslate"><span class="pre">particles.walk_data</span></code>.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using steady (time-invariant) plotting routine for 200 iterations</span>
-<span class="n">walk_data</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;unstructured_grid_anuga&#39;</span><span class="p">)</span>
+<span class="n">walk_data</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;unstructured_grid_anuga&#39;</span><span class="p">)</span>
 <span class="c1"># Outputs will be saved in the folder &#39;unstructured_grid_anuga&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Theta</span> <span class="n">parameter</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">using</span> <span class="mf">1.0</span>
-<span class="n">Gamma</span> <span class="n">parameter</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">using</span> <span class="mf">0.05</span>
-<span class="n">Diffusion</span> <span class="n">coefficient</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">using</span> <span class="mf">0.2</span>
-<span class="n">Cell</span> <span class="n">Types</span> <span class="ow">not</span> <span class="n">specified</span> <span class="o">-</span> <span class="n">Estimating</span> <span class="kn">from</span> <span class="nn">depth</span>
-<span class="n">Using</span> <span class="n">weighted</span> <span class="n">random</span> <span class="n">walk</span>
-<span class="n">Directories</span> <span class="n">already</span> <span class="n">exist</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">100</span><span class="o">%|</span><span class="c1">################################################################################| 200/200 [01:43&lt;00:00,  1.94it/s]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">100</span><span class="o">%|</span><span class="c1">################################################################################| 200/200 [02:44&lt;00:00,  1.21it/s]</span>
 </pre></div>
 </div>
 <p>Because the particles take different travel paths, at any given
@@ -331,11 +343,15 @@ indexing rules of a nested list.</p>
 <p>By default, this function will return the most recent step (iteration
 number <code class="docutils literal notranslate"><span class="pre">-1</span></code>), but we could ask it to slice along any given iteration
 number.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">ti</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">ti</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ti</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">265.49809934928425</span><span class="p">,</span> <span class="mf">274.94251871162766</span><span class="p">,</span> <span class="mf">284.81791839897977</span><span class="p">,</span> <span class="mf">284.5477688667267</span><span class="p">,</span> <span class="mf">303.1864479200722</span><span class="p">,</span> <span class="mf">298.17222516065874</span><span class="p">,</span> <span class="mf">272.6641530423291</span><span class="p">,</span> <span class="mf">266.0862922952372</span><span class="p">,</span> <span class="mf">351.373734333658</span><span class="p">,</span> <span class="mf">283.77793522819405</span><span class="p">,</span> <span class="mf">305.6739768877436</span><span class="p">,</span> <span class="mf">307.37347412453516</span><span class="p">,</span> <span class="mf">371.9278370985112</span><span class="p">,</span> <span class="mf">354.82431957686254</span><span class="p">,</span> <span class="mf">274.83774102910223</span><span class="p">,</span> <span class="mf">323.1084291243818</span><span class="p">,</span> <span class="mf">327.3923736890329</span><span class="p">,</span> <span class="mf">291.32472310706464</span><span class="p">,</span> <span class="mf">260.03387904829134</span><span class="p">,</span> <span class="mf">332.5389772183608</span><span class="p">,</span> <span class="mf">346.10742004405</span><span class="p">,</span> <span class="mf">273.1838317620726</span><span class="p">,</span> <span class="mf">288.9886334582885</span><span class="p">,</span> <span class="mf">283.6613461994197</span><span class="p">,</span> <span class="mf">275.01792816811127</span><span class="p">,</span> <span class="mf">340.2764338509763</span><span class="p">,</span> <span class="mf">276.49122325099637</span><span class="p">,</span> <span class="mf">283.4006343397997</span><span class="p">,</span> <span class="mf">320.0327248967139</span><span class="p">,</span> <span class="mf">368.1455263315037</span><span class="p">,</span> <span class="mf">262.17217679821584</span><span class="p">,</span> <span class="mf">302.1498741709681</span><span class="p">,</span> <span class="mf">291.35649376381184</span><span class="p">,</span> <span class="mf">328.709884075514</span><span class="p">,</span> <span class="mf">280.5716490424755</span><span class="p">,</span> <span class="mf">290.9019072706647</span><span class="p">,</span> <span class="mf">285.83270848854556</span><span class="p">,</span> <span class="mf">287.6384125389391</span><span class="p">,</span> <span class="mf">274.56682899570814</span><span class="p">,</span> <span class="mf">282.5740608216943</span><span class="p">,</span> <span class="mf">306.0197251195993</span><span class="p">,</span> <span class="mf">341.50433755374485</span><span class="p">,</span> <span class="mf">298.0967320335991</span><span class="p">,</span> <span class="mf">285.78904850300944</span><span class="p">,</span> <span class="mf">289.2900736094099</span><span class="p">,</span> <span class="mf">281.92565769484133</span><span class="p">,</span> <span class="mf">314.956172125463</span><span class="p">,</span> <span class="mf">278.5259141919523</span><span class="p">,</span> <span class="mf">282.39506170534554</span><span class="p">,</span> <span class="mf">330.3238018528977</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">284.1</span><span class="p">,</span> <span class="mf">292.6</span><span class="p">,</span> <span class="mf">301.7</span><span class="p">,</span> <span class="mf">293.1</span><span class="p">,</span> <span class="mf">294.2</span><span class="p">,</span> <span class="mf">319.2</span><span class="p">,</span> <span class="mf">275.1</span><span class="p">,</span> <span class="mf">332.2</span><span class="p">,</span> <span class="mf">302.7</span><span class="p">,</span> <span class="mf">273.2</span><span class="p">,</span>
+<span class="mf">303.0</span><span class="p">,</span> <span class="mf">303.4</span><span class="p">,</span> <span class="mf">297.2</span><span class="p">,</span> <span class="mf">304.5</span><span class="p">,</span> <span class="mf">281.1</span><span class="p">,</span> <span class="mf">297.7</span><span class="p">,</span> <span class="mf">270.8</span><span class="p">,</span> <span class="mf">300.1</span><span class="p">,</span> <span class="mf">299.0</span><span class="p">,</span> <span class="mf">318.7</span><span class="p">,</span>
+<span class="mf">274.5</span><span class="p">,</span> <span class="mf">293.8</span><span class="p">,</span> <span class="mf">288.5</span><span class="p">,</span> <span class="mf">397.7</span><span class="p">,</span> <span class="mf">332.9</span><span class="p">,</span> <span class="mf">274.3</span><span class="p">,</span> <span class="mf">271.1</span><span class="p">,</span> <span class="mf">302.7</span><span class="p">,</span> <span class="mf">298.6</span><span class="p">,</span> <span class="mf">314.4</span><span class="p">,</span>
+<span class="mf">317.9</span><span class="p">,</span> <span class="mf">284.3</span><span class="p">,</span> <span class="mf">332.5</span><span class="p">,</span> <span class="mf">294.8</span><span class="p">,</span> <span class="mf">313.7</span><span class="p">,</span> <span class="mf">302.1</span><span class="p">,</span> <span class="mf">291.5</span><span class="p">,</span> <span class="mf">311.6</span><span class="p">,</span> <span class="mf">326.2</span><span class="p">,</span> <span class="mf">302.1</span><span class="p">,</span>
+<span class="mf">274.0</span><span class="p">,</span> <span class="mf">307.0</span><span class="p">,</span> <span class="mf">275.0</span><span class="p">,</span> <span class="mf">273.7</span><span class="p">,</span> <span class="mf">317.2</span><span class="p">,</span> <span class="mf">367.2</span><span class="p">,</span> <span class="mf">272.9</span><span class="p">,</span> <span class="mf">307.9</span><span class="p">,</span> <span class="mf">294.5</span><span class="p">,</span> <span class="mf">280.6</span><span class="p">]</span>
 </pre></div>
 </div>
 <p><strong>Note:</strong> There exists an equivalent function, <code class="docutils literal notranslate"><span class="pre">get_time_state()</span></code>,
@@ -352,46 +368,51 @@ directly. The commented-out block of code below shows an example of what
 an unsteady case might look like, had we used more timesteps from the
 model output.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Specify folder to save figures:</span>
-<span class="c1"># path2folder = &#39;place_to_save_figures&#39;</span>
+<span class="c1"># path2folder = &#39;unstructured_grid_anuga&#39;</span>
 
-<span class="c1"># # Let&#39;s say our model outputs update every hour:</span>
-<span class="c1"># model_timestep = 3600. # Units in seconds</span>
+<span class="c1"># # Let&#39;s say our model outputs update minute:</span>
+<span class="c1"># model_timestep = 60. # Units in seconds</span>
 <span class="c1"># # Number of steps to take in total:</span>
-<span class="c1"># num_steps = 24 # Run for one day</span>
+<span class="c1"># num_steps = 20</span>
 <span class="c1"># # Create vector of target times</span>
-<span class="c1"># target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)</span>
+<span class="c1"># target_times = np.arange(model_timestep,</span>
+<span class="c1">#                          model_timestep*(num_steps+1),</span>
+<span class="c1">#                          model_timestep)</span>
 
-<span class="c1"># # Initialize the walk_data dict so we can feed it back into the function after each loop</span>
-<span class="c1"># walk_data = None</span>
 <span class="c1"># # Iterate through model timesteps</span>
-<span class="c1"># for i in list(range(0, num_steps+1)):</span>
+<span class="c1"># for i in list(range(num_steps)):</span>
 <span class="c1">#     # The main functional difference with an unsteady model is re-instantiating the</span>
 <span class="c1">#     # particle class with updated params *inside* the particle routing loop</span>
 
 <span class="c1">#     # Update the flow field by gridding new time-step</span>
-<span class="c1">#     params.depth = myinterp(unstructured[&#39;depth&#39;][i])</span>
-<span class="c1">#     params.stage = myinterp(unstructured[&#39;stage&#39;][i])</span>
-<span class="c1">#     params.qx = myinterp(unstructured[&#39;qx&#39;][i])</span>
-<span class="c1">#     params.qy = myinterp(unstructured[&#39;qy&#39;][i])</span>
-<span class="c1">#     # Above assumes that dictionary had additional time-steps per variable</span>
+<span class="c1">#     # We don&#39;t have additional timesteps, but if we did, we update params here:</span>
+<span class="c1">#     params.depth = myInterp(unstructured[&#39;depth&#39;])</span>
+<span class="c1">#     params.stage = myInterp(unstructured[&#39;stage&#39;])</span>
+<span class="c1">#     params.qx = myInterp(unstructured[&#39;qx&#39;])</span>
+<span class="c1">#     params.qy = myInterp(unstructured[&#39;qy&#39;])</span>
 
 <span class="c1">#     # Define the particle class and continue</span>
-<span class="c1">#     particle = pt.Particle(params)</span>
+<span class="c1">#     particle = pt.Particles(params)</span>
+<span class="c1">#     # Generate some particles</span>
+<span class="c1">#     if i == 0:</span>
+<span class="c1">#         particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         particle.generate_particles(0, [], [], &#39;random&#39;, walk_data)</span>
 
 <span class="c1">#     # Run the random walk for this &quot;model timestep&quot;</span>
-<span class="c1">#     walk_data = particle.run_iteration(previous_walk_data=walk_data,</span>
-<span class="c1">#                                        target_time=target_times[i])</span>
+<span class="c1">#     walk_data = particle.run_iteration(target_times[i])</span>
 
 <span class="c1">#     # Use get_state() to return original and most recent locations</span>
-<span class="c1">#     x0, y0, t0 = routines.get_state(walk_data, 0) # Starting locations</span>
-<span class="c1">#     xi, yi, ti = routines.get_state(walk_data) # Most recent locations</span>
+<span class="c1">#     x0, y0, t0 = dorado.routines.get_state(walk_data, 0) # Starting locations</span>
+<span class="c1">#     xi, yi, ti = dorado.routines.get_state(walk_data) # Most recent locations</span>
 
 <span class="c1">#     # Make and save plots and data</span>
 <span class="c1">#     fig = plt.figure(dpi=200)</span>
+<span class="c1">#     ax = fig.add_subplot(111)</span>
 <span class="c1">#     ax.scatter(y0, x0, c=&#39;b&#39;, s=0.75)</span>
 <span class="c1">#     ax.scatter(yi, xi, c=&#39;r&#39;, s=0.75)</span>
 <span class="c1">#     ax = plt.gca()</span>
-<span class="c1">#     im = ax.imshow(params.depth)</span>
+<span class="c1">#     im = ax.imshow(particle.depth)</span>
 <span class="c1">#     plt.title(&#39;Depth at Time &#39; + str(target_times[i]))</span>
 <span class="c1">#     cax = fig.add_axes([ax.get_position().x1+0.01,</span>
 <span class="c1">#                         ax.get_position().y0,</span>
@@ -399,7 +420,7 @@ model output.</p>
 <span class="c1">#                         ax.get_position().height])</span>
 <span class="c1">#     cbar = plt.colorbar(im, cax=cax)</span>
 <span class="c1">#     cbar.set_label(&#39;Water Depth [m]&#39;)</span>
-<span class="c1">#     plt.savefig(path2folder + &#39;/output&#39;+str(i)+&#39;.png&#39;)</span>
+<span class="c1">#     plt.savefig(path2folder + &#39;/output_by_dt&#39;+str(i)+&#39;.png&#39;)</span>
 <span class="c1">#     plt.close()</span>
 </pre></div>
 </div>
@@ -425,7 +446,7 @@ size (i.e. +/- dx/2)</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xcoord&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;ycoord&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">624465.25</span><span class="p">,</span> <span class="mf">3347077.0</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">624465.25</span><span class="p">,</span> <span class="mf">3347079.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For something a little more interesting, let’s measure the amount of
@@ -464,16 +485,16 @@ generate plots of the cumulative and differential forms of the ETD
 <span class="n">exposure_times</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">exposure_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span>
                                   <span class="n">regions</span><span class="p">)</span>
 <span class="c1"># Then generate plots and save data</span>
-<span class="n">routines</span><span class="o">.</span><span class="n">plot_exposure_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span>
-                            <span class="n">exposure_times</span><span class="p">,</span>
-                            <span class="s1">&#39;unstructured_grid_anuga/figs&#39;</span><span class="p">,</span>
-                            <span class="n">timedelta</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">exposure_times</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_exposure_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span>
+                                                    <span class="n">exposure_times</span><span class="p">,</span>
+                                                    <span class="s1">&#39;unstructured_grid_anuga/figs&#39;</span><span class="p">,</span>
+                                                    <span class="n">timedelta</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="c1"># Changing &#39;timedelta&#39; will change the units of the time-axis.</span>
 <span class="c1"># Units are seconds, so 60 will plot by minute.</span>
 <span class="c1"># Because we are using fewer particles than ideal, smooth the plots with small &#39;nbins&#39;</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">100</span><span class="o">%|</span><span class="c1">#################################################################################| 50/50 [00:00&lt;00:00, 769.23it/s]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">100</span><span class="o">%|</span><span class="c1">#################################################################################| 50/50 [00:00&lt;00:00, 1190.48it/s]</span>
 </pre></div>
 </div>
 <img alt="../_images/unstructured_grid_anuga_31_2.png" src="../_images/unstructured_grid_anuga_31_2.png" />

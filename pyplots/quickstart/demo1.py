@@ -1,15 +1,16 @@
 """Plot for quickstart demo 1."""
 import matplotlib.pyplot as plt
 from dorado import routines
-from dorado.example_data.define_params import make_rcm_params
+from dorado.example_data.define_params import make_rcm_particles
 import numpy as np
 
 np.random.seed(1)  # fix random seed so example is always the same
-params = make_rcm_params()
-all_walk_data = routines.steady_plots(params, 50, 'demo-1', save_output=False)
+particles = make_rcm_particles()
+all_walk_data = routines.steady_plots(particles, 50, 'demo-1',
+                                      save_output=False)
 
 fig = plt.figure(figsize=(8, 5))
-for k in list(range(0, params.Np_tracer)):
+for k in list(range(0, particles.Np_tracer)):
     plt.scatter(all_walk_data['yinds'][k][0],
                 all_walk_data['xinds'][k][0],
                 c='b',
@@ -19,7 +20,7 @@ for k in list(range(0, params.Np_tracer)):
                 c='r',
                 s=4.0)
 ax = plt.gca()
-im = ax.imshow(params.depth)
+im = ax.imshow(particles.depth)
 plt.title('Depth - Particle Iteration 49')
 cax = fig.add_axes([ax.get_position().x1+0.01,
                     ax.get_position().y0,

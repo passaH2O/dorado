@@ -15,27 +15,17 @@ import numpy as np
 import scipy
 from scipy import interpolate
 from tqdm import tqdm
-from .particle_tools import Tools
+import dorado.lagrangian_walker as lw
 
 
-class params:
+class modelParams:
     """Parameter class with attributes and grid particles will be routed on.
 
-    The parameters class, `params`, must be populated with user-defined
+    The parameters class, :obj:`dorado.particle_track.modelParams`,
+    must be populated with user-defined
     attributes of the grid the particles will be modeled on.
 
     **Required Parameters:**
-
-        seed_xloc : `list`
-            List of x-coordinates over which to initially distribute the
-            particles
-
-        seed_yloc : `list`
-            List of y-coordinates over which to initially distribute the
-            particles
-
-        Np_tracer : `int`
-            Number of particles to use
 
         dx : `float`
             Length along one square cell face
@@ -105,12 +95,13 @@ class params:
             used to route the particles. Default value is False.
 
     This list of expected parameter values can also be obtained by querying the
-    class attributes with `dir(params)`, `params.__dict__`, or `vars(params)`.
+    class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
+    `vars(modelParams)`.
 
     """
 
     def __init__(self):
-        """Create the expected variables for the params class.
+        """Create the expected variables for the modelParams class.
 
         Variables are initialized as NoneType they need to be assigned by the
         user. Due to the wide variety of data formats produced by differeny
@@ -118,9 +109,6 @@ class params:
         handled on a case-by-case basis.
 
         """
-        self.seed_xloc = None
-        self.seed_yloc = None
-        self.Np_tracer = None
         self.dx = None
         self.depth = None
         self.stage = None
@@ -130,14 +118,15 @@ class params:
         self.v = None
 
 
-class Particle(Tools):
+class Particles():
     """Class for the particle(s) that is(are) going to be routed."""
 
     def __init__(self, params):
         """Check input parameters and assign default values where/if needed.
 
-        Methods require a class of parameters (:obj:`params`) to be passed to
-        the Particles class. e.g. particle = Particles(params)
+        Methods require a class of parameters
+        (:obj:`dorado.particle_track.modelParams`) to be passed
+        to the Particles class. e.g. particle = Particles(modelParams)
 
         Initialization tries to assign each value from the parameter class,
         otherwise an error is raised or default values are assigned when
@@ -145,29 +134,10 @@ class Particle(Tools):
 
         """
         # REQUIRED PARAMETERS #
-        # Define the seeding locations as list of x and y locations
-        if getattr(params, 'seed_xloc', None) is None:
-            raise ValueError("No tracer seeding x-locations (params.seed_xloc)"
-                             " have been defined")
-        else:
-            self.seed_xloc = params.seed_xloc
-
-        if getattr(params, 'seed_yloc', None) is None:
-            raise ValueError("No tracer seeding y-locations (params.seed_yloc)"
-                             " have been defined")
-        else:
-            self.seed_yloc = params.seed_yloc
-
-        # Define the number of tracers to be simulated
-        if getattr(params, 'Np_tracer', None) is None:
-            raise ValueError("Number of tracer particles (params.Np_tracer)"
-                             " has not been defined")
-        else:
-            self.Np_tracer = params.Np_tracer
-
         # Define the length along one cell face (assuming square cells)
         if getattr(params, 'dx', None) is None:
-            raise ValueError("Length of cell face (params.dx) is undefined")
+            raise ValueError("Length of cell face (modelParams.dx) is"
+                             " undefined")
         else:
             self.dx = params.dx
 
@@ -403,14 +373,160 @@ class Particle(Tools):
                                     [pi, 0, 0],
                                     [5*pi/4, 3*pi/2, 7*pi/4]])
 
+        # initialize number of particles as 0
+        self.Np_tracer = 0
+
+        # initialize the walk_data
+        self.walk_data = None
+
+    # function to clear walk data if you've made a mistake while generating it
+    def clear_walk_data(self):
+        """Manually reset self.walk_data back to None."""
+        self.walk_data = None
+
+    # generate a group of particles in a set of initial locations
+    def generate_particles(self,
+                           Np_tracer,
+                           seed_xloc,
+                           seed_yloc,
+                           method='random',
+                           previous_walk_data=None):
+        """Generate a set of particles in defined locations.
+
+        After a :obj:`dorado.particle_track.Particles` class has been
+        initialized, this function can be called to create some particles
+        within a given region. If particles are to be seeded in different
+        groupings in different regions, this function can be called multiple
+        times in succession prior to moving them via
+        :obj:`dorado.particle_track.run_iteration`.
+
+        Walk data is stored within :obj:`dorado.particle_track.Particles` as
+        `Particles.walk_data` so if this method is called in succession, even
+        without the `previous_walk_data` flag, the new particle seed locations
+        will be appended to the `walk_data` attribute of
+        :obj:`dorado.particle_track.Particles`.
+
+        **Inputs** :
+
+            Np_tracer : `int`
+                Number of particles to generate.
+
+            seed_xloc : `list`
+                List of x-coordinates over which to initially distribute the
+                particles.
+
+            seed_yloc : `list`
+                List of y-coordinates over which to initially distribute the
+                particles.
+
+            method : `str`, optional
+                Specify the type of particle generation you wish to use.
+                Current options are 'random' and 'exact' for seeding particles
+                either randomly across a set of points, or exactly at a set
+                of defined locations. If unspecified, the default is 'random'.
+
+            previous_walk_data : `dict`, optional
+                Dictionary of all prior x locations, y locations, and travel
+                times. This input parameter should only be used if 'new' or
+                'indpendent' walk data exists (e.g. data loaded from a .json
+                file). Otherwise the walk data stored in `self.walk_data` is
+                likely to contain the previous information. Order of indices is
+                previous_walk_data[field][particle][iter], where e.g.
+                ['travel_times'][5][10] is the travel time of the 5th particle
+                at the 10th iteration.
+
+        """
+        # if the values in self are invalid the input checked will catch them
+        # do input type checking
+        Np_tracer, seed_xloc, seed_yloc = gen_input_check(Np_tracer,
+                                                          seed_xloc,
+                                                          seed_yloc,
+                                                          method)
+
+        init_walk_data = dict()  # create init_walk_data dictionary
+
+        # initialize new travel times list
+        new_start_times = [0.]*Np_tracer
+
+        if method == 'random':
+            # create random start indices based on x, y locations and np_tracer
+            new_start_xindices = [lw.random_pick_seed(seed_xloc) for x
+                                  in list(range(Np_tracer))]
+            new_start_yindices = [lw.random_pick_seed(seed_yloc) for x
+                                  in list(range(Np_tracer))]
+
+        elif method == 'exact':
+            # step through seed lists to create exact list of start locations
+            # if number of particles exceeds length of seed lists, loop back
+            # to beginning of the seed lists and continue from there
+            Np_to_seed = Np_tracer
+            new_start_xindices = []
+            new_start_yindices = []
+            while Np_to_seed > 0:
+                for i in range(0, len(seed_xloc)):
+                    # condition if we run out of particles within this loop
+                    if Np_to_seed <= 0:
+                        break
+                    # otherwise keep on seeding
+                    new_start_xindices = new_start_xindices + [seed_xloc[i]]
+                    new_start_yindices = new_start_yindices + [seed_yloc[i]]
+                    Np_to_seed -= 1  # reduce number of particles left to seed
+
+        # Now initialize vectors that will create the structured list
+        new_xinds = [[new_start_xindices[i]] for i in
+                     list(range(Np_tracer))]
+        new_yinds = [[new_start_yindices[i]] for i in
+                     list(range(Np_tracer))]
+        new_times = [[new_start_times[i]] for i in list(range(Np_tracer))]
+
+        # establish the start values
+        start_xindices = new_xinds
+        start_yindices = new_yinds
+        start_times = new_times
+
+        if self.walk_data is not None:
+            # if there is walk_data from a previous call to the generator,
+            # or from simulating particle transport previously, then we want
+            # to keep it and append the new data to it
+            internal_xinds = self.walk_data['xinds']
+            internal_yinds = self.walk_data['yinds']
+            internal_times = self.walk_data['travel_times']
+
+            # combine internal and new lists of particle information
+            start_xindices = internal_xinds + start_xindices
+            start_yindices = internal_yinds + start_yindices
+            start_times = internal_times + start_times
+
+        if previous_walk_data is not None:
+            # If the generator has been run before, or if new
+            # particles are going to be added to a set of pre-existing
+            # particles, then the walk_data dictionary from either can
+            # be fed into this function as input
+            prev_xinds = previous_walk_data['xinds']
+            prev_yinds = previous_walk_data['yinds']
+            prev_times = previous_walk_data['travel_times']
+
+            # combine previous and new lists of particle information
+            start_xindices = prev_xinds + start_xindices
+            start_yindices = prev_yinds + start_yindices
+            start_times = prev_times + start_times
+
+        # determine the new total number of particles we have now
+        # additive in the event we are running the generate multiple times
+        self.Np_tracer += Np_tracer
+
+        # store information in the init_walk_data dictionary and return it
+        init_walk_data['xinds'] = start_xindices
+        init_walk_data['yinds'] = start_yindices
+        init_walk_data['travel_times'] = start_times
+
+        # store the initialized walk data within self
+        self.walk_data = init_walk_data
+
     # run an iteration where particles are moved
     # have option of specifying the particle start locations
     # otherwise they are randomly placed within x and y seed locations
     def run_iteration(self,
-                      start_xindices=None,
-                      start_yindices=None,
-                      start_times=None,
-                      previous_walk_data=None,
                       target_time=None):
         """Run an iteration of the particle routing.
 
@@ -419,29 +535,7 @@ class Particle(Tools):
 
         **Inputs** :
 
-            start_xindices : `list`
-                List of x locations to seed the particles [x1, x2, x3, ..., xn]
-                if undefined, uses starting locations as given by the Particles
-                class (seed_xloc)
-
-            start_yindices : `list`
-                List of y locations to seed the particles [y1, y2, y3, ..., yn]
-                if undefined, uses starting locations as given by the Particles
-                class (seed_yloc)
-
-            start_times : `list`
-                List of particle travel times [t1, t2, t3, ..., tn] if
-                undefined, assumes no particles have travelled yet, so assigns
-                zeros
-
-            previous_walk_data : `dict`
-                Dictionary of all prior x locations, y locations, and travel
-                times. Order of indices is
-                previous_walk_data[field][particle][iter], where e.g.
-                ['travel_times'][5][10] is the travel time of the 5th particle
-                at the 10th iteration
-
-            target_time : `float`
+            target_time : `float`, optional
                 The travel time (seconds) each particle should aim to have at
                 end of this iteration. If left undefined, then just one
                 iteration is run and the particles will be out of sync in time.
@@ -451,46 +545,36 @@ class Particle(Tools):
         **Outputs** :
 
             all_walk_data : `dict`
-                Dictionary of all x and y locations and travel times, with
-                details same as input previous_walk_data
+                Dictionary of all x and y locations and travel times. Order of
+                indices is previous_walk_data[field][particle][iter],
+                where ['travel_times'][5][10] is the travel time of the 5th
+                particle at the 10th iteration
 
         """
+        # if there is no walk data raise an error
+        if self.walk_data is None:
+            raise ValueError('Particles have not been initialized.'
+                             ' Call the `particle_generator()` function.')
+
         all_walk_data = dict()  # init all_walk_data dictionary
 
-        if previous_walk_data is not None:
-            # If particle tracking has been run before
-            # feed previous output array back into input
-            # If this array exists, it overrides any starting indices given
-            # in function call
-            all_xinds = previous_walk_data['xinds']
-            # most recent locations
-            start_xindices = [all_xinds[i][-1] for i in
-                              list(range(self.Np_tracer))]
-            all_yinds = previous_walk_data['yinds']
-            start_yindices = [all_yinds[i][-1] for i in
-                              list(range(self.Np_tracer))]
-            all_times = previous_walk_data['travel_times']
-            start_times = [all_times[i][-1] for i in
-                           list(range(self.Np_tracer))]
-        else:
-            # if start locations not defined, then randomly assign them
-            if start_xindices is None:
-                # set starting x-index for all tracers
-                start_xindices = [self.random_pick_seed(self.seed_xloc) for x
-                                  in list(range(self.Np_tracer))]
-            if start_yindices is None:
-                # set starting y-index for all tracers
-                start_yindices = [self.random_pick_seed(self.seed_yloc) for x
-                                  in list(range(self.Np_tracer))]
-            # initialize travel times list
-            if start_times is None:
-                start_times = [0.]*self.Np_tracer
-            # Now initialize vectors that will create the structured list
-            all_xinds = [[start_xindices[i]] for i in
-                         list(range(self.Np_tracer))]
-            all_yinds = [[start_yindices[i]] for i in
-                         list(range(self.Np_tracer))]
-            all_times = [[start_times[i]] for i in list(range(self.Np_tracer))]
+        # if self.Np_tracer is not already defined, we can define it from
+        # the init_walk_data
+        if self.Np_tracer == 0:
+            self.Np_tracer = len(self.walk_data['xinds'])
+
+        # read in information from the init_walk_data dictionary
+        # most recent locations
+        all_xinds = self.walk_data['xinds']
+        start_xindices = [all_xinds[i][-1] for i in
+                          list(range(self.Np_tracer))]
+        all_yinds = self.walk_data['yinds']
+        start_yindices = [all_yinds[i][-1] for i in
+                          list(range(self.Np_tracer))]
+        # most recent times
+        all_times = self.walk_data['travel_times']
+        start_times = [all_times[i][-1] for i in
+                       list(range(self.Np_tracer))]
 
         # merge x and y indices into list of [x,y] pairs
         start_pairs = [[start_xindices[i], start_yindices[i]] for i in
@@ -498,9 +582,9 @@ class Particle(Tools):
 
         # Do the particle movement
         if target_time is None:
-            # If we're not aiming for a specific time, run a single iteration
-            new_inds, travel_times = self.single_iteration(start_pairs,
-                                                           start_times)
+            # If we're not aiming for a specific time, step the particles
+            new_inds, travel_times = lw.particle_stepper(self, start_pairs,
+                                                         start_times)
 
             for ii in list(range(self.Np_tracer)):
                 # Don't duplicate location
@@ -521,7 +605,7 @@ class Particle(Tools):
             # iterate each particle until we get there
             # Loop through all particles
             for ii in list(range(self.Np_tracer)):
-                if previous_walk_data is not None:
+                if len(all_times[ii]) > 1:
                     est_next_dt = all_times[ii][-1] - all_times[ii][-2]
                 else:
                     # Initialize a guess for the next iteration's timestep
@@ -538,7 +622,7 @@ class Particle(Tools):
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times = self.single_iteration(
+                        new_inds, travel_times = lw.particle_stepper(self,
                                                     [[all_xinds[ii][-1],
                                                       all_yinds[ii][-1]]],
                                                     [all_times[ii][-1]])
@@ -569,7 +653,76 @@ class Particle(Tools):
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
 
+            # re-write the walk_data attribute of self
+            self.walk_data = all_walk_data
+
         return all_walk_data
+
+
+def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
+    """Check the inputs provided to :obj:`generate_particles()`.
+
+    This function does input type checking and either succeeds or returns
+    an error if the types provided cannot be converted to those that we
+    expect in :obj:`dorado.particle_track.generate_particles()`.
+
+    **Inputs** :
+
+        Np_tracer : `int`
+            Number of particles to generate.
+
+        seed_xloc : `list`
+            List of x-coordinates over which to initially distribute the
+            particles
+
+        seed_yloc : `list`
+            List of y-coordinates over which to initially distribute the
+            particles
+
+        method : `str`, optional
+            Type of particle generation to use, either 'random' or 'exact'.
+
+    **Outputs** :
+
+        Np_tracer : `int`
+            Number of particles to generate.
+
+        seed_xloc : `list`
+            List of x-coordinates over which to initially distribute the
+            particles
+
+        seed_yloc : `list`
+            List of y-coordinates over which to initially distribute the
+            particles
+
+    """
+    try:
+        Np_tracer = int(Np_tracer)
+    except Exception:
+        raise TypeError("Np_tracer input type was not int.")
+    try:
+        # try to flatten if this is an array that is multi-dimensional
+        if len(np.shape(seed_xloc)) > 1:
+            seed_xloc = seed_xloc.flatten()
+        # try to coerce into a list
+        seed_xloc = [int(x) for x in list(seed_xloc)]
+    except Exception:
+        raise TypeError("seed_xloc input type was not a list.")
+    try:
+        # try to flatten if this is an array that is multi-dimensional
+        if len(np.shape(seed_yloc)) > 1:
+            seed_yloc = seed_yloc.flatten()
+        # try to coerce into a list
+        seed_yloc = [int(y) for y in list(seed_yloc)]
+    except Exception:
+        raise TypeError("seed_yloc input type was not a list.")
+    if isinstance(method, str) is False:
+        raise TypeError('Method provided was not a string.')
+    elif method not in ['random', 'exact']:
+        raise ValueError('Method input is not a valid method, must be'
+                         ' "random" or "exact".')
+
+    return Np_tracer, seed_xloc, seed_yloc
 
 
 def coord2ind(coordinates, raster_origin, raster_size, cellsize):
@@ -697,7 +850,7 @@ def exposure_time(walk_data,
             Output of a previous function call to run_iteration.
 
         region_of_interest : `int array`
-            Binary array the same size as input arrays in params class
+            Binary array the same size as input arrays in modelParams class
             with 1's everywhere inside the region in which we want to
             measure exposure time, and 0's everywhere else.
 
@@ -814,16 +967,16 @@ def unstruct2grid(coordinates,
 
     gridX, gridY = np.meshgrid(xvect, yvect)
 
-    inputXY = scipy.array([x[:], y[:]]).transpose()
+    inputXY = np.array([x[:], y[:]]).transpose()
 
-    gridXY_array = scipy.array([scipy.concatenate(gridX),
-                                scipy.concatenate(gridY)]).transpose()
-    gridXY_array = scipy.ascontiguousarray(gridXY_array)
+    gridXY_array = np.array([np.concatenate(gridX),
+                             np.concatenate(gridY)]).transpose()
+    gridXY_array = np.ascontiguousarray(gridXY_array)
 
     # Create Interpolation function
     if k_nearest_neighbors == 1:  # Only use nearest neighbor
         index_qFun = interpolate.NearestNDInterpolator(inputXY,
-                    scipy.arange(len(x), dtype='int64').transpose())
+                     np.arange(len(x), dtype='int64').transpose())
         gridqInd = index_qFun(gridXY_array)
 
         # Function to do the interpolation

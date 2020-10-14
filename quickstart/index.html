@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Quickstart &#8212; dorado 1.0.0 documentation</title>
+    <title>Quickstart &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -44,15 +44,15 @@ A set of 50 particles will be seeded in the main channel of the synthetic delta.
 Then using information about the water depths and flow rates in the delta, the particles will be allowed to travel downstream.
 River deltas are distributary networks, and so the particles will not all travel along the same channels.
 By using a tool like <cite>dorado</cite>, simulated particles can help us answer questions related to hydrological connectivity and nutrient residence times in deltaic systems.</p>
-<p>First we load the sample parameters.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span> <span class="k">as</span> <span class="nn">pr</span>
+<p>First we load and create the sample particles object.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rcmparams</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_rcm_params</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rcmparticles</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_rcm_particles</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>We can visualize the water depth for this scenario from the parameters. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/a7d3662605b99c036b6cc113a18bbfbb/demo1_depth.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rcmparams</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+<p>We can visualize the water depth for this scenario from the <cite>rcmparticles</cite> object. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/a7d3662605b99c036b6cc113a18bbfbb/demo1_depth.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rcmparticles</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Water Depth&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -63,7 +63,7 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 <img alt="../_images/demo1_depth.png" src="../_images/demo1_depth.png" />
 </div>
 <p>Now let’s route 50 particles for 50 iterations.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">rcmparams</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;demo-1&#39;</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">rcmparticles</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;demo-1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <cite>steady_plots()</cite> function saves plots of each iteration of the particle movement to the subfolder ‘demo-1/figs’. The final plot is shown below; the initial particle locations are shown as blue dots, and the final particle locations are red dots. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/a75d2e742594756ccbf1303ae820490b/demo1.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
@@ -75,11 +75,11 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 <div class="section" id="demo-2-using-lower-level-functionality">
 <h2>Demo 2 - Using Lower-Level Functionality<a class="headerlink" href="#demo-2-using-lower-level-functionality" title="Permalink to this headline">¶</a></h2>
 <p>In this demo, we show how particles can be placed on a gridded flow field generated using the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in <a class="reference download internal" download="" href="../_downloads/88740e1ea0aa18ed325a9e72627b7118/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>.</p>
-<p>First we load the sample parameters and define our <cite>Particle</cite> object.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span> <span class="k">as</span> <span class="nn">pr</span>
+<p>First we load the grid parameters for this example. The longer <a class="reference internal" href="../examples/index.html#examples"><span class="std std-ref">Examples</span></a> provide guidance on how to define your own grid parameters.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado.particle_track</span> <span class="k">as</span> <span class="nn">pt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">anugaparams</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_anuga_params</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">particle</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">Particle</span><span class="p">(</span><span class="n">anugaparams</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We can visualize the flow discharge components for this scenario from the loaded parameters. The full script used to produce the below figures is available <a class="reference download internal" download="" href="../_downloads/671fc917e367bc589c5fc3e92df76a6f/demo2_flow.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
@@ -97,10 +97,28 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 <div class="figure align-center">
 <img alt="../_images/demo2_flow.png" src="../_images/demo2_flow.png" />
 </div>
-<p>Now let’s route 50 particles with a target travel time of 2100 seconds. We will then visualize the final positions of the particles and display the final travel times associated with each of the particles to see how close they are to the target of 2100 seconds. Note that the <cite>dorado</cite> method of routing particles in discrete grid cells limits the precision which can be achieved in travel time values as the particles can only be located at the center of grid cells. The full script to produce the below figure and output is available <a class="reference download internal" download="" href="../_downloads/4bde4793bf1acee8f2dd3e884e13206a/demo2.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="mi">2100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">anugaparams</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">anugaparams</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<p>Now let’s route 50 particles with a target travel time of 2100 seconds. To do this, we first will need to define an instance of the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class. Then we will generate a set of 50 particles to be routed. Finally we will actually move the particles
+until the target travel time of 2100 seconds is reached.</p>
+<p>We will then visualize the final positions of the particles and display the final travel times associated with each of the particles to see how close they are to the target of 2100 seconds.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <cite>dorado</cite> method of routing particles in discrete grid cells limits the precision which can be achieved in travel time values as the particles can only be located at the center of grid cells.</p>
+</div>
+<p>The full script to produce the below figure and output is available <a class="reference download internal" download="" href="../_downloads/4bde4793bf1acee8f2dd3e884e13206a/demo2.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="go"># initialize the particles class</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">Particles</span><span class="p">(</span><span class="n">anugaparams</span><span class="p">)</span>
+
+<span class="go"># define where to place particles</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">53</span><span class="p">))</span>
+
+<span class="go"># now generate particles and route them</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="mi">2100</span><span class="p">)</span>
+
+<span class="go"># plotting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Initial and Final Particle Locations&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -109,9 +127,7 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 <div class="figure align-center">
 <img alt="../_images/demo22.png" src="../_images/demo22.png" />
 </div>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">finaltimes</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">)):</span>
-<span class="gp">&gt;&gt;&gt; </span>   <span class="n">finaltimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of particle travel times for final particle locations: &#39;</span> <span class="o">+</span>
 <span class="gp">&gt;&gt;&gt; </span>      <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">finaltimes</span><span class="p">)))</span>
 

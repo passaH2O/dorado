@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dorado.lagrangian_walker &#8212; dorado 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dorado.routines" href="routines.html" />
+    <link rel="prev" title="dorado.particle_track" href="particletrack.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-dorado.lagrangian_walker">
+<span id="dorado-lagrangian-walker"></span><span id="lagrangianwalker"></span><h1>dorado.lagrangian_walker<a class="headerlink" href="#module-dorado.lagrangian_walker" title="Permalink to this headline">¶</a></h1>
+<p>Core functions to handle the Lagrangian random walk movement of the particles.</p>
+<p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
+<dl class="function">
+<dt id="dorado.lagrangian_walker.calc_travel_times">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">calc_travel_times</code><span class="sig-paren">(</span><em>Particles</em>, <em>new_cell</em>, <em>ind</em>, <em>new_ind</em>, <em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calc_travel_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.calc_travel_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate travel time for particle to get to the new location.</p>
+<p>Function to calculate the travel time for the particle to get from the
+current location to the new location. Calculated by taking the inverse
+of the velocity at the old and new locations.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Particles<span class="classifier"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></span></dt><dd><p>A <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object</p>
+</dd>
+<dt>new_cell<span class="classifier"><cite>int</cite></span></dt><dd><p>Integer 1-8 indicating new location in D-8 way</p>
+</dd>
+<dt>ind<span class="classifier"><cite>tuple</cite></span></dt><dd><p>Tuple (x,y) of the current location</p>
+</dd>
+<dt>new_ind<span class="classifier"><cite>tuple</cite></span></dt><dd><p>Tuple (x,y) of the new location</p>
+</dd>
+<dt>dist<span class="classifier"><cite>float</cite></span></dt><dd><p>Distance between current (old) and new particle location</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>trav_time<span class="classifier"><cite>float</cite></span></dt><dd><p>Travel time it takes the particle to get from the current
+location to the new proposed location using the inverse of the
+average velocity</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.calculate_new_ind">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">calculate_new_ind</code><span class="sig-paren">(</span><em>ind</em>, <em>new_cell</em>, <em>iwalk</em>, <em>jwalk</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calculate_new_ind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.calculate_new_ind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new cell location (1-8 value) to the previous index.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>ind<span class="classifier"><cite>tuple</cite></span></dt><dd><p>Tuple (x,y) of old particle location</p>
+</dd>
+<dt>new_cell<span class="classifier"><cite>int</cite></span></dt><dd><p>Integer 1-8 indicating new cell location relative to the old
+one in a D-8 sense</p>
+</dd>
+<dt>iwalk<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>A D8 array with the positive and negative x directions</p>
+</dd>
+<dt>jwalk<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>A D8 array with the positive and negative y directions</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>new_ind<span class="classifier"><cite>tuple</cite></span></dt><dd><p>tuple (x,y) of the new particle location</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.check_for_boundary">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">check_for_boundary</code><span class="sig-paren">(</span><em>new_inds</em>, <em>current_inds</em>, <em>cell_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#check_for_boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.check_for_boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure new location is not a boundary cell.</p>
+<p>Function to make sure particle is not exiting the boundary with the
+proposed new location.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>new_inds<span class="classifier"><cite>list</cite></span></dt><dd><p>List [] of tuples (x,y) of new indices</p>
+</dd>
+<dt>current_inds<span class="classifier"><cite>list</cite></span></dt><dd><p>List [] of tuples (x,y) of old indices</p>
+</dd>
+<dt>cell_type<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Array of the different types of cells in the domain where 2 = land,
+1 = channel, 0 = ocean, and -1 = edge. If not explicitly defined
+then the values are estimated based on the depth array and the
+defined dry_depth</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>new_inds<span class="classifier"><cite>list</cite></span></dt><dd><p>list [] of tuples (x,y) of new indices where any proposed
+indices outside of the domain have been replaced by the old
+indices so those particles will not travel this iteration</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.get_weight">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">get_weight</code><span class="sig-paren">(</span><em>Particles</em>, <em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#get_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.get_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign weights to cells surrounding current index.</p>
+<p>Function to assign weights to the surrounding 8 cells around the
+current index and randomly choose one of those cells.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Particles<span class="classifier"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></span></dt><dd><p>A <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object</p>
+</dd>
+<dt>ind<span class="classifier"><cite>tuple</cite></span></dt><dd><p>Tuple (x,y) with the current location indices</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>new_cell<span class="classifier"><cite>int</cite></span></dt><dd><p>New location given as a value between 1 and 8 (inclusive)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.particle_stepper">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">particle_stepper</code><span class="sig-paren">(</span><em>Particles</em>, <em>current_inds</em>, <em>travel_times</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#particle_stepper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.particle_stepper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Step particles a single iteration.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Particles: <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></dt><dd><p>A <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object.</p>
+</dd>
+<dt>current_inds<span class="classifier"><cite>list</cite></span></dt><dd><p>List of tuples of the current particle (x,y) locations in space</p>
+</dd>
+<dt>travel_times<span class="classifier"><cite>list</cite></span></dt><dd><p>List of initial travel times for the particles</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>new_inds<span class="classifier"><cite>list</cite></span></dt><dd><p>List of the new particle locations after the single iteration</p>
+</dd>
+<dt>travel_times<span class="classifier"><cite>list</cite></span></dt><dd><p>List of the travel times associated with the particle movements</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.random">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">random</code><span class="sig-paren">(</span><em>size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#dorado.lagrangian_walker.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return random floats in the half-open interval [0.0, 1.0). Alias for
+<cite>random_sample</cite> to ease forward-porting to the new random API.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.random_pick">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">random_pick</code><span class="sig-paren">(</span><em>probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#random_pick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.random_pick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick value from weighted probability array.</p>
+<p>Randomly pick a number weighted by array probs (len 8)
+Return the index of the selected weight in array probs</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>probs<span class="classifier"><cite>list</cite></span></dt><dd><p>8 values indicating the probability (weight) associated with
+the surrounding cells for the random walk</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>idx<span class="classifier"><cite>int</cite></span></dt><dd><p>1-8 value chosen randomly based on the weighted probabilities</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.random_pick_seed">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">random_pick_seed</code><span class="sig-paren">(</span><em>choices</em>, <em>probs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#random_pick_seed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.random_pick_seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly pick a number from array of choices.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>choices<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>Array of possible values to draw from</p>
+</dd>
+<dt>probs<span class="classifier"><cite>ndarray</cite></span></dt><dd><p><em>Optional</em>, can add weighted probabilities to draw</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>choices[idx]<span class="classifier"><cite>int</cite></span></dt><dd><p>The randomly chosen value</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.steep_descent">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">steep_descent</code><span class="sig-paren">(</span><em>probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#steep_descent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.steep_descent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Choose value with greatest probability, no longer random.</p>
+<p>Pick the array value with the greatest probability, no longer a
+stochastic process, instead just choosing the steepest descent</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>probs<span class="classifier"><cite>float</cite></span></dt><dd><p>8 values indicating probability (weight) associated with the
+surrounding cells</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>idx<span class="classifier"><cite>int</cite></span></dt><dd><p>1-8 value chosen by greatest probs</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.step_update">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">step_update</code><span class="sig-paren">(</span><em>new_cell</em>, <em>distances</em>, <em>dx</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#step_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.step_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get distance to new particle location.</p>
+<p>Function to check new location is some distance away from old one,
+also provides way to track the travel distance of the particles</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>new_cell<span class="classifier"><cite>int</cite></span></dt><dd><p>Integer 1-8 indicating new location in D-8 way</p>
+</dd>
+<dt>distances<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>D8 distances between cells</p>
+</dd>
+<dt>dx<span class="classifier"><cite>float</cite></span></dt><dd><p>Length along one square cell face</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>dist<span class="classifier"><cite>float</cite></span></dt><dd><p>Distance between current (old) and new particle location</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">dorado</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quickstart</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/index.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/index.html">Paper</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/index.html">User Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../misc/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../misc/contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/acknowledgments.html">Acknowledgments</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="particletrack.html" title="previous chapter">dorado.particle_track</a></li>
+      <li>Next: <a href="routines.html" title="next chapter">dorado.routines</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apiref/lagrangianwalker.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

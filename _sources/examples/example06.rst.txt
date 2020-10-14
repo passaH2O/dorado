@@ -9,11 +9,17 @@ In this method, we allow the particles to take as many iterations as they need (
 
 Full example script available :download:`here <../../../examples/set_timestep_anuga_particles.py>`.
 
-After loading the data and establishing the parameters in the same way we did in :ref:`example01`, we will change the grid size so that the range of travel times we can obtain in this small example is a bit better constrained.
+After loading the data and establishing the parameters in the same way we did in :ref:`example01`, we will change the grid size so that the range of travel times we can obtain in this small example is a bit better constrained. Then we will just define our particle seeding locations and generate the particles so they can be used for the routing.
 
 .. doctest::
 
    >>> params.dx = 10.
+   # set up the particles
+   >>> seed_xloc = list(range(20, 30))
+   >>> seed_yloc = list(range(48, 53))
+   >>> Np_tracer = 50
+   >>> particle = pt.Particles(params)
+   >>> particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
 
 We note that by discretizing our grid and the particle routing procedure, we are unable to prescribe precise particle travel times. Due to the gridded scheme, we can only measure particle travel times when particles are located at the center of a cell. So when a target travel time is set, the particle travel times are not precisely that number, but rather the closest times corresponding to when each particle is in a cell center.
 
@@ -22,8 +28,8 @@ To set a travel time target, we will use the lower-level API and access the `par
 .. doctest::
 
    >>> walk_data = particle.run_iteration(target_time=2100)
-   >>> pr.routines.plot_state(anugaparams.depth, walk_data, iteration=0, c='b')
-   >>> pr.routines.plot_final(anugaparams.depth, walk_data, iteration=-1, c='r')
+   >>> routines.plot_state(params.depth, walk_data, iteration=0, c='b')
+   >>> routines.plot_final(params.depth, walk_data, iteration=-1, c='r')
    >>> plt.title('Initial and Final Particle Locations')
    >>> plt.show()
 
@@ -33,13 +39,12 @@ To see how close we are to the prescribed target travel time of 2100 seconds, we
 
 .. doctest::
 
-   >>> _, _, finaltimes = get_state(walk_data)
+   >>> _, _, finaltimes = routines.get_state(walk_data)
    >>> print('List of particle travel times for final particle locations: ' +
    >>>       str(np.round(finaltimes)))
 
-   List of particle travel times for final particle locations: [2158.
-   2118. 2088. 2149. 2096. 2206. 2104. 2104. 2207. 2137. 2097. 2147.
-   2032. 2118. 2084. 2037. 2066. 2076. 2104. 2108. 2033. 2101. 2080.
-   2072. 2031. 2041. 2076. 2063. 2125. 2102. 2140. 2178. 2173. 2097.
-   2104. 2189. 2061. 2112. 2074. 2095. 2100. 2177. 2069. 2032. 2050.
-   2086. 2036. 2109. 2078. 2047.]
+   List of particle travel times for final particle locations: [2042. 2064.
+   2106. 2087. 2085. 2102. 2069. 2089. 2090. 2091. 2051. 2106.
+   2111. 2119. 2140. 2129. 2101. 2083. 2091. 2145. 2179. 2080. 2067. 2100.
+   2163. 2096. 2125. 2079. 2129. 2151. 2122. 2089. 2137. 2112. 2093. 2093.
+   2102. 2102. 2099. 2042. 2070. 2108. 2115. 2115. 2108. 2112. 2062. 2124.]

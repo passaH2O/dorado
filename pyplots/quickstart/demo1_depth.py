@@ -1,11 +1,11 @@
 """Plot for quickstart demo 1."""
 import matplotlib.pyplot as plt
-from dorado.example_data.define_params import make_rcm_params
+from dorado.example_data.define_params import make_rcm_particles
 
-params = make_rcm_params()
+particles = make_rcm_particles()
 fig = plt.figure()
 ax = plt.gca()
-im = ax.imshow(params.depth)
+im = ax.imshow(particles.depth)
 plt.title('Water Depth')
 cax = fig.add_axes([ax.get_position().x1+0.01,
                     ax.get_position().y0,

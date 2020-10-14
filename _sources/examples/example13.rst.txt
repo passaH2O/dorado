@@ -36,8 +36,7 @@ Import necessary dependencies
     from matplotlib import pyplot as plt
     import json
     import dorado
-    from dorado import particle_track as pt
-    from dorado import routines
+    import dorado.particle_track as pt
 
 
 Load in model outputs
@@ -271,30 +270,20 @@ Set up particle routing parameters
 
 Now that we have pre-converted the input data we need, let’s set up the
 particle routing to be run. We do this using the
-``particle_track.params`` class, in which we populate the attributes to
-suit our application. This includes the gridded hydrodynamic outputs
-from above, the seed location, and other features of our particle
-application (e.g. grid size ``dx``, number of particles ``Np_tracer``,
-coefficients of the random walk).
+``particle_track.modelParams`` class, in which we populate the attributes to
+suit our application. This includes the gridded hydrodynamic outputs from 
+above, the grid size ``dx``, and tuning parameters which influence our random walk.
 
 .. code:: ipython
 
     # Create the parameters object and then assign the values
-    params = pt.params()
+    params = pt.modelParams()
 
-    # Populate the params variables
+    # Populate the params attributes
     params.stage = stage
     params.depth = depth
     params.qx = qx
     params.qy = qy
-
-    # Now we in the region +/- 1 cell of the seed location we computed earlier
-    # Note that "xloc" and "yloc" are x and y in the particle coordinate system!
-    params.seed_xloc = [seedind[0][0]-1, seedind[0][0]+1]
-    params.seed_yloc = [seedind[0][1]-1, seedind[0][1]+1]
-
-    # For this example, we model 50 particles:
-    params.Np_tracer = 50
 
     # Other choices/parameters
     params.dx = 1. # Grid size
@@ -305,6 +294,39 @@ coefficients of the random walk).
 In this application, we are using the default values for the parameters
 of the random walk (``gamma``, ``theta``, ``diff_coeff``). I encourage
 you to play with these weights and see how your solution is affected.
+
+Generate particles
+~~~~~~~~~~~~~~~~~~
+
+Now we instantiate the ``particle_track.Particles`` class, and generate 
+some particles to be routed. Here we are using the ``'random'`` method 
+to generate particles, which seeds them randomly within a specified region. 
+If we knew exactly where we wanted particles, we could call the 
+``'exact'`` method instead.
+
+.. code:: ipython
+
+    # Now we seed in the region +/- 1 cell of the seed location we computed earlier
+    # Note that "xloc" and "yloc" are x and y in the particle coordinate system!
+    params.seed_xloc = [seedind[0][0]-1, seedind[0][0]+1]
+    params.seed_yloc = [seedind[0][1]-1, seedind[0][1]+1]
+
+    # For this example, we model 50 particles:
+    params.Np_tracer = 50
+    
+    # Initialize particles and generate particles
+    particles = pt.Particles(params)
+    particles.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+
+
+.. parsed-literal::
+
+    Theta parameter not specified - using 1.0
+    Gamma parameter not specified - using 0.05
+    Diffusion coefficient not specified - using 0.2
+    Cell Types not specified - Estimating from depth
+    Using weighted random walk
+
 
 Run the particle routing
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,26 +347,20 @@ dict. This dict is organized into ``['xinds']``, ``['yinds']``, and
 finally iteration number. (e.g. ``walk_data['xinds'][5][10]`` will
 return the xindex for the 6th particle’s 11th iteration).
 
+Note that, while this function returns a ``walk_data`` dictionary, this 
+information is also stored as an attribute of the particles class, 
+accessible via ``particles.walk_data``.
+
 .. code:: ipython
 
     # Using steady (time-invariant) plotting routine for 200 iterations
-    walk_data = routines.steady_plots(params, 200, 'unstructured_grid_anuga')
+    walk_data = dorado.routines.steady_plots(particles, 200, 'unstructured_grid_anuga')
     # Outputs will be saved in the folder 'unstructured_grid_anuga'
 
 
 .. parsed-literal::
 
-    Theta parameter not specified - using 1.0
-    Gamma parameter not specified - using 0.05
-    Diffusion coefficient not specified - using 0.2
-    Cell Types not specified - Estimating from depth
-    Using weighted random walk
-    Directories already exist
-
-
-.. parsed-literal::
-
-    100%|################################################################################| 200/200 [01:43<00:00,  1.94it/s]
+    100%|################################################################################| 200/200 [02:44<00:00,  1.21it/s]
 
 
 Because the particles take different travel paths, at any given
@@ -361,13 +377,17 @@ number.
 
 .. code:: ipython
 
-    xi, yi, ti = routines.get_state(walk_data)
-    print(ti)
+    xi, yi, ti = dorado.routines.get_state(walk_data)
+    print([round(t, 1) for t in ti])
 
 
 .. parsed-literal::
 
-    [265.49809934928425, 274.94251871162766, 284.81791839897977, 284.5477688667267, 303.1864479200722, 298.17222516065874, 272.6641530423291, 266.0862922952372, 351.373734333658, 283.77793522819405, 305.6739768877436, 307.37347412453516, 371.9278370985112, 354.82431957686254, 274.83774102910223, 323.1084291243818, 327.3923736890329, 291.32472310706464, 260.03387904829134, 332.5389772183608, 346.10742004405, 273.1838317620726, 288.9886334582885, 283.6613461994197, 275.01792816811127, 340.2764338509763, 276.49122325099637, 283.4006343397997, 320.0327248967139, 368.1455263315037, 262.17217679821584, 302.1498741709681, 291.35649376381184, 328.709884075514, 280.5716490424755, 290.9019072706647, 285.83270848854556, 287.6384125389391, 274.56682899570814, 282.5740608216943, 306.0197251195993, 341.50433755374485, 298.0967320335991, 285.78904850300944, 289.2900736094099, 281.92565769484133, 314.956172125463, 278.5259141919523, 282.39506170534554, 330.3238018528977]
+    [284.1, 292.6, 301.7, 293.1, 294.2, 319.2, 275.1, 332.2, 302.7, 273.2, 
+    303.0, 303.4, 297.2, 304.5, 281.1, 297.7, 270.8, 300.1, 299.0, 318.7, 
+    274.5, 293.8, 288.5, 397.7, 332.9, 274.3, 271.1, 302.7, 298.6, 314.4, 
+    317.9, 284.3, 332.5, 294.8, 313.7, 302.1, 291.5, 311.6, 326.2, 302.1, 
+    274.0, 307.0, 275.0, 273.7, 317.2, 367.2, 272.9, 307.9, 294.5, 280.6]
 
 
 **Note:** There exists an equivalent function, ``get_time_state()``,
@@ -388,46 +408,51 @@ model output.
 .. code:: ipython
 
     # # Specify folder to save figures:
-    # path2folder = 'place_to_save_figures'
+    # path2folder = 'unstructured_grid_anuga'
 
-    # # Let's say our model outputs update every hour:
-    # model_timestep = 3600. # Units in seconds
+    # # Let's say our model outputs update minute:
+    # model_timestep = 60. # Units in seconds
     # # Number of steps to take in total:
-    # num_steps = 24 # Run for one day
+    # num_steps = 20
     # # Create vector of target times
-    # target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
+    # target_times = np.arange(model_timestep, 
+    #                          model_timestep*(num_steps+1), 
+    #                          model_timestep)
 
-    # # Initialize the walk_data dict so we can feed it back into the function after each loop
-    # walk_data = None
     # # Iterate through model timesteps
-    # for i in list(range(0, num_steps+1)):
-    #     # The main functional difference with an unsteady model is re-instantiating the
+    # for i in list(range(num_steps)):
+    #     # The main functional difference with an unsteady model is re-instantiating the 
     #     # particle class with updated params *inside* the particle routing loop
 
     #     # Update the flow field by gridding new time-step
-    #     params.depth = myinterp(unstructured['depth'][i])
-    #     params.stage = myinterp(unstructured['stage'][i])
-    #     params.qx = myinterp(unstructured['qx'][i])
-    #     params.qy = myinterp(unstructured['qy'][i])
-    #     # Above assumes that dictionary had additional time-steps per variable
+    #     # We don't have additional timesteps, but if we did, we update params here:
+    #     params.depth = myInterp(unstructured['depth'])
+    #     params.stage = myInterp(unstructured['stage'])
+    #     params.qx = myInterp(unstructured['qx'])
+    #     params.qy = myInterp(unstructured['qy'])
 
     #     # Define the particle class and continue
-    #     particle = pt.Particle(params)
+    #     particle = pt.Particles(params)
+    #     # Generate some particles
+    #     if i == 0:
+    #         particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    #     else:
+    #         particle.generate_particles(0, [], [], 'random', walk_data)
 
     #     # Run the random walk for this "model timestep"
-    #     walk_data = particle.run_iteration(previous_walk_data=walk_data,
-    #                                        target_time=target_times[i])
+    #     walk_data = particle.run_iteration(target_times[i])
 
-    #     # Use get_state() to return original and most recent locations
-    #     x0, y0, t0 = routines.get_state(walk_data, 0) # Starting locations
-    #     xi, yi, ti = routines.get_state(walk_data) # Most recent locations
+    #     # Use get_state() to return original and most recent locations 
+    #     x0, y0, t0 = dorado.routines.get_state(walk_data, 0) # Starting locations
+    #     xi, yi, ti = dorado.routines.get_state(walk_data) # Most recent locations
 
     #     # Make and save plots and data
     #     fig = plt.figure(dpi=200)
+    #     ax = fig.add_subplot(111)
     #     ax.scatter(y0, x0, c='b', s=0.75)
     #     ax.scatter(yi, xi, c='r', s=0.75)
     #     ax = plt.gca()
-    #     im = ax.imshow(params.depth)
+    #     im = ax.imshow(particle.depth)
     #     plt.title('Depth at Time ' + str(target_times[i]))
     #     cax = fig.add_axes([ax.get_position().x1+0.01,
     #                         ax.get_position().y0,
@@ -435,7 +460,7 @@ model output.
     #                         ax.get_position().height])
     #     cbar = plt.colorbar(im, cax=cax)
     #     cbar.set_label('Water Depth [m]')
-    #     plt.savefig(path2folder + '/output'+str(i)+'.png')
+    #     plt.savefig(path2folder + '/output_by_dt'+str(i)+'.png')
     #     plt.close()
 
 Analyze the outputs
@@ -466,7 +491,7 @@ size (i.e. +/- dx/2)
 
 .. parsed-literal::
 
-    (624465.25, 3347077.0)
+    (624465.25, 3347079.0)
 
 
 For something a little more interesting, let’s measure the amount of
@@ -518,10 +543,10 @@ generate plots of the cumulative and differential forms of the ETD
     exposure_times = pt.exposure_time(walk_data,
                                       regions)
     # Then generate plots and save data
-    routines.plot_exposure_time(walk_data,
-                                exposure_times,
-                                'unstructured_grid_anuga/figs',
-                                timedelta = 60, nbins=20)
+    exposure_times = dorado.routines.plot_exposure_time(walk_data,
+                                                        exposure_times,
+                                                        'unstructured_grid_anuga/figs',
+                                                        timedelta = 60, nbins=20)
     # Changing 'timedelta' will change the units of the time-axis.
     # Units are seconds, so 60 will plot by minute.
     # Because we are using fewer particles than ideal, smooth the plots with small 'nbins'
@@ -529,7 +554,7 @@ generate plots of the cumulative and differential forms of the ETD
 
 .. parsed-literal::
 
-    100%|#################################################################################| 50/50 [00:00<00:00, 769.23it/s]
+    100%|#################################################################################| 50/50 [00:00<00:00, 1190.48it/s]
 
 
 

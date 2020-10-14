@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 1.0.0 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -49,27 +49,17 @@
 <span class="kn">import</span> <span class="nn">scipy</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">from</span> <span class="nn">.particle_tools</span> <span class="kn">import</span> <span class="n">Tools</span>
+<span class="kn">import</span> <span class="nn">dorado.lagrangian_walker</span> <span class="k">as</span> <span class="nn">lw</span>
 
 
-<div class="viewcode-block" id="params"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.params">[docs]</a><span class="k">class</span> <span class="nc">params</span><span class="p">:</span>
+<div class="viewcode-block" id="modelParams"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.modelParams">[docs]</a><span class="k">class</span> <span class="nc">modelParams</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parameter class with attributes and grid particles will be routed on.</span>
 
-<span class="sd">    The parameters class, `params`, must be populated with user-defined</span>
+<span class="sd">    The parameters class, :obj:`dorado.particle_track.modelParams`,</span>
+<span class="sd">    must be populated with user-defined</span>
 <span class="sd">    attributes of the grid the particles will be modeled on.</span>
 
 <span class="sd">    **Required Parameters:**</span>
-
-<span class="sd">        seed_xloc : `list`</span>
-<span class="sd">            List of x-coordinates over which to initially distribute the</span>
-<span class="sd">            particles</span>
-
-<span class="sd">        seed_yloc : `list`</span>
-<span class="sd">            List of y-coordinates over which to initially distribute the</span>
-<span class="sd">            particles</span>
-
-<span class="sd">        Np_tracer : `int`</span>
-<span class="sd">            Number of particles to use</span>
 
 <span class="sd">        dx : `float`</span>
 <span class="sd">            Length along one square cell face</span>
@@ -139,12 +129,13 @@
 <span class="sd">            used to route the particles. Default value is False.</span>
 
 <span class="sd">    This list of expected parameter values can also be obtained by querying the</span>
-<span class="sd">    class attributes with `dir(params)`, `params.__dict__`, or `vars(params)`.</span>
+<span class="sd">    class attributes with `dir(modelParams)`, `modelParams.__dict__`, or</span>
+<span class="sd">    `vars(modelParams)`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="params.__init__"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.params.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create the expected variables for the params class.</span>
+<div class="viewcode-block" id="modelParams.__init__"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.modelParams.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the expected variables for the modelParams class.</span>
 
 <span class="sd">        Variables are initialized as NoneType they need to be assigned by the</span>
 <span class="sd">        user. Due to the wide variety of data formats produced by differeny</span>
@@ -152,9 +143,6 @@
 <span class="sd">        handled on a case-by-case basis.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="kc">None</span>
@@ -164,14 +152,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="kc">None</span></div></div>
 
 
-<div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span><span class="n">Tools</span><span class="p">):</span>
+<div class="viewcode-block" id="Particles"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles">[docs]</a><span class="k">class</span> <span class="nc">Particles</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Class for the particle(s) that is(are) going to be routed.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Particle.__init__"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particle.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="Particles.__init__"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check input parameters and assign default values where/if needed.</span>
 
-<span class="sd">        Methods require a class of parameters (:obj:`params`) to be passed to</span>
-<span class="sd">        the Particles class. e.g. particle = Particles(params)</span>
+<span class="sd">        Methods require a class of parameters</span>
+<span class="sd">        (:obj:`dorado.particle_track.modelParams`) to be passed</span>
+<span class="sd">        to the Particles class. e.g. particle = Particles(modelParams)</span>
 
 <span class="sd">        Initialization tries to assign each value from the parameter class,</span>
 <span class="sd">        otherwise an error is raised or default values are assigned when</span>
@@ -179,29 +168,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># REQUIRED PARAMETERS #</span>
-        <span class="c1"># Define the seeding locations as list of x and y locations</span>
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;seed_xloc&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No tracer seeding x-locations (params.seed_xloc)&quot;</span>
-                             <span class="s2">&quot; have been defined&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">seed_xloc</span>
-
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;seed_yloc&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No tracer seeding y-locations (params.seed_yloc)&quot;</span>
-                             <span class="s2">&quot; have been defined&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">seed_yloc</span>
-
-        <span class="c1"># Define the number of tracers to be simulated</span>
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;Np_tracer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of tracer particles (params.Np_tracer)&quot;</span>
-                             <span class="s2">&quot; has not been defined&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">Np_tracer</span>
-
         <span class="c1"># Define the length along one cell face (assuming square cells)</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;dx&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of cell face (params.dx) is undefined&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of cell face (modelParams.dx) is&quot;</span>
+                             <span class="s2">&quot; undefined&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">dx</span>
 
@@ -435,16 +405,162 @@
             <span class="c1"># defined if not given</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>
                                     <span class="p">[</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                    <span class="p">[</span><span class="mi">5</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">]])</span></div>
+                                    <span class="p">[</span><span class="mi">5</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">]])</span>
+
+        <span class="c1"># initialize number of particles as 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># initialize the walk_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="c1"># function to clear walk data if you&#39;ve made a mistake while generating it</span>
+<div class="viewcode-block" id="Particles.clear_walk_data"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles.clear_walk_data">[docs]</a>    <span class="k">def</span> <span class="nf">clear_walk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Manually reset self.walk_data back to None.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="c1"># generate a group of particles in a set of initial locations</span>
+<div class="viewcode-block" id="Particles.generate_particles"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles.generate_particles">[docs]</a>    <span class="k">def</span> <span class="nf">generate_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                           <span class="n">Np_tracer</span><span class="p">,</span>
+                           <span class="n">seed_xloc</span><span class="p">,</span>
+                           <span class="n">seed_yloc</span><span class="p">,</span>
+                           <span class="n">method</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">,</span>
+                           <span class="n">previous_walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a set of particles in defined locations.</span>
+
+<span class="sd">        After a :obj:`dorado.particle_track.Particles` class has been</span>
+<span class="sd">        initialized, this function can be called to create some particles</span>
+<span class="sd">        within a given region. If particles are to be seeded in different</span>
+<span class="sd">        groupings in different regions, this function can be called multiple</span>
+<span class="sd">        times in succession prior to moving them via</span>
+<span class="sd">        :obj:`dorado.particle_track.run_iteration`.</span>
+
+<span class="sd">        Walk data is stored within :obj:`dorado.particle_track.Particles` as</span>
+<span class="sd">        `Particles.walk_data` so if this method is called in succession, even</span>
+<span class="sd">        without the `previous_walk_data` flag, the new particle seed locations</span>
+<span class="sd">        will be appended to the `walk_data` attribute of</span>
+<span class="sd">        :obj:`dorado.particle_track.Particles`.</span>
+
+<span class="sd">        **Inputs** :</span>
+
+<span class="sd">            Np_tracer : `int`</span>
+<span class="sd">                Number of particles to generate.</span>
+
+<span class="sd">            seed_xloc : `list`</span>
+<span class="sd">                List of x-coordinates over which to initially distribute the</span>
+<span class="sd">                particles.</span>
+
+<span class="sd">            seed_yloc : `list`</span>
+<span class="sd">                List of y-coordinates over which to initially distribute the</span>
+<span class="sd">                particles.</span>
+
+<span class="sd">            method : `str`, optional</span>
+<span class="sd">                Specify the type of particle generation you wish to use.</span>
+<span class="sd">                Current options are &#39;random&#39; and &#39;exact&#39; for seeding particles</span>
+<span class="sd">                either randomly across a set of points, or exactly at a set</span>
+<span class="sd">                of defined locations. If unspecified, the default is &#39;random&#39;.</span>
+
+<span class="sd">            previous_walk_data : `dict`, optional</span>
+<span class="sd">                Dictionary of all prior x locations, y locations, and travel</span>
+<span class="sd">                times. This input parameter should only be used if &#39;new&#39; or</span>
+<span class="sd">                &#39;indpendent&#39; walk data exists (e.g. data loaded from a .json</span>
+<span class="sd">                file). Otherwise the walk data stored in `self.walk_data` is</span>
+<span class="sd">                likely to contain the previous information. Order of indices is</span>
+<span class="sd">                previous_walk_data[field][particle][iter], where e.g.</span>
+<span class="sd">                [&#39;travel_times&#39;][5][10] is the travel time of the 5th particle</span>
+<span class="sd">                at the 10th iteration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if the values in self are invalid the input checked will catch them</span>
+        <span class="c1"># do input type checking</span>
+        <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span> <span class="o">=</span> <span class="n">gen_input_check</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span>
+                                                          <span class="n">seed_xloc</span><span class="p">,</span>
+                                                          <span class="n">seed_yloc</span><span class="p">,</span>
+                                                          <span class="n">method</span><span class="p">)</span>
+
+        <span class="n">init_walk_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># create init_walk_data dictionary</span>
+
+        <span class="c1"># initialize new travel times list</span>
+        <span class="n">new_start_times</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span><span class="o">*</span><span class="n">Np_tracer</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="c1"># create random start indices based on x, y locations and np_tracer</span>
+            <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="p">[</span><span class="n">lw</span><span class="o">.</span><span class="n">random_pick_seed</span><span class="p">(</span><span class="n">seed_xloc</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span>
+                                  <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">))]</span>
+            <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="p">[</span><span class="n">lw</span><span class="o">.</span><span class="n">random_pick_seed</span><span class="p">(</span><span class="n">seed_yloc</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span>
+                                  <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">))]</span>
+
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;exact&#39;</span><span class="p">:</span>
+            <span class="c1"># step through seed lists to create exact list of start locations</span>
+            <span class="c1"># if number of particles exceeds length of seed lists, loop back</span>
+            <span class="c1"># to beginning of the seed lists and continue from there</span>
+            <span class="n">Np_to_seed</span> <span class="o">=</span> <span class="n">Np_tracer</span>
+            <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">while</span> <span class="n">Np_to_seed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seed_xloc</span><span class="p">)):</span>
+                    <span class="c1"># condition if we run out of particles within this loop</span>
+                    <span class="k">if</span> <span class="n">Np_to_seed</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="c1"># otherwise keep on seeding</span>
+                    <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="n">new_start_xindices</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed_xloc</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="n">new_start_yindices</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed_yloc</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">Np_to_seed</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># reduce number of particles left to seed</span>
+
+        <span class="c1"># Now initialize vectors that will create the structured list</span>
+        <span class="n">new_xinds</span> <span class="o">=</span> <span class="p">[[</span><span class="n">new_start_xindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                     <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">))]</span>
+        <span class="n">new_yinds</span> <span class="o">=</span> <span class="p">[[</span><span class="n">new_start_yindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                     <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">))]</span>
+        <span class="n">new_times</span> <span class="o">=</span> <span class="p">[[</span><span class="n">new_start_times</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">))]</span>
+
+        <span class="c1"># establish the start values</span>
+        <span class="n">start_xindices</span> <span class="o">=</span> <span class="n">new_xinds</span>
+        <span class="n">start_yindices</span> <span class="o">=</span> <span class="n">new_yinds</span>
+        <span class="n">start_times</span> <span class="o">=</span> <span class="n">new_times</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># if there is walk_data from a previous call to the generator,</span>
+            <span class="c1"># or from simulating particle transport previously, then we want</span>
+            <span class="c1"># to keep it and append the new data to it</span>
+            <span class="n">internal_xinds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span>
+            <span class="n">internal_yinds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span>
+            <span class="n">internal_times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
+
+            <span class="c1"># combine internal and new lists of particle information</span>
+            <span class="n">start_xindices</span> <span class="o">=</span> <span class="n">internal_xinds</span> <span class="o">+</span> <span class="n">start_xindices</span>
+            <span class="n">start_yindices</span> <span class="o">=</span> <span class="n">internal_yinds</span> <span class="o">+</span> <span class="n">start_yindices</span>
+            <span class="n">start_times</span> <span class="o">=</span> <span class="n">internal_times</span> <span class="o">+</span> <span class="n">start_times</span>
+
+        <span class="k">if</span> <span class="n">previous_walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If the generator has been run before, or if new</span>
+            <span class="c1"># particles are going to be added to a set of pre-existing</span>
+            <span class="c1"># particles, then the walk_data dictionary from either can</span>
+            <span class="c1"># be fed into this function as input</span>
+            <span class="n">prev_xinds</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span>
+            <span class="n">prev_yinds</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span>
+            <span class="n">prev_times</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
+
+            <span class="c1"># combine previous and new lists of particle information</span>
+            <span class="n">start_xindices</span> <span class="o">=</span> <span class="n">prev_xinds</span> <span class="o">+</span> <span class="n">start_xindices</span>
+            <span class="n">start_yindices</span> <span class="o">=</span> <span class="n">prev_yinds</span> <span class="o">+</span> <span class="n">start_yindices</span>
+            <span class="n">start_times</span> <span class="o">=</span> <span class="n">prev_times</span> <span class="o">+</span> <span class="n">start_times</span>
+
+        <span class="c1"># determine the new total number of particles we have now</span>
+        <span class="c1"># additive in the event we are running the generate multiple times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">+=</span> <span class="n">Np_tracer</span>
+
+        <span class="c1"># store information in the init_walk_data dictionary and return it</span>
+        <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_xindices</span>
+        <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_yindices</span>
+        <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_times</span>
+
+        <span class="c1"># store the initialized walk data within self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">init_walk_data</span></div>
 
     <span class="c1"># run an iteration where particles are moved</span>
     <span class="c1"># have option of specifying the particle start locations</span>
     <span class="c1"># otherwise they are randomly placed within x and y seed locations</span>
-<div class="viewcode-block" id="Particle.run_iteration"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particle.run_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">run_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                      <span class="n">start_xindices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">start_yindices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">start_times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">previous_walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Particles.run_iteration"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles.run_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">run_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                       <span class="n">target_time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run an iteration of the particle routing.</span>
 
@@ -453,29 +569,7 @@
 
 <span class="sd">        **Inputs** :</span>
 
-<span class="sd">            start_xindices : `list`</span>
-<span class="sd">                List of x locations to seed the particles [x1, x2, x3, ..., xn]</span>
-<span class="sd">                if undefined, uses starting locations as given by the Particles</span>
-<span class="sd">                class (seed_xloc)</span>
-
-<span class="sd">            start_yindices : `list`</span>
-<span class="sd">                List of y locations to seed the particles [y1, y2, y3, ..., yn]</span>
-<span class="sd">                if undefined, uses starting locations as given by the Particles</span>
-<span class="sd">                class (seed_yloc)</span>
-
-<span class="sd">            start_times : `list`</span>
-<span class="sd">                List of particle travel times [t1, t2, t3, ..., tn] if</span>
-<span class="sd">                undefined, assumes no particles have travelled yet, so assigns</span>
-<span class="sd">                zeros</span>
-
-<span class="sd">            previous_walk_data : `dict`</span>
-<span class="sd">                Dictionary of all prior x locations, y locations, and travel</span>
-<span class="sd">                times. Order of indices is</span>
-<span class="sd">                previous_walk_data[field][particle][iter], where e.g.</span>
-<span class="sd">                [&#39;travel_times&#39;][5][10] is the travel time of the 5th particle</span>
-<span class="sd">                at the 10th iteration</span>
-
-<span class="sd">            target_time : `float`</span>
+<span class="sd">            target_time : `float`, optional</span>
 <span class="sd">                The travel time (seconds) each particle should aim to have at</span>
 <span class="sd">                end of this iteration. If left undefined, then just one</span>
 <span class="sd">                iteration is run and the particles will be out of sync in time.</span>
@@ -485,46 +579,36 @@
 <span class="sd">        **Outputs** :</span>
 
 <span class="sd">            all_walk_data : `dict`</span>
-<span class="sd">                Dictionary of all x and y locations and travel times, with</span>
-<span class="sd">                details same as input previous_walk_data</span>
+<span class="sd">                Dictionary of all x and y locations and travel times. Order of</span>
+<span class="sd">                indices is previous_walk_data[field][particle][iter],</span>
+<span class="sd">                where [&#39;travel_times&#39;][5][10] is the travel time of the 5th</span>
+<span class="sd">                particle at the 10th iteration</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if there is no walk data raise an error</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Particles have not been initialized.&#39;</span>
+                             <span class="s1">&#39; Call the `particle_generator()` function.&#39;</span><span class="p">)</span>
+
         <span class="n">all_walk_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># init all_walk_data dictionary</span>
 
-        <span class="k">if</span> <span class="n">previous_walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># If particle tracking has been run before</span>
-            <span class="c1"># feed previous output array back into input</span>
-            <span class="c1"># If this array exists, it overrides any starting indices given</span>
-            <span class="c1"># in function call</span>
-            <span class="n">all_xinds</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span>
-            <span class="c1"># most recent locations</span>
-            <span class="n">start_xindices</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
-                              <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-            <span class="n">all_yinds</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span>
-            <span class="n">start_yindices</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_yinds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
-                              <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-            <span class="n">all_times</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
-            <span class="n">start_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
-                           <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># if start locations not defined, then randomly assign them</span>
-            <span class="k">if</span> <span class="n">start_xindices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># set starting x-index for all tracers</span>
-                <span class="n">start_xindices</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">random_pick_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_xloc</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span>
-                                  <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-            <span class="k">if</span> <span class="n">start_yindices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># set starting y-index for all tracers</span>
-                <span class="n">start_yindices</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">random_pick_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_yloc</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span>
-                                  <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-            <span class="c1"># initialize travel times list</span>
-            <span class="k">if</span> <span class="n">start_times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">start_times</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span>
-            <span class="c1"># Now initialize vectors that will create the structured list</span>
-            <span class="n">all_xinds</span> <span class="o">=</span> <span class="p">[[</span><span class="n">start_xindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
-                         <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-            <span class="n">all_yinds</span> <span class="o">=</span> <span class="p">[[</span><span class="n">start_yindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
-                         <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
-            <span class="n">all_times</span> <span class="o">=</span> <span class="p">[[</span><span class="n">start_times</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
+        <span class="c1"># if self.Np_tracer is not already defined, we can define it from</span>
+        <span class="c1"># the init_walk_data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">])</span>
+
+        <span class="c1"># read in information from the init_walk_data dictionary</span>
+        <span class="c1"># most recent locations</span>
+        <span class="n">all_xinds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span>
+        <span class="n">start_xindices</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                          <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
+        <span class="n">all_yinds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span>
+        <span class="n">start_yindices</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_yinds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                          <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
+        <span class="c1"># most recent times</span>
+        <span class="n">all_times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
+        <span class="n">start_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                       <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
 
         <span class="c1"># merge x and y indices into list of [x,y] pairs</span>
         <span class="n">start_pairs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">start_xindices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">start_yindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
@@ -532,9 +616,9 @@
 
         <span class="c1"># Do the particle movement</span>
         <span class="k">if</span> <span class="n">target_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># If we&#39;re not aiming for a specific time, run a single iteration</span>
-            <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_iteration</span><span class="p">(</span><span class="n">start_pairs</span><span class="p">,</span>
-                                                           <span class="n">start_times</span><span class="p">)</span>
+            <span class="c1"># If we&#39;re not aiming for a specific time, step the particles</span>
+            <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_pairs</span><span class="p">,</span>
+                                                         <span class="n">start_times</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">)):</span>
                 <span class="c1"># Don&#39;t duplicate location</span>
@@ -555,7 +639,7 @@
             <span class="c1"># iterate each particle until we get there</span>
             <span class="c1"># Loop through all particles</span>
             <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">previous_walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">est_next_dt</span> <span class="o">=</span> <span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Initialize a guess for the next iteration&#39;s timestep</span>
@@ -572,7 +656,7 @@
                     <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_time</span><span class="p">)</span> <span class="o">&gt;=</span> \
                           <span class="nb">abs</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">est_next_dt</span> <span class="o">-</span> <span class="n">target_time</span><span class="p">):</span>
                         <span class="c1"># for particle ii, take a step from most recent index</span>
-                        <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_iteration</span><span class="p">(</span>
+                        <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="p">[[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                                                       <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]],</span>
                                                     <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
@@ -603,7 +687,76 @@
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_yinds</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_times</span>
 
+            <span class="c1"># re-write the walk_data attribute of self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">all_walk_data</span>
+
         <span class="k">return</span> <span class="n">all_walk_data</span></div></div>
+
+
+<div class="viewcode-block" id="gen_input_check"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.gen_input_check">[docs]</a><span class="k">def</span> <span class="nf">gen_input_check</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check the inputs provided to :obj:`generate_particles()`.</span>
+
+<span class="sd">    This function does input type checking and either succeeds or returns</span>
+<span class="sd">    an error if the types provided cannot be converted to those that we</span>
+<span class="sd">    expect in :obj:`dorado.particle_track.generate_particles()`.</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        Np_tracer : `int`</span>
+<span class="sd">            Number of particles to generate.</span>
+
+<span class="sd">        seed_xloc : `list`</span>
+<span class="sd">            List of x-coordinates over which to initially distribute the</span>
+<span class="sd">            particles</span>
+
+<span class="sd">        seed_yloc : `list`</span>
+<span class="sd">            List of y-coordinates over which to initially distribute the</span>
+<span class="sd">            particles</span>
+
+<span class="sd">        method : `str`, optional</span>
+<span class="sd">            Type of particle generation to use, either &#39;random&#39; or &#39;exact&#39;.</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        Np_tracer : `int`</span>
+<span class="sd">            Number of particles to generate.</span>
+
+<span class="sd">        seed_xloc : `list`</span>
+<span class="sd">            List of x-coordinates over which to initially distribute the</span>
+<span class="sd">            particles</span>
+
+<span class="sd">        seed_yloc : `list`</span>
+<span class="sd">            List of y-coordinates over which to initially distribute the</span>
+<span class="sd">            particles</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Np_tracer input type was not int.&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># try to flatten if this is an array that is multi-dimensional</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">seed_xloc</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">seed_xloc</span> <span class="o">=</span> <span class="n">seed_xloc</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="c1"># try to coerce into a list</span>
+        <span class="n">seed_xloc</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">seed_xloc</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;seed_xloc input type was not a list.&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># try to flatten if this is an array that is multi-dimensional</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">seed_yloc</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">seed_yloc</span> <span class="o">=</span> <span class="n">seed_yloc</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="c1"># try to coerce into a list</span>
+        <span class="n">seed_yloc</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">seed_yloc</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;seed_yloc input type was not a list.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Method provided was not a string.&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="s1">&#39;exact&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Method input is not a valid method, must be&#39;</span>
+                         <span class="s1">&#39; &quot;random&quot; or &quot;exact&quot;.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span></div>
 
 
 <div class="viewcode-block" id="coord2ind"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.coord2ind">[docs]</a><span class="k">def</span> <span class="nf">coord2ind</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">raster_origin</span><span class="p">,</span> <span class="n">raster_size</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">):</span>
@@ -731,7 +884,7 @@
 <span class="sd">            Output of a previous function call to run_iteration.</span>
 
 <span class="sd">        region_of_interest : `int array`</span>
-<span class="sd">            Binary array the same size as input arrays in params class</span>
+<span class="sd">            Binary array the same size as input arrays in modelParams class</span>
 <span class="sd">            with 1&#39;s everywhere inside the region in which we want to</span>
 <span class="sd">            measure exposure time, and 0&#39;s everywhere else.</span>
 
@@ -848,16 +1001,16 @@
 
     <span class="n">gridX</span><span class="p">,</span> <span class="n">gridY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xvect</span><span class="p">,</span> <span class="n">yvect</span><span class="p">)</span>
 
-    <span class="n">inputXY</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[:],</span> <span class="n">y</span><span class="p">[:]])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">inputXY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[:],</span> <span class="n">y</span><span class="p">[:]])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
 
-    <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">scipy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridX</span><span class="p">),</span>
-                                <span class="n">scipy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridY</span><span class="p">)])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
-    <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">gridXY_array</span><span class="p">)</span>
+    <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridX</span><span class="p">),</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridY</span><span class="p">)])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">gridXY_array</span><span class="p">)</span>
 
     <span class="c1"># Create Interpolation function</span>
     <span class="k">if</span> <span class="n">k_nearest_neighbors</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Only use nearest neighbor</span>
         <span class="n">index_qFun</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">NearestNDInterpolator</span><span class="p">(</span><span class="n">inputXY</span><span class="p">,</span>
-                    <span class="n">scipy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+                     <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
         <span class="n">gridqInd</span> <span class="o">=</span> <span class="n">index_qFun</span><span class="p">(</span><span class="n">gridXY_array</span><span class="p">)</span>
 
         <span class="c1"># Function to do the interpolation</span>

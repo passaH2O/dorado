@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Example 5 - Visualizing Particle Travel Times &#8212; dorado 1.0.0 documentation</title>
+    <title>Example 5 - Visualizing Particle Travel Times &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -37,8 +37,8 @@
 <span id="example05"></span><h1>Example 5 - Visualizing Particle Travel Times<a class="headerlink" href="#example-5-visualizing-particle-travel-times" title="Permalink to this headline">¶</a></h1>
 <p>In this example we will revisit the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> model output we looked at in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>. This time, however, we will be visualizing the particle travel times in addition to their position.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/e29693d41e132dbe5f99a7109436322c/timing_anuga_particles.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
-<p>After loading the data and establishing the parameters in the same way we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will invoke the <cite>time_plots</cite> method from the <cite>routines.py</cite> code.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">time_plots</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;timing_anuga_example&#39;</span><span class="p">)</span>
+<p>After loading the data and establishing the parameters and the particles in the same way we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will invoke the <cite>time_plots</cite> method from the <cite>routines.py</cite> code.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">time_plots</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;timing_anuga_example&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In the animation the actual particle travel times are tough to see as the colorbar limits continually update, however if you run this script, you can look at the individual frames in the ‘timing_anuga_example/figs’ folder that will be created. The general idea is that the red particles have traveled for a longer time than the blue ones.</p>

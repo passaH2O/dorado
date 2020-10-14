@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 1.0.0 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="dorado.particle_tools" href="particletools.html" />
+    <link rel="next" title="dorado.lagrangian_walker" href="lagrangianwalker.html" />
     <link rel="prev" title="API Reference" href="index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -41,48 +41,87 @@ parameters of the domain as well as iterative movement of the particles
 through the domain.</p>
 <p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
 <dl class="class">
-<dt id="dorado.particle_track.Particle">
-<em class="property">class </em><code class="descclassname">dorado.particle_track.</code><code class="descname">Particle</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particle" title="Permalink to this definition">¶</a></dt>
+<dt id="dorado.particle_track.Particles">
+<em class="property">class </em><code class="descclassname">dorado.particle_track.</code><code class="descname">Particles</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for the particle(s) that is(are) going to be routed.</p>
 <dl class="method">
-<dt id="dorado.particle_track.Particle.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particle.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particle.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="dorado.particle_track.Particles.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check input parameters and assign default values where/if needed.</p>
-<p>Methods require a class of parameters (<a class="reference internal" href="#dorado.particle_track.params" title="dorado.particle_track.params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">params</span></code></a>) to be passed to
-the Particles class. e.g. particle = Particles(params)</p>
+<p>Methods require a class of parameters
+(<a class="reference internal" href="#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>) to be passed
+to the Particles class. e.g. particle = Particles(modelParams)</p>
 <p>Initialization tries to assign each value from the parameter class,
 otherwise an error is raised or default values are assigned when
 possible/sensible</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="dorado.particle_track.Particles.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#dorado.particle_track.Particles.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
 <dl class="method">
-<dt id="dorado.particle_track.Particle.run_iteration">
-<code class="descname">run_iteration</code><span class="sig-paren">(</span><em>start_xindices=None</em>, <em>start_yindices=None</em>, <em>start_times=None</em>, <em>previous_walk_data=None</em>, <em>target_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particle.run_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particle.run_iteration" title="Permalink to this definition">¶</a></dt>
+<dt id="dorado.particle_track.Particles.clear_walk_data">
+<code class="descname">clear_walk_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.clear_walk_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.clear_walk_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manually reset self.walk_data back to None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dorado.particle_track.Particles.generate_particles">
+<code class="descname">generate_particles</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>method='random'</em>, <em>previous_walk_data=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.generate_particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.generate_particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a set of particles in defined locations.</p>
+<p>After a <a class="reference internal" href="#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class has been
+initialized, this function can be called to create some particles
+within a given region. If particles are to be seeded in different
+groupings in different regions, this function can be called multiple
+times in succession prior to moving them via
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.run_iteration</span></code>.</p>
+<p>Walk data is stored within <a class="reference internal" href="#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> as
+<cite>Particles.walk_data</cite> so if this method is called in succession, even
+without the <cite>previous_walk_data</cite> flag, the new particle seed locations
+will be appended to the <cite>walk_data</cite> attribute of
+<a class="reference internal" href="#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a>.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Np_tracer<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of particles to generate.</p>
+</dd>
+<dt>seed_xloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x-coordinates over which to initially distribute the
+particles.</p>
+</dd>
+<dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
+particles.</p>
+</dd>
+<dt>method<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Specify the type of particle generation you wish to use.
+Current options are ‘random’ and ‘exact’ for seeding particles
+either randomly across a set of points, or exactly at a set
+of defined locations. If unspecified, the default is ‘random’.</p>
+</dd>
+<dt>previous_walk_data<span class="classifier"><cite>dict</cite>, optional</span></dt><dd><p>Dictionary of all prior x locations, y locations, and travel
+times. This input parameter should only be used if ‘new’ or
+‘indpendent’ walk data exists (e.g. data loaded from a .json
+file). Otherwise the walk data stored in <cite>self.walk_data</cite> is
+likely to contain the previous information. Order of indices is
+previous_walk_data[field][particle][iter], where e.g.
+[‘travel_times’][5][10] is the travel time of the 5th particle
+at the 10th iteration.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="dorado.particle_track.Particles.run_iteration">
+<code class="descname">run_iteration</code><span class="sig-paren">(</span><em>target_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.run_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.run_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run an iteration of the particle routing.</p>
 <p>Runs an iteration of the particle routing.
 Returns at each step the particle’s locations and travel times.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>start_xindices<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x locations to seed the particles [x1, x2, x3, …, xn]
-if undefined, uses starting locations as given by the Particles
-class (seed_xloc)</p>
-</dd>
-<dt>start_yindices<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y locations to seed the particles [y1, y2, y3, …, yn]
-if undefined, uses starting locations as given by the Particles
-class (seed_yloc)</p>
-</dd>
-<dt>start_times<span class="classifier"><cite>list</cite></span></dt><dd><p>List of particle travel times [t1, t2, t3, …, tn] if
-undefined, assumes no particles have travelled yet, so assigns
-zeros</p>
-</dd>
-<dt>previous_walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all prior x locations, y locations, and travel
-times. Order of indices is
-previous_walk_data[field][particle][iter], where e.g.
-[‘travel_times’][5][10] is the travel time of the 5th particle
-at the 10th iteration</p>
-</dd>
-<dt>target_time<span class="classifier"><cite>float</cite></span></dt><dd><p>The travel time (seconds) each particle should aim to have at
+<dt>target_time<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>The travel time (seconds) each particle should aim to have at
 end of this iteration. If left undefined, then just one
 iteration is run and the particles will be out of sync in time.
 Note that this loop will terminate before the target_time if
@@ -93,8 +132,10 @@ the particle exceeds the hard-coded limit of 1e4 steps</p>
 <p><strong>Outputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>all_walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all x and y locations and travel times, with
-details same as input previous_walk_data</p>
+<dt>all_walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all x and y locations and travel times. Order of
+indices is previous_walk_data[field][particle][iter],
+where [‘travel_times’][5][10] is the travel time of the 5th
+particle at the 10th iteration</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -148,7 +189,7 @@ multiple excursions into the region, all of those times are counted.</p>
 <div><dl>
 <dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Output of a previous function call to run_iteration.</p>
 </dd>
-<dt>region_of_interest<span class="classifier"><cite>int array</cite></span></dt><dd><p>Binary array the same size as input arrays in params class
+<dt>region_of_interest<span class="classifier"><cite>int array</cite></span></dt><dd><p>Binary array the same size as input arrays in modelParams class
 with 1’s everywhere inside the region in which we want to
 measure exposure time, and 0’s everywhere else.</p>
 </dd>
@@ -159,6 +200,43 @@ measure exposure time, and 0’s everywhere else.</p>
 <div><dl>
 <dt>exposure_times<span class="classifier"><cite>list</cite></span></dt><dd><p>List of exposure times to region of interest, listed
 in order of particle ID.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.particle_track.gen_input_check">
+<code class="descclassname">dorado.particle_track.</code><code class="descname">gen_input_check</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>method</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#gen_input_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.gen_input_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the inputs provided to <code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_particles()</span></code>.</p>
+<p>This function does input type checking and either succeeds or returns
+an error if the types provided cannot be converted to those that we
+expect in <code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.generate_particles()</span></code>.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Np_tracer<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of particles to generate.</p>
+</dd>
+<dt>seed_xloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x-coordinates over which to initially distribute the
+particles</p>
+</dd>
+<dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
+particles</p>
+</dd>
+<dt>method<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Type of particle generation to use, either ‘random’ or ‘exact’.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Np_tracer<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of particles to generate.</p>
+</dd>
+<dt>seed_xloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x-coordinates over which to initially distribute the
+particles</p>
+</dd>
+<dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
+particles</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -202,22 +280,15 @@ geographic position at each iteration.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="dorado.particle_track.params">
-<em class="property">class </em><code class="descclassname">dorado.particle_track.</code><code class="descname">params</code><a class="reference internal" href="../_modules/dorado/particle_track.html#params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.params" title="Permalink to this definition">¶</a></dt>
+<dt id="dorado.particle_track.modelParams">
+<em class="property">class </em><code class="descclassname">dorado.particle_track.</code><code class="descname">modelParams</code><a class="reference internal" href="../_modules/dorado/particle_track.html#modelParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.modelParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter class with attributes and grid particles will be routed on.</p>
-<p>The parameters class, <cite>params</cite>, must be populated with user-defined
+<p>The parameters class, <a class="reference internal" href="#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>,
+must be populated with user-defined
 attributes of the grid the particles will be modeled on.</p>
 <p><strong>Required Parameters:</strong></p>
 <blockquote>
 <div><dl>
-<dt>seed_xloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x-coordinates over which to initially distribute the
-particles</p>
-</dd>
-<dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
-particles</p>
-</dd>
-<dt>Np_tracer<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of particles to use</p>
-</dd>
 <dt>dx<span class="classifier"><cite>float</cite></span></dt><dd><p>Length along one square cell face</p>
 </dd>
 <dt>depth<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Array of water depth values, if absent then the stage and
@@ -276,11 +347,12 @@ used to route the particles. Default value is False.</p>
 </dl>
 </div></blockquote>
 <p>This list of expected parameter values can also be obtained by querying the
-class attributes with <cite>dir(params)</cite>, <cite>params.__dict__</cite>, or <cite>vars(params)</cite>.</p>
+class attributes with <cite>dir(modelParams)</cite>, <cite>modelParams.__dict__</cite>, or
+<cite>vars(modelParams)</cite>.</p>
 <dl class="method">
-<dt id="dorado.particle_track.params.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#params.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.params.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create the expected variables for the params class.</p>
+<dt id="dorado.particle_track.modelParams.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#modelParams.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.modelParams.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the expected variables for the modelParams class.</p>
 <p>Variables are initialized as NoneType they need to be assigned by the
 user. Due to the wide variety of data formats produced by differeny
 hydrodynamic models, this is process is not automated and must be
@@ -288,8 +360,8 @@ handled on a case-by-case basis.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="dorado.particle_track.params.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#dorado.particle_track.params.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt id="dorado.particle_track.modelParams.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#dorado.particle_track.modelParams.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
@@ -387,7 +459,7 @@ assumes data have the same coordinates. It is used as follows:
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">API Reference</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">API Reference</a></li>
-      <li>Next: <a href="particletools.html" title="next chapter">dorado.particle_tools</a></li>
+      <li>Next: <a href="lagrangianwalker.html" title="next chapter">dorado.lagrangian_walker</a></li>
   </ul></li>
   </ul></li>
 </ul>

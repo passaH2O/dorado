@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.routines &#8212; dorado 1.0.0 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dorado.parallel_routing" href="parallelrouting.html" />
-    <link rel="prev" title="dorado.particle_tools" href="particletools.html" />
+    <link rel="prev" title="dorado.lagrangian_walker" href="lagrangianwalker.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -192,12 +192,14 @@ times as a json (‘human-readable’) text file.</p>
 <blockquote>
 <div><dl>
 <dt>grid<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>A 2-D grid upon which the particles will be plotted. Examples of
-grids that might be nice to use are <cite>params.depth</cite>, <cite>params.stage</cite>,
-<cite>params.topography</cite>.</p>
+grids that might be nice to use are
+<cite>dorado.particle_track.modelParams.depth</cite>,
+<cite>dorado.particle_track.modelParams.stage</cite>,
+<cite>dorado.particle_track.modelParams.topography</cite>.</p>
 </dd>
 <dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>The dictionary with the particle information. This is the output
 from one of the other routines or the
-:obj:particle_track.run_iteration() function.</p>
+:obj:dorado.particle_track.run_iteration() function.</p>
 </dd>
 <dt>iteration<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Iteration number at which to plot the particles. Default is -1,
 i.e. the most recent step</p>
@@ -221,7 +223,7 @@ figure, default is ‘b’ for blue</p>
 
 <dl class="function">
 <dt id="dorado.routines.steady_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">steady_plots</code><span class="sig-paren">(</span><em>params</em>, <em>num_iter</em>, <em>folder_name=None</em>, <em>save_output=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#steady_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.steady_plots" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.routines.</code><code class="descname">steady_plots</code><span class="sig-paren">(</span><em>particle</em>, <em>num_iter</em>, <em>folder_name=None</em>, <em>save_output=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#steady_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.steady_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Automated particle movement in steady flow field.</p>
 <p>Function to automate plotting of particle movement over a steady flow
 fields. Particles all have same number of iterations and are allowed to
@@ -229,7 +231,8 @@ have different travel times.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>params<span class="classifier"><cite>obj</cite></span></dt><dd><p>Class of parameter values for the particles</p>
+<dt>particle<span class="classifier"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></span></dt><dd><p>An initialized <code class="xref py py-obj docutils literal notranslate"><span class="pre">particle_track.Particles</span></code> object with some
+generated particles.</p>
 </dd>
 <dt>num_iter<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of iterations to move particles over</p>
 </dd>
@@ -255,7 +258,7 @@ with the particle locations and travel times as a json
 
 <dl class="function">
 <dt id="dorado.routines.time_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">time_plots</code><span class="sig-paren">(</span><em>params</em>, <em>num_iter</em>, <em>folder_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#time_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.time_plots" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.routines.</code><code class="descname">time_plots</code><span class="sig-paren">(</span><em>particle</em>, <em>num_iter</em>, <em>folder_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#time_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.time_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Steady flow plots with particle travel times visualized.</p>
 <p>Make plots with each particle’s travel time visualized.
 Routine assumes a steady flow field, but could be expanded to an unsteady
@@ -263,7 +266,8 @@ case.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>params<span class="classifier"><cite>obj</cite></span></dt><dd><p>Parameters for the particle</p>
+<dt>particle<span class="classifier"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></span></dt><dd><p>An initialized <code class="xref py py-obj docutils literal notranslate"><span class="pre">particle_track.Particles</span></code> object with some
+generated particles.</p>
 </dd>
 <dt>num_iter<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of iterations to move particles</p>
 </dd>
@@ -283,7 +287,7 @@ case.</p>
 
 <dl class="function">
 <dt id="dorado.routines.unsteady_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">unsteady_plots</code><span class="sig-paren">(</span><em>params</em>, <em>num_steps</em>, <em>timestep</em>, <em>output_base</em>, <em>output_type</em>, <em>folder_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#unsteady_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.unsteady_plots" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.routines.</code><code class="descname">unsteady_plots</code><span class="sig-paren">(</span><em>dx</em>, <em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>num_steps</em>, <em>timestep</em>, <em>output_base</em>, <em>output_type</em>, <em>folder_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#unsteady_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.unsteady_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Automated particle movement in unsteady flow.</p>
 <p>Function to automate plotting of particle movement in an unsteady flow
 field (time-varying). Particles all have the same travel time at the end
@@ -295,7 +299,15 @@ the section that updates the flow field.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>params<span class="classifier"><cite>obj</cite></span></dt><dd><p>Class of particle parameter values</p>
+<dt>dx<span class="classifier"><cite>float</cite></span></dt><dd><p>Length of a cell face</p>
+</dd>
+<dt>Np_tracer<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of particles to generate.</p>
+</dd>
+<dt>seed_xloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x-coordinates over which to initially distribute the
+particles.</p>
+</dd>
+<dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
+particles.</p>
 </dd>
 <dt>num_steps<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of model timesteps being covered</p>
 </dd>
@@ -371,7 +383,7 @@ and travel times as a json text file.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">API Reference</a><ul>
-      <li>Previous: <a href="particletools.html" title="previous chapter">dorado.particle_tools</a></li>
+      <li>Previous: <a href="lagrangianwalker.html" title="previous chapter">dorado.lagrangian_walker</a></li>
       <li>Next: <a href="parallelrouting.html" title="next chapter">dorado.parallel_routing</a></li>
   </ul></li>
   </ul></li>

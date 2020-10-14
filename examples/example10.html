@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Example 10 - Routing Particles in Parallel &#8212; dorado 1.0.0 documentation</title>
+    <title>Example 10 - Routing Particles in Parallel &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -42,21 +42,25 @@
 <p>In this example, we will use the parallel routing functionality to distribute the particle routing procedure across multiple CPU cores. Then we will compare the time it takes to route particles in serial against the time it takes to route an equivalent number of particles on 2 CPU cores. To do this, we use the native <cite>multiprocessing</cite> library that is provided with Python.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/bb0c7a9406e4ee140f502caaf57eb667/parallel_comparison.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>We will be running the parallel comparison on the ANUGA example domain used in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>. The only difference is that we will use a larger number of particles so that the impact of the parallelization can be measured even on this relatively small and simple domain.</p>
-<p>So after initializing the parameters as we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will change the number of particles being used.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">200</span>
+<p>So after initializing the parameters as we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will define the number of particles and where they should be seeded.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">53</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Next we will do the parallel routing using 2 CPU cores using the <cite>parallel_routing</cite> function. In this case, we are routing 200 particles on each core, and iterating each particle 50 times.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.parallel_routing</span> <span class="kn">import</span> <span class="n">parallel_routing</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">par_result</span> <span class="o">=</span> <span class="n">parallel_routing</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span> <span class="o">=</span> <span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.parallel_routing</span> <span class="kn">import</span> <span class="n">parallel_routing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">par_result</span> <span class="o">=</span> <span class="n">parallel_routing</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span>
+<span class="go">                                  seed_yloc, 2)</span>
 </pre></div>
 </div>
-<p>For comparison, we will the comparable serial process twice so that the proper number of particles are simulated.</p>
+<p>For comparison, we will run the comparable serial process twice so that the same number of particles are simulated.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
-<span class="gp">&gt;&gt;&gt; </span>   <span class="n">all_walk</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># initialize walk data list</span>
-<span class="gp">&gt;&gt;&gt; </span>   <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="n">particle</span> <span class="o">=</span> <span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)):</span>
-<span class="gp">&gt;&gt;&gt; </span>       <span class="n">all_walk</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">previous_walk_data</span><span class="o">=</span><span class="n">all_walk</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="n">all_walk</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>If we were to time this example (timing included in full example script), a roughly 2x speed-up can be observed. Speed-up may vary based on a variety of factors.</p>

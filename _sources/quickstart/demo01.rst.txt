@@ -9,20 +9,20 @@ Then using information about the water depths and flow rates in the delta, the p
 River deltas are distributary networks, and so the particles will not all travel along the same channels.
 By using a tool like `dorado`, simulated particles can help us answer questions related to hydrological connectivity and nutrient residence times in deltaic systems.
 
-First we load the sample parameters.
+First we load and create the sample particles object.
 
 .. doctest::
 
-    >>> from dorado.example_data import define_params as dp
-    >>> import dorado as pr
+    >>> import dorado
     >>> import matplotlib.pyplot as plt
-    >>> rcmparams = dp.make_rcm_params()
+    >>> from dorado.example_data import define_params as dp
+    >>> rcmparticles = dp.make_rcm_particles()
 
-We can visualize the water depth for this scenario from the parameters. If you'd like to download this portion of the demo as a standalone script, it is available :download:`here <../pyplots/quickstart/demo1_depth.py>`.
+We can visualize the water depth for this scenario from the `rcmparticles` object. If you'd like to download this portion of the demo as a standalone script, it is available :download:`here <../pyplots/quickstart/demo1_depth.py>`.
 
 .. doctest::
 
-    >>> plt.imshow(rcmparams.depth)
+    >>> plt.imshow(rcmparticles.depth)
     >>> plt.colorbar()
     >>> plt.title('Water Depth')
     >>> plt.show()
@@ -33,7 +33,7 @@ Now let's route 50 particles for 50 iterations.
 
 .. doctest::
 
-    >>> pr.routines.steady_plots(rcmparams, 50, 'demo-1')
+    >>> dorado.routines.steady_plots(rcmparticles, 50, 'demo-1')
 
 The `steady_plots()` function saves plots of each iteration of the particle movement to the subfolder 'demo-1/figs'. The final plot is shown below; the initial particle locations are shown as blue dots, and the final particle locations are red dots. If you'd like to download this portion of the demo as a standalone script, it is available :download:`here <../pyplots/quickstart/demo1.py>`.
 

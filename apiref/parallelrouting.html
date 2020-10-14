@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.parallel_routing &#8212; dorado 1.0.0 documentation</title>
+    <title>dorado.parallel_routing &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -64,18 +64,47 @@ and travel times for each particle computed by that process/core</p>
 </div></blockquote>
 </dd></dl>
 
+<dl class="class">
+<dt id="dorado.parallel_routing.parallel_obj">
+<em class="property">class </em><code class="descclassname">dorado.parallel_routing.</code><code class="descname">parallel_obj</code><a class="reference internal" href="../_modules/dorado/parallel_routing.html#parallel_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.parallel_routing.parallel_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empty class to hold parallel parameters.</p>
+<p>This is an internal class used by <cite>parallel_routing</cite> that never needs to be
+defined outside of that function.</p>
+<dl class="method">
+<dt id="dorado.parallel_routing.parallel_obj.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/parallel_routing.html#parallel_obj.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.parallel_routing.parallel_obj.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize attributes.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dorado.parallel_routing.parallel_obj.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#dorado.parallel_routing.parallel_obj.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="dorado.parallel_routing.parallel_routing">
-<code class="descclassname">dorado.parallel_routing.</code><code class="descname">parallel_routing</code><span class="sig-paren">(</span><em>params</em>, <em>num_iter</em>, <em>num_cores</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/parallel_routing.html#parallel_routing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.parallel_routing.parallel_routing" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.parallel_routing.</code><code class="descname">parallel_routing</code><span class="sig-paren">(</span><em>particles</em>, <em>num_iter</em>, <em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>num_cores</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/parallel_routing.html#parallel_routing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.parallel_routing.parallel_routing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do the parallel routing of particles.</p>
 <p>Function to do parallel routing of particles. Does this by duplicating the
 call to <em>Particle.run_iteration()</em> across different processes.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>params<span class="classifier"><cite>obj</cite></span></dt><dd><p>Normal parameters for the particles in a class</p>
+<dt>particle<span class="classifier"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></span></dt><dd><p>An initialized <code class="xref py py-obj docutils literal notranslate"><span class="pre">particle_track.Particles</span></code> object with some
+generated particles.</p>
 </dd>
 <dt>num_iter<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of iterations to route particles for</p>
+</dd>
+<dt>Np_tracer<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of particles to generate.</p>
+</dd>
+<dt>seed_xloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of x-coordinates over which to initially distribute the
+particles.</p>
+</dd>
+<dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
+particles.</p>
 </dd>
 <dt>num_cores<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of processors/cores to use for parallel part</p>
 </dd>
@@ -93,15 +122,17 @@ and travel times for each particle computed by that process/core</p>
 
 <dl class="function">
 <dt id="dorado.parallel_routing.run_iter">
-<code class="descclassname">dorado.parallel_routing.</code><code class="descname">run_iter</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/parallel_routing.html#run_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.parallel_routing.run_iter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.parallel_routing.</code><code class="descname">run_iter</code><span class="sig-paren">(</span><em>pobj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/parallel_routing.html#run_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.parallel_routing.run_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper run script for the particle iterations.</p>
-<p>Uses params class to define a <em>Particle</em> and does iterations of the
-particle. Requires a new params variable : <em>params.num_iter</em> to define the
-number of iterations to route the particles for.</p>
+<p>This is an internal function that should not be called directly. Rather it
+is wrapped by the <cite>parallel_routing</cite> function and mapped to the CPU cores
+to allow for particle routing in parallel. Uses a small <cite>parallel_obj</cite>
+class to hold a bunch of attributes and do the particle generation and
+routing.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>params<span class="classifier"><cite>obj</cite></span></dt><dd><p>Class with all the parameters for the particle routing</p>
+<dt>pobj<span class="classifier"><a class="reference internal" href="#dorado.parallel_routing.parallel_obj" title="dorado.parallel_routing.parallel_obj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parallel_obj</span></code></a></span></dt><dd><p>Special parallel object.</p>
 </dd>
 </dl>
 </div></blockquote>

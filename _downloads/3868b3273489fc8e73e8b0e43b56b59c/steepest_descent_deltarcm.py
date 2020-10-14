@@ -3,7 +3,7 @@
 import numpy as np
 import os.path
 from dorado.routines import steady_plots
-from dorado.particle_track import params
+import dorado.particle_track as pt
 
 # load some variables from a deltarcm output so stage is varied
 f_path = os.path.abspath(os.path.dirname(__file__))
@@ -15,15 +15,11 @@ stage = data['stage']
 depth = data['depth']
 
 # create params and then assign the parameters
-params = params()
+params = pt.modelParams()
 
 # define the params variables
 params.stage = stage
 params.depth = depth
-
-params.seed_xloc = list(range(15,17))
-params.seed_yloc = list(range(137,140))
-params.Np_tracer = 50
 params.dx = 50.
 # don't have any discharge data so we use zeros in place of it
 # weighting scheme uses both discharge and depth so can still weight
@@ -34,7 +30,13 @@ params.theta = 1.0
 params.steepest_descent = True
 params.model = 'DeltaRCM' # say that our inputs are from DeltaRCM
 
-### Apply the parameters to run the particle routing model
+# define particle information
+seed_xloc = list(range(15, 17))
+seed_yloc = list(range(137, 140))
+Np_tracer = 50
+
+particles = pt.Particles(params)
+particles.generate_particles(Np_tracer, seed_xloc, seed_yloc)
 
 # using steady (time-invariant) plotting routine
-steady_plots(params, 50, 'steepest_descent_deltarcm')
+steady_plots(particles, 50, 'steepest_descent_deltarcm')

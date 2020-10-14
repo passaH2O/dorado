@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Demo 1- Using the High-Level API &#8212; dorado 1.0.0 documentation</title>
+    <title>Demo 1- Using the High-Level API &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -39,15 +39,15 @@ A set of 50 particles will be seeded in the main channel of the synthetic delta.
 Then using information about the water depths and flow rates in the delta, the particles will be allowed to travel downstream.
 River deltas are distributary networks, and so the particles will not all travel along the same channels.
 By using a tool like <cite>dorado</cite>, simulated particles can help us answer questions related to hydrological connectivity and nutrient residence times in deltaic systems.</p>
-<p>First we load the sample parameters.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span> <span class="k">as</span> <span class="nn">pr</span>
+<p>First we load and create the sample particles object.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rcmparams</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_rcm_params</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rcmparticles</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_rcm_particles</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>We can visualize the water depth for this scenario from the parameters. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/a7d3662605b99c036b6cc113a18bbfbb/demo1_depth.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rcmparams</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+<p>We can visualize the water depth for this scenario from the <cite>rcmparticles</cite> object. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/a7d3662605b99c036b6cc113a18bbfbb/demo1_depth.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rcmparticles</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Water Depth&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -58,7 +58,7 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 <img alt="../_images/demo1_depth.png" src="../_images/demo1_depth.png" />
 </div>
 <p>Now let’s route 50 particles for 50 iterations.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">rcmparams</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;demo-1&#39;</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">rcmparticles</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;demo-1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <cite>steady_plots()</cite> function saves plots of each iteration of the particle movement to the subfolder ‘demo-1/figs’. The final plot is shown below; the initial particle locations are shown as blue dots, and the final particle locations are red dots. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/a75d2e742594756ccbf1303ae820490b/demo1.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>

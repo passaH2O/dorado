@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Background &#8212; dorado 1.0.0 documentation</title>
+    <title>Background &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -55,7 +55,7 @@
 </div><p>In this way, the <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> parameter controls the proportional dependence of water surface slope and water discharge on the downstream direction. A <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> of 0 means that the water slope is ignored when determining the downstream flow direction, and a <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> of 1 means that the discharge values (the flow field) is ignored.</p>
 <p>The second weighting parameter, <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/> modifies the routing weight for the random walk based on the local water depth value. The routing weights for each neighboring cell are calculated per [5], using the following equation:</p>
 <div class="math">
-<p><img src="../_images/math/39adc3555724c693b846992f2a459f308f262a0c.png" alt="w_i = \frac{\frac{1}{R_i} \text{max} \left(0, F \cdot d_i \right)}{\Delta_i}"/></p>
+<p><img src="../_images/math/4b3fdf1059ccf10148f9360117fa10fca0c931be.png" alt="w_i = \frac{ \text{max} \left(0, F \cdot d_i \right)}{R_i \Delta_i}"/></p>
 </div><p>The resistance value (<img class="math" src="../_images/math/19a651980028fb9460bbe1b0ba7e01c4694f815b.png" alt="{R_i}"/>) is computed using the local water depth (<img class="math" src="../_images/math/a64bda3b3b9aa304ba2c049b8a63965e7e9a76da.png" alt="{h_i}"/>) and the parameter <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/>:</p>
 <div class="math">
 <p><img src="../_images/math/b5bae4314e3619c121032021a36475304f4e9f06.png" alt="R_i = \frac{1}{h_i^\theta}"/></p>

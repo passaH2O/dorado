@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Example 6 - Set Travel Time Target &#8212; dorado 1.0.0 documentation</title>
+    <title>Example 6 - Set Travel Time Target &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -38,15 +38,21 @@
 <p>In this example we will revisit the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> model output we looked at in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>. This time, however, we will set a particle travel time target as opposed to a number of iterations for the particles to move.</p>
 <p>In this method, we allow the particles to take as many iterations as they need (individually) to get as close as possible to the target travel time that we prescribe.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/489718d883787a901045db47eed623e5/set_timestep_anuga_particles.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
-<p>After loading the data and establishing the parameters in the same way we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will change the grid size so that the range of travel times we can obtain in this small example is a bit better constrained.</p>
+<p>After loading the data and establishing the parameters in the same way we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will change the grid size so that the range of travel times we can obtain in this small example is a bit better constrained. Then we will just define our particle seeding locations and generate the particles so they can be used for the routing.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">10.</span>
+<span class="go"># set up the particles</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">53</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">particle</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We note that by discretizing our grid and the particle routing procedure, we are unable to prescribe precise particle travel times. Due to the gridded scheme, we can only measure particle travel times when particles are located at the center of a cell. So when a target travel time is set, the particle travel times are not precisely that number, but rather the closest times corresponding to when each particle is in a cell center.</p>
 <p>To set a travel time target, we will use the lower-level API and access the <cite>particle_track</cite> module directly, and then use some routines to plot the initial and final particle locations. The target travel time we will be using is 2100 seconds.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="mi">2100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">anugaparams</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pr</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">plot_final</span><span class="p">(</span><span class="n">anugaparams</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">routines</span><span class="o">.</span><span class="n">plot_final</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Initial and Final Particle Locations&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -56,16 +62,15 @@
 <img alt="../_images/demo2.png" src="../_images/demo2.png" />
 </div>
 <p>To see how close we are to the prescribed target travel time of 2100 seconds, we will get a list of the final travel times that we then print to the console. We can access the data from the most recent step using <cite>get_state</cite>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of particle travel times for final particle locations: &#39;</span> <span class="o">+</span>
 <span class="gp">&gt;&gt;&gt; </span>      <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">finaltimes</span><span class="p">)))</span>
 
-<span class="go">List of particle travel times for final particle locations: [2158.</span>
-<span class="go">2118. 2088. 2149. 2096. 2206. 2104. 2104. 2207. 2137. 2097. 2147.</span>
-<span class="go">2032. 2118. 2084. 2037. 2066. 2076. 2104. 2108. 2033. 2101. 2080.</span>
-<span class="go">2072. 2031. 2041. 2076. 2063. 2125. 2102. 2140. 2178. 2173. 2097.</span>
-<span class="go">2104. 2189. 2061. 2112. 2074. 2095. 2100. 2177. 2069. 2032. 2050.</span>
-<span class="go">2086. 2036. 2109. 2078. 2047.]</span>
+<span class="go">List of particle travel times for final particle locations: [2042. 2064.</span>
+<span class="go">2106. 2087. 2085. 2102. 2069. 2089. 2090. 2091. 2051. 2106.</span>
+<span class="go">2111. 2119. 2140. 2129. 2101. 2083. 2091. 2145. 2179. 2080. 2067. 2100.</span>
+<span class="go">2163. 2096. 2125. 2079. 2129. 2151. 2122. 2089. 2137. 2112. 2093. 2093.</span>
+<span class="go">2102. 2102. 2099. 2042. 2070. 2108. 2115. 2115. 2108. 2112. 2062. 2124.]</span>
 </pre></div>
 </div>
 </div>

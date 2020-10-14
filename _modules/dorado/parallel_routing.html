@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.parallel_routing &#8212; dorado 1.0.0 documentation</title>
+    <title>dorado.parallel_routing &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,22 +46,23 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">string</span>
-<span class="kn">from</span> <span class="nn">.particle_track</span> <span class="kn">import</span> <span class="n">Particle</span>
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
 
 
 <span class="c1"># convert run script into a function that returns a single dictionary &#39;data&#39;</span>
-<div class="viewcode-block" id="run_iter"><a class="viewcode-back" href="../../apiref/parallelrouting.html#dorado.parallel_routing.run_iter">[docs]</a><span class="k">def</span> <span class="nf">run_iter</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="run_iter"><a class="viewcode-back" href="../../apiref/parallelrouting.html#dorado.parallel_routing.run_iter">[docs]</a><span class="k">def</span> <span class="nf">run_iter</span><span class="p">(</span><span class="n">pobj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Wrapper run script for the particle iterations.</span>
 
-<span class="sd">    Uses params class to define a *Particle* and does iterations of the</span>
-<span class="sd">    particle. Requires a new params variable : *params.num_iter* to define the</span>
-<span class="sd">    number of iterations to route the particles for.</span>
+<span class="sd">    This is an internal function that should not be called directly. Rather it</span>
+<span class="sd">    is wrapped by the `parallel_routing` function and mapped to the CPU cores</span>
+<span class="sd">    to allow for particle routing in parallel. Uses a small `parallel_obj`</span>
+<span class="sd">    class to hold a bunch of attributes and do the particle generation and</span>
+<span class="sd">    routing.</span>
 
 <span class="sd">    **Inputs** :</span>
 
-<span class="sd">        params : `obj`</span>
-<span class="sd">            Class with all the parameters for the particle routing</span>
+<span class="sd">        pobj : :obj:`parallel_obj`</span>
+<span class="sd">            Special parallel object.</span>
 
 <span class="sd">    **Outputs** :</span>
 
@@ -70,11 +71,11 @@
 <span class="sd">            details same as input previous_walk_data</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-    <span class="n">all_walk</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">pobj</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">pobj</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">pobj</span><span class="o">.</span><span class="n">seed_xloc</span><span class="p">,</span>
+                                      <span class="n">pobj</span><span class="o">.</span><span class="n">seed_yloc</span><span class="p">)</span>
     <span class="c1"># do iterations</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">num_iter</span><span class="p">)):</span>
-        <span class="n">all_walk</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">previous_walk_data</span><span class="o">=</span><span class="n">all_walk</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pobj</span><span class="o">.</span><span class="n">num_iter</span><span class="p">)):</span>
+        <span class="n">all_walk</span> <span class="o">=</span> <span class="n">pobj</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">all_walk</span></div>
 
@@ -117,7 +118,25 @@
     <span class="k">return</span> <span class="n">single_result</span></div>
 
 
-<div class="viewcode-block" id="parallel_routing"><a class="viewcode-back" href="../../apiref/parallelrouting.html#dorado.parallel_routing.parallel_routing">[docs]</a><span class="k">def</span> <span class="nf">parallel_routing</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">):</span>
+<div class="viewcode-block" id="parallel_obj"><a class="viewcode-back" href="../../apiref/parallelrouting.html#dorado.parallel_routing.parallel_obj">[docs]</a><span class="k">class</span> <span class="nc">parallel_obj</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Empty class to hold parallel parameters.</span>
+
+<span class="sd">    This is an internal class used by `parallel_routing` that never needs to be</span>
+<span class="sd">    defined outside of that function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="parallel_obj.__init__"><a class="viewcode-back" href="../../apiref/parallelrouting.html#dorado.parallel_routing.parallel_obj.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize attributes.&quot;&quot;&quot;</span>
+        <span class="n">parallel_obj</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parallel_obj</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parallel_obj</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parallel_obj</span><span class="o">.</span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parallel_obj</span><span class="o">.</span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="parallel_routing"><a class="viewcode-back" href="../../apiref/parallelrouting.html#dorado.parallel_routing.parallel_routing">[docs]</a><span class="k">def</span> <span class="nf">parallel_routing</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span>
+                     <span class="n">num_cores</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Do the parallel routing of particles.</span>
 
 <span class="sd">    Function to do parallel routing of particles. Does this by duplicating the</span>
@@ -125,11 +144,23 @@
 
 <span class="sd">    **Inputs** :</span>
 
-<span class="sd">        params : `obj`</span>
-<span class="sd">            Normal parameters for the particles in a class</span>
+<span class="sd">        particle : :obj:`dorado.particle_track.Particles`</span>
+<span class="sd">            An initialized :obj:`particle_track.Particles` object with some</span>
+<span class="sd">            generated particles.</span>
 
 <span class="sd">        num_iter : `int`</span>
 <span class="sd">            Number of iterations to route particles for</span>
+
+<span class="sd">        Np_tracer : `int`</span>
+<span class="sd">            Number of particles to generate.</span>
+
+<span class="sd">        seed_xloc : `list`</span>
+<span class="sd">            List of x-coordinates over which to initially distribute the</span>
+<span class="sd">            particles.</span>
+
+<span class="sd">        seed_yloc : `list`</span>
+<span class="sd">            List of y-coordinates over which to initially distribute the</span>
+<span class="sd">            particles.</span>
 
 <span class="sd">        num_cores : `int`</span>
 <span class="sd">            Number of processors/cores to use for parallel part</span>
@@ -141,16 +172,20 @@
 <span class="sd">            and travel times for each particle computed by that process/core</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># assign number of iterations to the params class</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">=</span> <span class="n">num_iter</span>
+    <span class="c1"># make parallel object to assign to function</span>
+    <span class="n">pobj</span> <span class="o">=</span> <span class="n">parallel_obj</span>
+    <span class="n">pobj</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particles</span>
+    <span class="n">pobj</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">=</span> <span class="n">num_iter</span>
+    <span class="n">pobj</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="n">Np_tracer</span>
+    <span class="n">pobj</span><span class="o">.</span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="n">seed_xloc</span>
+    <span class="n">pobj</span><span class="o">.</span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="n">seed_yloc</span>
 
-    <span class="c1"># make params list to apply to map function</span>
-    <span class="n">params_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">params</span><span class="p">]</span>
-    <span class="n">params_list</span> <span class="o">=</span> <span class="n">params_list</span> <span class="o">*</span> <span class="n">num_cores</span>
+    <span class="c1"># define list to pass to actual function that will be mapped to in parallel</span>
+    <span class="n">p_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">pobj</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_cores</span>
 
     <span class="c1"># create the parallel pool and run the process</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)</span>
-    <span class="n">par_result</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">run_iter</span><span class="p">,</span> <span class="n">params_list</span><span class="p">)</span>
+    <span class="n">par_result</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">run_iter</span><span class="p">,</span> <span class="n">p_list</span><span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">par_result</span></div>

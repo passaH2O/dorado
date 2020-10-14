@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.routines &#8212; dorado 1.0.0 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.0.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -40,7 +40,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">.particle_track</span> <span class="kn">import</span> <span class="n">Particle</span>
+<span class="kn">from</span> <span class="nn">.particle_track</span> <span class="kn">import</span> <span class="n">Particles</span>
+<span class="kn">from</span> <span class="nn">.particle_track</span> <span class="kn">import</span> <span class="n">modelParams</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -54,7 +55,8 @@
 <span class="c1"># --------------------------------------------------------</span>
 <span class="c1"># Functions for running random walk model</span>
 <span class="c1"># --------------------------------------------------------</span>
-<div class="viewcode-block" id="steady_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.steady_plots">[docs]</a><span class="k">def</span> <span class="nf">steady_plots</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span> <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="steady_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.steady_plots">[docs]</a><span class="k">def</span> <span class="nf">steady_plots</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span>
+                 <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Automated particle movement in steady flow field.</span>
 
 <span class="sd">    Function to automate plotting of particle movement over a steady flow</span>
@@ -63,8 +65,9 @@
 
 <span class="sd">    **Inputs** :</span>
 
-<span class="sd">        params : `obj`</span>
-<span class="sd">            Class of parameter values for the particles</span>
+<span class="sd">        particle : :obj:`dorado.particle_track.Particles`</span>
+<span class="sd">            An initialized :obj:`particle_track.Particles` object with some</span>
+<span class="sd">            generated particles.</span>
 
 <span class="sd">        num_iter : `int`</span>
 <span class="sd">            Number of iterations to move particles over</span>
@@ -87,9 +90,6 @@
 <span class="sd">        (&#39;human-readable&#39;) text file.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># define the particle</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-
     <span class="c1"># make directory to save the data</span>
     <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -103,19 +103,17 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
 
-    <span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Initialize object for function call</span>
-
     <span class="c1"># Iterate and save results</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">)),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># Do particle iterations</span>
-        <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">previous_walk_data</span><span class="o">=</span><span class="n">walk_data</span><span class="p">)</span>
+        <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
             <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">ti</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 
             <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
             <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
-            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Depth - Particle Iteration &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
             <span class="n">cax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">x1</span><span class="o">+</span><span class="mf">0.01</span><span class="p">,</span>
                                 <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span>
@@ -125,7 +123,7 @@
             <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">&#39;Water Depth [m]&#39;</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">yi</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span>
                         <span class="s1">&#39;figs&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;output&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span>
                         <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -141,7 +139,7 @@
     <span class="k">return</span> <span class="n">walk_data</span></div>
 
 
-<div class="viewcode-block" id="unsteady_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.unsteady_plots">[docs]</a><span class="k">def</span> <span class="nf">unsteady_plots</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span>
+<div class="viewcode-block" id="unsteady_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.unsteady_plots">[docs]</a><span class="k">def</span> <span class="nf">unsteady_plots</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span>
                    <span class="n">output_base</span><span class="p">,</span> <span class="n">output_type</span><span class="p">,</span>
                    <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Automated particle movement in unsteady flow.</span>
@@ -156,8 +154,19 @@
 
 <span class="sd">    **Inputs** :</span>
 
-<span class="sd">        params : `obj`</span>
-<span class="sd">            Class of particle parameter values</span>
+<span class="sd">        dx : `float`</span>
+<span class="sd">            Length of a cell face</span>
+
+<span class="sd">        Np_tracer : `int`</span>
+<span class="sd">            Number of particles to generate.</span>
+
+<span class="sd">        seed_xloc : `list`</span>
+<span class="sd">            List of x-coordinates over which to initially distribute the</span>
+<span class="sd">            particles.</span>
+
+<span class="sd">        seed_yloc : `list`</span>
+<span class="sd">            List of y-coordinates over which to initially distribute the</span>
+<span class="sd">            particles.</span>
 
 <span class="sd">        num_steps : `int`</span>
 <span class="sd">            Number of model timesteps being covered</span>
@@ -187,6 +196,9 @@
 <span class="sd">        and travel times as a json text file.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># init params</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">modelParams</span><span class="p">()</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="n">dx</span>
     <span class="c1"># make directory to save the data</span>
     <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -219,7 +231,6 @@
 
     <span class="c1"># Create vector of target times</span>
     <span class="n">target_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">timestep</span><span class="o">*</span><span class="p">(</span><span class="n">num_steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">timestep</span><span class="p">)</span>
-    <span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># Iterate through model timesteps</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">)),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># load depth, stage, qx, qy for this timestep</span>
@@ -249,11 +260,15 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Output datatype/structure unsupported, modify&#39;</span>
                              <span class="s1">&#39; the output reading portion of the code&#39;</span><span class="p">)</span>
 
-        <span class="c1"># then define the particle class and continue</span>
-        <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># then define the particles class and continue</span>
+        <span class="n">particle</span> <span class="o">=</span> <span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># generate some particles</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">)</span>
 
-        <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">previous_walk_data</span><span class="o">=</span><span class="n">walk_data</span><span class="p">,</span>
-                                           <span class="n">target_time</span><span class="o">=</span><span class="n">target_times</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="n">target_times</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
         <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">ti</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
@@ -285,7 +300,7 @@
     <span class="k">return</span> <span class="n">walk_data</span></div>
 
 
-<div class="viewcode-block" id="time_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.time_plots">[docs]</a><span class="k">def</span> <span class="nf">time_plots</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span> <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="time_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.time_plots">[docs]</a><span class="k">def</span> <span class="nf">time_plots</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span> <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Steady flow plots with particle travel times visualized.</span>
 
 <span class="sd">    Make plots with each particle&#39;s travel time visualized.</span>
@@ -294,8 +309,9 @@
 
 <span class="sd">    **Inputs** :</span>
 
-<span class="sd">        params : `obj`</span>
-<span class="sd">            Parameters for the particle</span>
+<span class="sd">        particle : :obj:`dorado.particle_track.Particles`</span>
+<span class="sd">            An initialized :obj:`particle_track.Particles` object with some</span>
+<span class="sd">            generated particles.</span>
 
 <span class="sd">        num_iter : `int`</span>
 <span class="sd">            Number of iterations to move particles</span>
@@ -311,9 +327,6 @@
 <span class="sd">        Saves plots and data for each iteration</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># define the particle</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-
     <span class="c1"># make directory to save the data</span>
     <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -326,11 +339,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
 
-    <span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Initialize list for function call</span>
     <span class="c1"># Iterate and save results</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">)),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># Do particle iterations</span>
-        <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">previous_walk_data</span><span class="o">=</span><span class="n">walk_data</span><span class="p">)</span>
+        <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">()</span>
 
         <span class="c1"># collect latest travel times</span>
         <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -349,7 +361,7 @@
         <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
         <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">)</span>
         <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">&#39;Particle Travel Times [s]&#39;</span><span class="p">)</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
         <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
         <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">cbar2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
@@ -779,13 +791,15 @@
 
 <span class="sd">        grid : `numpy.ndarray`</span>
 <span class="sd">            A 2-D grid upon which the particles will be plotted. Examples of</span>
-<span class="sd">            grids that might be nice to use are `params.depth`, `params.stage`,</span>
-<span class="sd">            `params.topography`.</span>
+<span class="sd">            grids that might be nice to use are</span>
+<span class="sd">            `dorado.particle_track.modelParams.depth`,</span>
+<span class="sd">            `dorado.particle_track.modelParams.stage`,</span>
+<span class="sd">            `dorado.particle_track.modelParams.topography`.</span>
 
 <span class="sd">        walk_data : `dict`</span>
 <span class="sd">            The dictionary with the particle information. This is the output</span>
 <span class="sd">            from one of the other routines or the</span>
-<span class="sd">            :obj:particle_track.run_iteration() function.</span>
+<span class="sd">            :obj:dorado.particle_track.run_iteration() function.</span>
 
 <span class="sd">        iteration : `int`, optional</span>
 <span class="sd">            Iteration number at which to plot the particles. Default is -1,</span>

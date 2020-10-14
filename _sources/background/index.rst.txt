@@ -34,7 +34,7 @@ The second weighting parameter, :math:`{\theta}` modifies the routing weight for
 
 .. math::
 
-      w_i = \frac{\frac{1}{R_i} \text{max} \left(0, F \cdot d_i \right)}{\Delta_i}
+      w_i = \frac{ \text{max} \left(0, F \cdot d_i \right)}{R_i \Delta_i}
 
 The resistance value (:math:`{R_i}`) is computed using the local water depth (:math:`{h_i}`) and the parameter :math:`{\theta}`:
 

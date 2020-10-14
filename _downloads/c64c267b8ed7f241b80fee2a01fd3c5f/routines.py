@@ -6,7 +6,8 @@ Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
 from builtins import range
-from .particle_track import Particle
+from .particle_track import Particles
+from .particle_track import modelParams
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
@@ -20,7 +21,8 @@ import json
 # --------------------------------------------------------
 # Functions for running random walk model
 # --------------------------------------------------------
-def steady_plots(params, num_iter, folder_name=None, save_output=True):
+def steady_plots(particle, num_iter,
+                 folder_name=None, save_output=True):
     """Automated particle movement in steady flow field.
 
     Function to automate plotting of particle movement over a steady flow
@@ -29,8 +31,9 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
 
     **Inputs** :
 
-        params : `obj`
-            Class of parameter values for the particles
+        particle : :obj:`dorado.particle_track.Particles`
+            An initialized :obj:`particle_track.Particles` object with some
+            generated particles.
 
         num_iter : `int`
             Number of iterations to move particles over
@@ -53,9 +56,6 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
         ('human-readable') text file.
 
     """
-    # define the particle
-    particle = Particle(params)
-
     # make directory to save the data
     if save_output:
         if folder_name is None:
@@ -69,19 +69,17 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
         if not os.path.exists(folder_name+os.sep+'data'):
             os.makedirs(folder_name+os.sep+'data')
 
-    walk_data = None  # Initialize object for function call
-
     # Iterate and save results
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
-        walk_data = particle.run_iteration(previous_walk_data=walk_data)
+        walk_data = particle.run_iteration()
         if save_output:
             x0, y0, t0 = get_state(walk_data, 0)
             xi, yi, ti = get_state(walk_data)
 
             fig = plt.figure(dpi=200)
             ax = fig.add_subplot(111)
-            im = ax.imshow(params.depth)
+            im = ax.imshow(particle.depth)
             plt.title('Depth - Particle Iteration ' + str(i))
             cax = fig.add_axes([ax.get_position().x1+0.01,
                                 ax.get_position().y0,
@@ -91,7 +89,7 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
             cbar.set_label('Water Depth [m]')
             ax.scatter(y0, x0, c='b', s=0.75)
             ax.scatter(yi, xi, c='r', s=0.75)
-            plt.savefig(folder_name+os.sep+
+            plt.savefig(folder_name+os.sep +
                         'figs'+os.sep+'output'+str(i)+'.png',
                         bbox_inches='tight')
             plt.close()
@@ -107,7 +105,7 @@ def steady_plots(params, num_iter, folder_name=None, save_output=True):
     return walk_data
 
 
-def unsteady_plots(params, num_steps, timestep,
+def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
                    output_base, output_type,
                    folder_name=None):
     """Automated particle movement in unsteady flow.
@@ -122,8 +120,19 @@ def unsteady_plots(params, num_steps, timestep,
 
     **Inputs** :
 
-        params : `obj`
-            Class of particle parameter values
+        dx : `float`
+            Length of a cell face
+
+        Np_tracer : `int`
+            Number of particles to generate.
+
+        seed_xloc : `list`
+            List of x-coordinates over which to initially distribute the
+            particles.
+
+        seed_yloc : `list`
+            List of y-coordinates over which to initially distribute the
+            particles.
 
         num_steps : `int`
             Number of model timesteps being covered
@@ -153,6 +162,9 @@ def unsteady_plots(params, num_steps, timestep,
         and travel times as a json text file.
 
     """
+    # init params
+    params = modelParams()
+    params.dx = dx
     # make directory to save the data
     if folder_name is None:
         folder_name = os.getcwd()
@@ -185,7 +197,6 @@ def unsteady_plots(params, num_steps, timestep,
 
     # Create vector of target times
     target_times = np.arange(timestep, timestep*(num_steps + 1), timestep)
-    walk_data = None
     # Iterate through model timesteps
     for i in tqdm(list(range(0, num_steps)), ascii=True):
         # load depth, stage, qx, qy for this timestep
@@ -215,11 +226,15 @@ def unsteady_plots(params, num_steps, timestep,
             raise ValueError('Output datatype/structure unsupported, modify'
                              ' the output reading portion of the code')
 
-        # then define the particle class and continue
-        particle = Particle(params)
+        # then define the particles class and continue
+        particle = Particles(params)
+        # generate some particles
+        if i == 0:
+            particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+        else:
+            particle.generate_particles(0, [], [], 'random', walk_data)
 
-        walk_data = particle.run_iteration(previous_walk_data=walk_data,
-                                           target_time=target_times[i])
+        walk_data = particle.run_iteration(target_time=target_times[i])
 
         x0, y0, t0 = get_state(walk_data, 0)
         xi, yi, ti = get_state(walk_data)
@@ -251,7 +266,7 @@ def unsteady_plots(params, num_steps, timestep,
     return walk_data
 
 
-def time_plots(params, num_iter, folder_name=None):
+def time_plots(particle, num_iter, folder_name=None):
     """Steady flow plots with particle travel times visualized.
 
     Make plots with each particle's travel time visualized.
@@ -260,8 +275,9 @@ def time_plots(params, num_iter, folder_name=None):
 
     **Inputs** :
 
-        params : `obj`
-            Parameters for the particle
+        particle : :obj:`dorado.particle_track.Particles`
+            An initialized :obj:`particle_track.Particles` object with some
+            generated particles.
 
         num_iter : `int`
             Number of iterations to move particles
@@ -277,9 +293,6 @@ def time_plots(params, num_iter, folder_name=None):
         Saves plots and data for each iteration
 
     """
-    # define the particle
-    particle = Particle(params)
-
     # make directory to save the data
     if folder_name is None:
         folder_name = os.getcwd()
@@ -292,11 +305,10 @@ def time_plots(params, num_iter, folder_name=None):
     if not os.path.exists(folder_name+os.sep+'data'):
         os.makedirs(folder_name+os.sep+'data')
 
-    walk_data = None  # Initialize list for function call
     # Iterate and save results
     for i in tqdm(list(range(0, num_iter)), ascii=True):
         # Do particle iterations
-        walk_data = particle.run_iteration(previous_walk_data=walk_data)
+        walk_data = particle.run_iteration()
 
         # collect latest travel times
         x0, y0, t0 = get_state(walk_data, 0)
@@ -315,7 +327,7 @@ def time_plots(params, num_iter, folder_name=None):
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(sc, cax=cax)
         cbar.set_label('Particle Travel Times [s]')
-        im = ax.imshow(params.depth)
+        im = ax.imshow(particle.depth)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("bottom", size="5%", pad=0.5)
         cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
@@ -745,13 +757,15 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
 
         grid : `numpy.ndarray`
             A 2-D grid upon which the particles will be plotted. Examples of
-            grids that might be nice to use are `params.depth`, `params.stage`,
-            `params.topography`.
+            grids that might be nice to use are
+            `dorado.particle_track.modelParams.depth`,
+            `dorado.particle_track.modelParams.stage`,
+            `dorado.particle_track.modelParams.topography`.
 
         walk_data : `dict`
             The dictionary with the particle information. This is the output
             from one of the other routines or the
-            :obj:particle_track.run_iteration() function.
+            :obj:dorado.particle_track.run_iteration() function.
 
         iteration : `int`, optional
             Iteration number at which to plot the particles. Default is -1,
