@@ -11,8 +11,6 @@ from .particle_track import modelParams
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-from matplotlib import patheffects as path_effects
-from matplotlib.collections import LineCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scipy
 import os
@@ -389,11 +387,12 @@ def get_state(walk_data, iteration=-1):
     iter_exceeds_warning = 0
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
-        if len(walk_data['xinds'][ii]) > iteration:
+        try:
             xinds.append(walk_data['xinds'][ii][iteration])
             yinds.append(walk_data['yinds'][ii][iteration])
             times.append(walk_data['travel_times'][ii][iteration])
-        else:
+        except IndexError:
+            # If target iter exceeds walk history, return last iter
             xinds.append(walk_data['xinds'][ii][-1])
             yinds.append(walk_data['yinds'][ii][-1])
             times.append(walk_data['travel_times'][ii][-1])
@@ -725,6 +724,9 @@ def draw_travel_path(grid, walk_data,
         Saves a plot of particle travel paths.
 
     """
+    import matplotlib.patheffects as path_effects
+    from matplotlib.collections import LineCollection
+
     if(particles_to_follow == 'all'):
         Np_tracer = len(walk_data['xinds'])
         particles_to_follow = list(range(Np_tracer))
@@ -732,7 +734,7 @@ def draw_travel_path(grid, walk_data,
     plt.figure(figsize=(7, 4), dpi=300)
     ax = plt.gca()
     im = ax.imshow(grid, cmap='bone', alpha=0.9)
-    ax.set_title('Particle paths')
+    ax.set_title('Particle Paths')
     
     paths = [] # Place to store particle paths
     colors = [] # Place to store colors
@@ -806,13 +808,14 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
 
     return ax
 
-def tail_plots(particle,
-               num_steps,
-               folder_name=None,
-               frequency=4,
-               tail_length=12,
-               rgba_start=[1, 0.4, 0.2, 1],
-               rgba_end=[1, 0.3, 0.1, 0]):
+
+def snake_plots(particle,
+                num_steps,
+                folder_name=None,
+                frequency=4,
+                tail_length=12,
+                rgba_start=[1, 0.4, 0.2, 1],
+                rgba_end=[1, 0.3, 0.1, 0]):
     """Plot particle positions with a trailing tail
     
     Loops through existing walk_data history and creates a series of
@@ -858,6 +861,9 @@ def tail_plots(particle,
         Saves a plot of the particle travel history at each step as a png
 
     """
+    import matplotlib.patheffects as path_effects
+    from matplotlib.collections import LineCollection
+
     # Handle directories
     if folder_name is None:
         folder_name = os.getcwd()
@@ -865,15 +871,16 @@ def tail_plots(particle,
         print('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
-    if not os.path.exists(folder_name+os.sep+'tailfigs'):
-        os.makedirs(folder_name+os.sep+'tailfigs')
-    
+    if not os.path.exists(folder_name+os.sep+'figs'):
+        os.makedirs(folder_name+os.sep+'figs')
+
     # Colors of the tail. Linearly trends from rgba_start to _end
     # Color list repeats for each particle when plotted
     colors = np.zeros((tail_length, 4))
     for c in list(range(4)):
-        colors[:,c] = np.linspace(rgba_start[c], rgba_end[c], tail_length).T
-    
+        colors[:,c] = np.linspace(rgba_start[c], rgba_end[c],
+                                  tail_length).T
+
     # Loop through specified number of steps
     for ii in list(range(frequency, num_steps*frequency, frequency)):
         paths = [] # Initialize place to store paths
@@ -884,7 +891,7 @@ def tail_plots(particle,
         fig = plt.figure(figsize=(7, 4), dpi=300)
         ax = plt.gca()
         im = ax.imshow(particle.depth, cmap='bone', alpha=0.9)
-        
+
         # Loop through particles
         for jj in list(range(len(particle.walk_data['xinds']))):
             # Grab this particle's walk history
@@ -892,11 +899,11 @@ def tail_plots(particle,
             y = particle.walk_data['yinds'][jj]
             lineseg = zip(y, x)
             newest_segment = lineseg[0:2] # Use first segment as backup
-            
+
             # Check that this partice had enough iterations
             if ii > len(lineseg):
                 continue # If not, skip
-            
+
             # Loop through history in reverse order and grab segments
             for c in chunks:
                 # Check to make sure low index isn't below zero
@@ -914,7 +921,7 @@ def tail_plots(particle,
             break
 
         # Add new line collection to our figure, apply a background shadow
-        lc = LineCollection(paths, colors=colors, 
+        lc = LineCollection(paths, colors=colors,
                             linewidths=1.2, capstyle='round',
                             path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
                                                                         alpha=0.1,
@@ -922,7 +929,7 @@ def tail_plots(particle,
                                           path_effects.Normal()])
         ax.add_collection(lc)
         ax.set_title('Iteration %s' % ii)
-        plt.savefig(folder_name+os.sep+'tailfigs'
-                    +os.sep+'output'+str(ii)+'.png',
+        plt.savefig(folder_name+os.sep+'figs'
+                    +os.sep+'snakefig'+str(ii)+'.png',
                     bbox_inches='tight')
         plt.close()
