@@ -24,7 +24,7 @@ Now we will apply the `draw_travel_path` function. In this example we are going 
 .. doctest::
 
    >>> draw_travel_path(depth, all_walk_data, [0, 1, 2, 3],
-   >>>           'steady_deltarcm_example'+os.sep+'figs'+os.sep+'travel_paths.png',
-   >>>           interval=2, plot_legend=True)
+   >>>                  'steady_deltarcm_example'+os.sep+'figs'+os.sep+'travel_paths.png',
+   >>>                  interval=2, plot_legend=True)
 
 .. image:: images/example07/travel_paths.png
