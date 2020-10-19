@@ -398,9 +398,9 @@ def get_state(walk_data, iteration=-1):
             times.append(walk_data['travel_times'][ii][-1])
             iter_exceeds_warning += 1
     
-    # if iter_exceeds_warning > 0:
-        # print('Warning: %s particles have not reached %s iterations' % \
-              # (iter_exceeds_warning, iteration))
+    if iter_exceeds_warning > 0:
+        print('Note: %s particles have not reached %s iterations' % \
+              (iter_exceeds_warning, iteration))
 
     return xinds, yinds, times
 
@@ -691,7 +691,7 @@ def animate_plots(start_val, end_val, folder_name):
 def draw_travel_path(grid, walk_data,
                      particles_to_follow='all',
                      output_file='travel_paths.png',
-                     frequency=1):
+                     interval=1, plot_legend=False):
     """Make a plot with the travel path of specified particles drawn out.
 
     **Inputs** :
@@ -714,10 +714,14 @@ def draw_travel_path(grid, walk_data,
         output_file : `str`, optional
             Path to save the output image to.
 
-        frequency : `int`, optional
+        interval : `int`, optional
             Determines how "smooth" each particle trajectory appears by
             skipping iterations between successive points on the path.
             Default it to show every iteration
+
+        plot_legend : `bool`, optional
+            Controls whether resulting plot includes a legend of particle IDs. 
+            Default is False
 
     **Outputs** :
 
@@ -726,6 +730,7 @@ def draw_travel_path(grid, walk_data,
     """
     import matplotlib.patheffects as path_effects
     from matplotlib.collections import LineCollection
+    from matplotlib.lines import Line2D
 
     if(particles_to_follow == 'all'):
         Np_tracer = len(walk_data['xinds'])
@@ -743,8 +748,8 @@ def draw_travel_path(grid, walk_data,
         c = np.random.rand(3,)
         colors.append([c[0], c[1], c[2], 0.9])
         
-        x = walk_data['xinds'][i][0::frequency]
-        y = walk_data['yinds'][i][0::frequency]
+        x = walk_data['xinds'][i][0::interval]
+        y = walk_data['yinds'][i][0::interval]
         lineseg = zip(y, x)
         paths.append(lineseg)
 
@@ -756,11 +761,14 @@ def draw_travel_path(grid, walk_data,
                                                                     linewidth=1.6),
                                       path_effects.Normal()])
     ax.add_collection(lc)
-    # FIXME: Need to figure out generalizable legend for any # of particles
+    if plot_legend:
+        custom_lines = [Line2D([0], [0], color=c, lw=1.2) for c in colors]
+        ax.legend(custom_lines, [str(i) for i in particles_to_follow],
+                  loc='center left', bbox_to_anchor=(1, 0.5), fontsize='small',
+                  title='Particle ID')
     plt.axis('scaled')
     plt.tight_layout()
     plt.savefig(output_file, bbox_inches='tight')
-    plt.close()
 
 
 def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
@@ -812,7 +820,7 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
 def snake_plots(particle,
                 num_steps,
                 folder_name=None,
-                frequency=4,
+                interval=4,
                 tail_length=12,
                 rgba_start=[1, 0.4, 0.2, 1],
                 rgba_end=[1, 0.3, 0.1, 0]):
@@ -836,14 +844,14 @@ def snake_plots(particle,
         folder_name : `str`, optional
             Path to folder in which to save output plots
 
-        frequency : `int`, optional
+        interval : `int`, optional
             Interval of iterations to skip over between each plot. Also
             determines how "smooth" each particle trajectory appears. 
-            Default it to show every 4th iteration
+            Default is to show every 4th iteration
 
         tail_length : `int`, optional
             Number of previous locations to show in the "tail" behind
-            each particle. Oldest location will be frequency*tail_length
+            each particle. Oldest location will be interval*tail_length
             iterations before the current iteration. Default is 12
 
         rgba_start : `list`, optional
@@ -882,10 +890,10 @@ def snake_plots(particle,
                                   tail_length).T
 
     # Loop through specified number of steps
-    for ii in list(range(frequency, num_steps*frequency, frequency)):
+    for ii in list(range(interval, num_steps*interval, interval)):
         paths = [] # Initialize place to store paths
         # Recent chunk of the path we're going to plot
-        chunks = list(range(ii, ii-tail_length*frequency, -1*frequency))
+        chunks = list(range(ii, ii-tail_length*interval, -1*interval))
 
         # Create figure for this step
         fig = plt.figure(figsize=(7, 4), dpi=300)
@@ -900,16 +908,16 @@ def snake_plots(particle,
             lineseg = zip(y, x)
             newest_segment = lineseg[0:2] # Use first segment as backup
 
-            # Check that this partice had enough iterations
+            # Check that this particle had enough iterations
             if ii > len(lineseg):
                 continue # If not, skip
 
             # Loop through history in reverse order and grab segments
             for c in chunks:
                 # Check to make sure low index isn't below zero
-                if c-frequency-1 >= 0:
+                if c-interval-1 >= 0:
                     # Store the most recent segment with a valid index
-                    newest_segment = lineseg[c-frequency-1:c:frequency]
+                    newest_segment = lineseg[c-interval-1:c:interval]
                     paths.append(newest_segment)
                 else:
                     # If indices are below zero, we've reached the beginning
