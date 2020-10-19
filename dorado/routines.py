@@ -750,7 +750,7 @@ def draw_travel_path(grid, walk_data,
         
         x = walk_data['xinds'][i][0::interval]
         y = walk_data['yinds'][i][0::interval]
-        lineseg = zip(y, x)
+        lineseg = list(zip(y, x))
         paths.append(lineseg)
 
     # Add new line collection to our figure, apply a background shadow
@@ -905,7 +905,7 @@ def snake_plots(particle,
             # Grab this particle's walk history
             x = particle.walk_data['xinds'][jj]
             y = particle.walk_data['yinds'][jj]
-            lineseg = zip(y, x)
+            lineseg = list(zip(y, x))
             newest_segment = lineseg[0:2] # Use first segment as backup
 
             # Check that this particle had enough iterations
