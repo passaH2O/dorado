@@ -817,7 +817,8 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
     return ax
 
 
-def snake_plots(particle,
+def snake_plots(grid,
+                walk_data,
                 num_steps,
                 folder_name=None,
                 interval=4,
@@ -829,14 +830,21 @@ def snake_plots(particle,
     Loops through existing walk_data history and creates a series of
     plots of the particle locations, with recent locations shown as a
     trailing tail. Default is for the tails to fade away, but they 
-    can also change color.
+    can also change color. Currently this function can only sync up
+    particles by iteration number, not travel_times.
 
     **Inputs** :
 
-        particle : :obj:`dorado.particle_track.Particles`
-            An initialized :obj:`particle_track.Particles` object with an
-            existing walk history stored in particle.walk_data, as well as
-            a particle.depth array to serve as the background
+        grid : `numpy.ndarray`
+            A 2-D grid upon which the particles will be plotted. Examples of
+            grids that might be nice to use are
+            `dorado.particle_track.modelParams.depth`,
+            `dorado.particle_track.modelParams.stage`,
+            `dorado.particle_track.modelParams.topography`.
+
+        walk_data : `dict`
+            Output of `steady_plots`, `unsteady_plots`, `time_plots`, as well
+            as the `particle_track.run_iteration` method.
 
         num_steps : `int`
             Number of states in the particle history to plot
@@ -898,13 +906,13 @@ def snake_plots(particle,
         # Create figure for this step
         fig = plt.figure(figsize=(7, 4), dpi=300)
         ax = plt.gca()
-        im = ax.imshow(particle.depth, cmap='bone', alpha=0.9)
+        im = ax.imshow(grid, cmap='bone', alpha=0.9)
 
         # Loop through particles
-        for jj in list(range(len(particle.walk_data['xinds']))):
+        for jj in list(range(len(walk_data['xinds']))):
             # Grab this particle's walk history
-            x = particle.walk_data['xinds'][jj]
-            y = particle.walk_data['yinds'][jj]
+            x = walk_data['xinds'][jj]
+            y = walk_data['yinds'][jj]
             lineseg = list(zip(y, x))
             newest_segment = lineseg[0:2] # Use first segment as backup
 
