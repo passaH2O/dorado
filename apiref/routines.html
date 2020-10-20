@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.routines &#8212; dorado 2.0.0 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -62,12 +62,16 @@ of the previous plotting routines.</p>
 
 <dl class="function">
 <dt id="dorado.routines.draw_travel_path">
-<code class="descclassname">dorado.routines.</code><code class="descname">draw_travel_path</code><span class="sig-paren">(</span><em>depth</em>, <em>walk_data</em>, <em>particles_to_follow='all'</em>, <em>output_file='travel_paths.png'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#draw_travel_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.draw_travel_path" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.routines.</code><code class="descname">draw_travel_path</code><span class="sig-paren">(</span><em>grid</em>, <em>walk_data</em>, <em>particles_to_follow='all'</em>, <em>output_file='travel_paths.png'</em>, <em>interval=1</em>, <em>plot_legend=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#draw_travel_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.draw_travel_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a plot with the travel path of specified particles drawn out.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>depth<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Water depth array.</p>
+<dt>grid<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>A 2-D grid upon which the particles will be plotted. Examples of
+grids that might be nice to use are
+<cite>dorado.particle_track.modelParams.depth</cite>,
+<cite>dorado.particle_track.modelParams.stage</cite>,
+<cite>dorado.particle_track.modelParams.topography</cite>.</p>
 </dd>
 <dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Output of <cite>steady_plots</cite>, <cite>unsteady_plots</cite>, <cite>time_plots</cite>, as well
 as the <cite>particle_track.run_iteration</cite> method.</p>
@@ -76,6 +80,13 @@ as the <cite>particle_track.run_iteration</cite> method.</p>
 Default is <cite>all</cite> particles.</p>
 </dd>
 <dt>output_file<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Path to save the output image to.</p>
+</dd>
+<dt>interval<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Determines how “smooth” each particle trajectory appears by
+skipping iterations between successive points on the path.
+Default it to show every iteration</p>
+</dd>
+<dt>plot_legend<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Controls whether resulting plot includes a legend of particle IDs.
+Default is False</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -218,6 +229,55 @@ figure, default is ‘b’ for blue</p>
 <dt>ax<span class="classifier"><cite>matplotlib.axes</cite></span></dt><dd><p>A <cite>matplotlib.axes</cite> with the intended plot drawn on it</p>
 </dd>
 </dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.routines.snake_plots">
+<code class="descclassname">dorado.routines.</code><code class="descname">snake_plots</code><span class="sig-paren">(</span><em>grid, walk_data, num_steps, folder_name=None, interval=4, tail_length=12, rgba_start=[1, 0.4, 0.2, 1], rgba_end=[1, 0.3, 0.1, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#snake_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.snake_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot particle positions with a trailing tail</p>
+<p>Loops through existing walk_data history and creates a series of
+plots of the particle locations, with recent locations shown as a
+trailing tail. Default is for the tails to fade away, but they
+can also change color. Currently this function can only sync up
+particles by iteration number, not travel_times.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>grid<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>A 2-D grid upon which the particles will be plotted. Examples of
+grids that might be nice to use are
+<cite>dorado.particle_track.modelParams.depth</cite>,
+<cite>dorado.particle_track.modelParams.stage</cite>,
+<cite>dorado.particle_track.modelParams.topography</cite>.</p>
+</dd>
+<dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Output of <cite>steady_plots</cite>, <cite>unsteady_plots</cite>, <cite>time_plots</cite>, as well
+as the <cite>particle_track.run_iteration</cite> method.</p>
+</dd>
+<dt>num_steps<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of states in the particle history to plot</p>
+</dd>
+<dt>folder_name<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Path to folder in which to save output plots</p>
+</dd>
+<dt>interval<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Interval of iterations to skip over between each plot. Also
+determines how “smooth” each particle trajectory appears.
+Default is to show every 4th iteration</p>
+</dd>
+<dt>tail_length<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Number of previous locations to show in the “tail” behind
+each particle. Oldest location will be interval*tail_length
+iterations before the current iteration. Default is 12</p>
+</dd>
+<dt>rgba_start<span class="classifier"><cite>list</cite>, optional</span></dt><dd><p>List of floats to use as the “recent” color in the particle
+path, specified as [red, green, blue, alpha] in the range 0-1.
+Default is a light orange</p>
+</dd>
+<dt>rgba_end<span class="classifier"><cite>list</cite>, optional</span></dt><dd><p>List of floats to use as the “oldest” color in the particle
+path, specified as [red, green, blue, alpha] in the range 0-1.
+Default slowly fades to red-ish with an alpha of zero</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><p>Saves a plot of the particle travel history at each step as a png</p>
 </div></blockquote>
 </dd></dl>
 
