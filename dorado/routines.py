@@ -384,11 +384,23 @@ def get_state(walk_data, iteration=-1):
     xinds = []
     yinds = []
     times = []
+    iter_exceeds_warning = 0
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
-        xinds.append(walk_data['xinds'][ii][iteration])
-        yinds.append(walk_data['yinds'][ii][iteration])
-        times.append(walk_data['travel_times'][ii][iteration])
+        try:
+            xinds.append(walk_data['xinds'][ii][iteration])
+            yinds.append(walk_data['yinds'][ii][iteration])
+            times.append(walk_data['travel_times'][ii][iteration])
+        except IndexError:
+            # If target iter exceeds walk history, return last iter
+            xinds.append(walk_data['xinds'][ii][-1])
+            yinds.append(walk_data['yinds'][ii][-1])
+            times.append(walk_data['travel_times'][ii][-1])
+            iter_exceeds_warning += 1
+    
+    if iter_exceeds_warning > 0:
+        print('Note: %s particles have not reached %s iterations' % \
+              (iter_exceeds_warning, iteration))
 
     return xinds, yinds, times
 
@@ -676,15 +688,20 @@ def animate_plots(start_val, end_val, folder_name):
               dpi=300)
 
 
-def draw_travel_path(depth, walk_data,
+def draw_travel_path(grid, walk_data,
                      particles_to_follow='all',
-                     output_file='travel_paths.png'):
+                     output_file='travel_paths.png',
+                     interval=1, plot_legend=False):
     """Make a plot with the travel path of specified particles drawn out.
 
     **Inputs** :
 
-        depth : `numpy.ndarray`
-            Water depth array.
+        grid : `numpy.ndarray`
+            A 2-D grid upon which the particles will be plotted. Examples of
+            grids that might be nice to use are
+            `dorado.particle_track.modelParams.depth`,
+            `dorado.particle_track.modelParams.stage`,
+            `dorado.particle_track.modelParams.topography`.
 
         walk_data : `dict`
             Output of `steady_plots`, `unsteady_plots`, `time_plots`, as well
@@ -697,57 +714,61 @@ def draw_travel_path(depth, walk_data,
         output_file : `str`, optional
             Path to save the output image to.
 
+        interval : `int`, optional
+            Determines how "smooth" each particle trajectory appears by
+            skipping iterations between successive points on the path.
+            Default it to show every iteration
+
+        plot_legend : `bool`, optional
+            Controls whether resulting plot includes a legend of particle IDs. 
+            Default is False
+
     **Outputs** :
 
         Saves a plot of particle travel paths.
 
     """
-    from matplotlib import cm
-    color_index = 0
+    import matplotlib.patheffects as path_effects
+    from matplotlib.collections import LineCollection
+    from matplotlib.lines import Line2D
 
     if(particles_to_follow == 'all'):
         Np_tracer = len(walk_data['xinds'])
         particles_to_follow = list(range(Np_tracer))
 
     plt.figure(figsize=(7, 4), dpi=300)
-    plt.imshow(depth, cmap='bone')
-    plt.title('Particle paths overlaid on water depth')
-    cbar2 = plt.colorbar(orientation='horizontal')
-    cbar2.set_label('Water Depth [m]')
-
+    ax = plt.gca()
+    im = ax.imshow(grid, cmap='bone', alpha=0.9)
+    ax.set_title('Particle Paths')
+    
+    paths = [] # Place to store particle paths
+    colors = [] # Place to store colors
     for i in tqdm(particles_to_follow):
-        # set color for this particle (using a discrete colormap)
-        c = cm.Set1(color_index)
-        col = [c[0], c[1], c[2], 0.85]  # make color a bit transparent
-        color_index += 1
-        # visualize this particle's travel path
-        for j in range(1, len(walk_data['xinds'][i][:])):
-            # define old x-y point
-            old_x = walk_data['xinds'][i][j-1]
-            old_y = walk_data['yinds'][i][j-1]
-            # identify new x-y point
-            new_x = walk_data['xinds'][i][j]
-            new_y = walk_data['yinds'][i][j]
-            # add the line for the particle
-            if j == 1:
-                plt.plot([old_y, new_y],
-                         [old_x, new_x],
-                         color=col,
-                         linewidth=0.9,
-                         label='Particle ' + str(i))
+        # Set color for this particle
+        c = np.random.rand(3,)
+        colors.append([c[0], c[1], c[2], 0.9])
+        
+        x = walk_data['xinds'][i][0::interval]
+        y = walk_data['yinds'][i][0::interval]
+        lineseg = list(zip(y, x))
+        paths.append(lineseg)
 
-            else:
-                plt.plot([old_y, new_y],
-                         [old_x, new_x],
-                         color=col,
-                         linewidth=0.9,
-                         label='_nolegend_')
-
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    # Add new line collection to our figure, apply a background shadow
+    lc = LineCollection(paths, colors=colors, 
+                        linewidths=1.2, capstyle='round',
+                        path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
+                                                                    alpha=0.2,
+                                                                    linewidth=1.6),
+                                      path_effects.Normal()])
+    ax.add_collection(lc)
+    if plot_legend:
+        custom_lines = [Line2D([0], [0], color=c, lw=1.2) for c in colors]
+        ax.legend(custom_lines, [str(i) for i in particles_to_follow],
+                  loc='center left', bbox_to_anchor=(1, 0.5), fontsize='small',
+                  title='Particle ID')
     plt.axis('scaled')
     plt.tight_layout()
     plt.savefig(output_file, bbox_inches='tight')
-    plt.close()
 
 
 def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
@@ -794,3 +815,137 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
     plt.scatter(y, x, c=c)
 
     return ax
+
+
+def snake_plots(grid,
+                walk_data,
+                num_steps,
+                folder_name=None,
+                interval=4,
+                tail_length=12,
+                rgba_start=[1, 0.4, 0.2, 1],
+                rgba_end=[1, 0.3, 0.1, 0]):
+    """Plot particle positions with a trailing tail
+    
+    Loops through existing walk_data history and creates a series of
+    plots of the particle locations, with recent locations shown as a
+    trailing tail. Default is for the tails to fade away, but they 
+    can also change color. Currently this function can only sync up
+    particles by iteration number, not travel_times.
+
+    **Inputs** :
+
+        grid : `numpy.ndarray`
+            A 2-D grid upon which the particles will be plotted. Examples of
+            grids that might be nice to use are
+            `dorado.particle_track.modelParams.depth`,
+            `dorado.particle_track.modelParams.stage`,
+            `dorado.particle_track.modelParams.topography`.
+
+        walk_data : `dict`
+            Output of `steady_plots`, `unsteady_plots`, `time_plots`, as well
+            as the `particle_track.run_iteration` method.
+
+        num_steps : `int`
+            Number of states in the particle history to plot
+
+        folder_name : `str`, optional
+            Path to folder in which to save output plots
+
+        interval : `int`, optional
+            Interval of iterations to skip over between each plot. Also
+            determines how "smooth" each particle trajectory appears. 
+            Default is to show every 4th iteration
+
+        tail_length : `int`, optional
+            Number of previous locations to show in the "tail" behind
+            each particle. Oldest location will be interval*tail_length
+            iterations before the current iteration. Default is 12
+
+        rgba_start : `list`, optional
+            List of floats to use as the "recent" color in the particle
+            path, specified as [red, green, blue, alpha] in the range 0-1.
+            Default is a light orange
+
+        rgba_end : `list`, optional
+            List of floats to use as the "oldest" color in the particle
+            path, specified as [red, green, blue, alpha] in the range 0-1.
+            Default slowly fades to red-ish with an alpha of zero
+
+    **Outputs** :
+
+        Saves a plot of the particle travel history at each step as a png
+
+    """
+    import matplotlib.patheffects as path_effects
+    from matplotlib.collections import LineCollection
+
+    # Handle directories
+    if folder_name is None:
+        folder_name = os.getcwd()
+    if os.path.exists(folder_name):
+        print('Saving files in existing directory')
+    else:
+        os.makedirs(folder_name)
+    if not os.path.exists(folder_name+os.sep+'figs'):
+        os.makedirs(folder_name+os.sep+'figs')
+
+    # Colors of the tail. Linearly trends from rgba_start to _end
+    # Color list repeats for each particle when plotted
+    colors = np.zeros((tail_length, 4))
+    for c in list(range(4)):
+        colors[:,c] = np.linspace(rgba_start[c], rgba_end[c],
+                                  tail_length).T
+
+    # Loop through specified number of steps
+    for ii in list(range(interval, num_steps*interval, interval)):
+        paths = [] # Initialize place to store paths
+        # Recent chunk of the path we're going to plot
+        chunks = list(range(ii, ii-tail_length*interval, -1*interval))
+
+        # Create figure for this step
+        fig = plt.figure(figsize=(7, 4), dpi=300)
+        ax = plt.gca()
+        im = ax.imshow(grid, cmap='bone', alpha=0.9)
+
+        # Loop through particles
+        for jj in list(range(len(walk_data['xinds']))):
+            # Grab this particle's walk history
+            x = walk_data['xinds'][jj]
+            y = walk_data['yinds'][jj]
+            lineseg = list(zip(y, x))
+            newest_segment = lineseg[0:2] # Use first segment as backup
+
+            # Check that this particle had enough iterations
+            if ii > len(lineseg):
+                continue # If not, skip
+
+            # Loop through history in reverse order and grab segments
+            for c in chunks:
+                # Check to make sure low index isn't below zero
+                if c-interval-1 >= 0:
+                    # Store the most recent segment with a valid index
+                    newest_segment = lineseg[c-interval-1:c:interval]
+                    paths.append(newest_segment)
+                else:
+                    # If indices are below zero, we've reached the beginning
+                    # Just re-add the most recent valid segment again
+                    paths.append(newest_segment)
+
+        # Check that we're not still plotting after all particles are done
+        if len(paths) < 1:
+            break
+
+        # Add new line collection to our figure, apply a background shadow
+        lc = LineCollection(paths, colors=colors,
+                            linewidths=1.2, capstyle='round',
+                            path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
+                                                                        alpha=0.1,
+                                                                        linewidth=1.6),
+                                          path_effects.Normal()])
+        ax.add_collection(lc)
+        ax.set_title('Iteration %s' % ii)
+        plt.savefig(folder_name+os.sep+'figs'
+                    +os.sep+'snakefig'+str(ii)+'.png',
+                    bbox_inches='tight')
+        plt.close()

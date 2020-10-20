@@ -17,4 +17,5 @@ all_walk_data = json.load(open('steady_anuga_example'+os.sep+'data'+os.sep+'data
 
 # Draw the travel path
 draw_travel_path(depth, all_walk_data, [0, 1, 2, 3],
-                 'steady_anuga_example'+os.sep+'data'+os.sep+'travel_paths.png')
+                 'steady_anuga_example'+os.sep+'figs'+os.sep+'travel_paths.png',
+                 interval=2, plot_legend=True)
