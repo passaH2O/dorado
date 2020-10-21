@@ -36,7 +36,7 @@ Existing software for tracking water parcels or particles in a Lagrangian framew
 \begin{equation}
     F^{*} = \gamma F_{sfc} + (1-\gamma) F_{int}
 \end{equation}
-in which $F_{sfc}$ and $F_{int}$ represent the surface gradient and inertial components, respectively. Modifying $\gamma$ indirectly controls the diffusivity of the travel path. The second weighting parameter, $\theta$, modifies the routing weights, $w_i$, for the random walk based on the local water depth value, $h_i$. The routing weights for each neighboring cell are calculated per @Liang2015b:
+in which $F_{sfc}$ and $F_{int}$ represent the surface gradient and inertial components, respectively. Modifying $\gamma$ indirectly controls the diffusivity of the travel path. The second weighting parameter, $\theta$, modifies the routing weights, $w_i$, for the random walk based on the local water depth value, $h_i$. The routing weights for each neighboring cell are calculated per @Liang2015a:
 
 \begin{equation}
     w_i = \frac{h_i^\theta \max \left(0, F \cdot d_i \right)}{\Delta_i}
