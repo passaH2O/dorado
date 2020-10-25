@@ -3,6 +3,7 @@
 [![codecov](https://codecov.io/gh/passaH2O/dorado/branch/master/graph/badge.svg?token=A4MWN4K1XJ)](https://codecov.io/gh/passaH2O/dorado)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pydorado)
 [![PyPI version](https://badge.fury.io/py/pydorado.svg)](https://badge.fury.io/py/pydorado)
+[![status](https://joss.theoj.org/papers/f1f61292f998588ae06bb1cd14dd4063/status.svg)](https://joss.theoj.org/papers/f1f61292f998588ae06bb1cd14dd4063)
 <div class="nav3" style="height:705px;">
     <img src="docs/source/examples/images/logo.gif" alt="Particle routing on Lidar-derived bathymetry" width="65%"></a>
 </div>
@@ -34,6 +35,9 @@ For additional installation options and instructions, refer to the [documentatio
 
 ## Contributing
 We welcome contributions to the dorado project. Please open an issue or a pull request if there is functionality you would like to see or propose. Refer to our [contributing guide](https://passah2o.github.io/dorado/misc/contributing.html) for more information.
+
+## Citing
+If you use this package and wish to cite it, please use the [Journal of Open Source Software article](https://joss.theoj.org/papers/10.21105/joss.02585#).
 
 ## Funding Acknowledgments
 This work was supported in part by NSF EAR-1719670, the NSF GRFP under grant DGE-1610403 and the NASA Earth Venture Suborbital (EVS) award 17-EVS3-17_1-0009 in support of the DELTA-X project.
