@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.1.0 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.1.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -546,8 +546,7 @@
             <span class="n">start_times</span> <span class="o">=</span> <span class="n">prev_times</span> <span class="o">+</span> <span class="n">start_times</span>
 
         <span class="c1"># determine the new total number of particles we have now</span>
-        <span class="c1"># additive in the event we are running the generate multiple times</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">+=</span> <span class="n">Np_tracer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_xindices</span><span class="p">)</span>
 
         <span class="c1"># store information in the init_walk_data dictionary and return it</span>
         <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_xindices</span>

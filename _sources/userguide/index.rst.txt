@@ -25,7 +25,7 @@ Defining the parameters is required prior to doing any particle routing. Initiat
 .. doctest::
 
    >>> import dorado.particle_track as pt
-   >>> params = pt.params()
+   >>> params = pt.modelParams()
 
 After establishing the parameter class, information about the domain must be provided. As `dorado` is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible, however some values **must** be provided.
 
