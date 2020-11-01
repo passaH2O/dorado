@@ -512,8 +512,7 @@ class Particles():
             start_times = prev_times + start_times
 
         # determine the new total number of particles we have now
-        # additive in the event we are running the generate multiple times
-        self.Np_tracer += Np_tracer
+        self.Np_tracer = len(start_xindices)
 
         # store information in the init_walk_data dictionary and return it
         init_walk_data['xinds'] = start_xindices
