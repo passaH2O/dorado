@@ -903,10 +903,69 @@ def exposure_time(walk_data,
     return exposure_times.tolist()
 
 
+def nourishment_area(walk_data, raster_size, sigma=0.7):
+    """Determine the nourishment area of a particle injection
+
+    Function will measure the regions of the domain 'fed' by a seed location,
+    as indicated by the history of particle travel locations in walk_data.
+    Returns a heatmap raster, in which values indicate number of occasions
+    each cell was occupied by a particle (after spatial filtering to reduce
+    noise in the random walk, and normalizing by number of particles).
+
+    **Inputs** :
+
+        walk_data : `dict`
+            Dictionary of all prior x locations, y locations, and travel
+            times (the output of run_iteration)
+
+        raster_size : `tuple`
+            Tuple (L,W) of the domain dimensions, i.e. the output of
+            numpy.shape(raster).
+
+        sigma : `float`, optional
+            Degree of spatial smoothing of the area, implemented using a
+            Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
+            Default is light smoothing with sigma = 0.7 (to turn off smoothing,
+            set sigma = 0)
+
+    **Outputs** :
+
+        visit_freq : `numpy.ndarray`
+            Array of normalized particle visit frequency, with cells in the
+            range [0, 1] representing the number of instances particles visited
+            that cell. If sigma > 0, the array values include spatial filtering
+
+    """
+    if sigma > 0:
+        from scipy.ndimage import gaussian_filter
+    
+    # Measure visit frequency
+    visit_freq = np.zeros(raster_size)
+    for ii in list(range(len(walk_data['xinds']))):
+        for jj in list(range(len(walk_data['xinds'][ii]))):
+            visit_freq[walk_data['xinds'][ii][jj],
+                       walk_data['yinds'][ii][jj]] += 1
+
+    # If applicable, do smoothing
+    if sigma > 0:
+        visit_freq = gaussian_filter(visit_freq, sigma=sigma)
+        visit_freq[visit_freq==np.min(visit_freq)] = np.nan
+    else:
+        visit_freq[visit_freq==0] = np.nan
+    
+    # Make normalization robust to extrema by using high percentile
+    vmax = float(np.nanpercentile(visit_freq, 99.5))
+    visit_freq = visit_freq/vmax
+    visit_freq = np.clip(visit_freq, 0, 1)
+    
+    return visit_freq
+
+
 def unstruct2grid(coordinates,
                   quantity,
                   cellsize,
-                  k_nearest_neighbors=3):
+                  k_nearest_neighbors=3,
+                  boundary=None):
     """Convert unstructured model outputs into gridded arrays.
 
     Interpolates model variables (e.g. depth, velocity) from an
@@ -931,9 +990,14 @@ def unstruct2grid(coordinates,
         cellsize : `float or int`
             Length along one square cell face.
 
-        k_nearest_neighbors : `int`
+        k_nearest_neighbors : `int`, optional
             Number of nearest neighbors to use in the interpolation.
             If k>1, inverse-distance-weighted interpolation is used.
+
+        boundary : `list`, optional
+            List [] of (x,y) coordinates used to delineate the boundary of
+            interpolation. Points outside the polygon will be assigned as nan.
+            Format needs to match requirements of matplotlib.path.Path()
 
     **Outputs** :
 
@@ -971,6 +1035,13 @@ def unstruct2grid(coordinates,
     gridXY_array = np.array([np.concatenate(gridX),
                              np.concatenate(gridY)]).transpose()
     gridXY_array = np.ascontiguousarray(gridXY_array)
+    
+    # If a boundary has been specified, create array to index outside it
+    if boundary is not None:
+        path = matplotlib.path.Path(boundary)
+        outside = ~path.contains_points(gridXY_array)
+    else:
+        outside = np.zeros_like(gridXY_array, dtype=int)
 
     # Create Interpolation function
     if k_nearest_neighbors == 1:  # Only use nearest neighbor
@@ -983,6 +1054,7 @@ def unstruct2grid(coordinates,
             if isinstance(data, list):
                 data = np.array(data)
             gridded_data = data[gridqInd]
+            gridded_data[outside] = np.nan # Crop to bounds
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
             return gridded_data
@@ -1003,6 +1075,7 @@ def unstruct2grid(coordinates,
                 denom += nn_wts[:, i]
                 num += data[nn_inds[:, i]]*nn_wts[:, i]
             gridded_data = (num/denom)
+            gridded_data[outside] = np.nan # Crop to bounds
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
             return gridded_data

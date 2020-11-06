@@ -949,3 +949,93 @@ def snake_plots(grid,
                     +os.sep+'snakefig'+str(ii)+'.png',
                     bbox_inches='tight')
         plt.close()
+
+
+def show_nourishment_area(visit_freq, grid=None, walk_data=None,
+                          cmap='Reds', sigma=0.7, min_alpha=0,
+                          show_seed=True, seed_color='dodgerblue'):
+    """Plot a smoothed, normalized heatmap of particle visit frequency
+
+    Function will plot the history of particle travel locations in walk_data
+    as a heatmap overtop the specified grid, using the output of
+    particle_track.nourishment_area(). Colors indicate number of instances
+    in which that cell was occupied by a particle.
+
+    **Inputs** :
+
+        visit_freq : `numpy.ndarray`
+            A 2-D grid of normalized particle visit frequencies, i.e. the
+            output of the dorado.particle_track.nourishment_area() function
+
+        grid : `numpy.ndarray`, optional
+            An optional 2-D grid upon which the particles will be plotted.
+            Examples of grids that might be nice to use are
+            `dorado.particle_track.modelParams.depth`,
+            `dorado.particle_track.modelParams.stage`,
+            `dorado.particle_track.modelParams.topography`.
+
+        walk_data : `dict`, optional
+            The dictionary with the particle information, which is used to
+            show the seed location. This is the output from one of the other
+            routines or the :obj:dorado.particle_track.run_iteration() function.
+
+        cmap : `str`, optional
+            Name of Matplotlib colormap used for the foreground (heatmap).
+            Default is 'Reds'
+
+        sigma : `float`, optional
+            Degree of spatial smoothing of the heatmap used in the
+            dorado.particle_track.nourishment_area() function, only used to
+            adjust the plot asthetics for low sigma's
+
+        min_alpha : `float`, optional
+            Minimum alpha value of the heatmap, representing the least
+            frequented cell locations, default is full transparency
+
+        show_seed : `bool`, optional
+            Determines whether resulting plot shows a marker indicating the
+            (first) seed location. Uses indices of walk_data[:][0][0]. Default
+            is True, but only if 'walk_data' is also provided.
+
+        seed_color : `str`, optional
+            Name of Matplotlib color used for the marker seed, if shown. Default
+            is a light blue to contrast with the 'Reds' heatmap.
+
+    **Outputs** :
+
+        ax : `matplotlib.axes`
+            A `matplotlib.axes` upon which the nourishment area is drawn
+
+    """
+    from matplotlib.colors import Normalize
+
+    # Plot heatmap with alpha based on visit_freq
+    if sigma >= 0.125: # This is just a visual trial-and-error thing
+        amax = np.nanpercentile(visit_freq, 60)
+    else:
+        amax = np.nanpercentile(visit_freq, 30)
+    alphas = Normalize(0, amax, clip=True)(visit_freq) # Normalize alphas
+    alphas = np.clip(alphas, min_alpha, 1)
+    colors = Normalize(np.nanmin(visit_freq), 1)(visit_freq) # Normalize colors
+    cmap = plt.cm.get_cmap(cmap)
+    colors = cmap(colors)
+    colors[..., -1] = alphas
+
+    # Plot figure
+    if len(plt.get_fignums()) < 1:
+        # Create new figure axes if none are open
+        fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=300)
+    else:
+        ax = plt.gca() # Otherwise grab existing
+    ax.set_facecolor('k') # Set facecolor black
+    if grid is not None:
+        # Grid background intentionally dark:
+        im = ax.imshow(grid, cmap='gist_gray', vmax=np.max(grid)*3)
+    # Show nourishment area
+    nr = ax.imshow(colors)
+    plt.title('Nourishment Area')
+    if (show_seed) & (walk_data is not None):
+        ax.scatter(walk_data['yinds'][0][0], walk_data['xinds'][0][0],
+                   c=seed_color, edgecolors='black', s=10, linewidths=0.5)
+    
+    return ax
