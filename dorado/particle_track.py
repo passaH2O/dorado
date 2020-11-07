@@ -961,6 +961,74 @@ def nourishment_area(walk_data, raster_size, sigma=0.7):
     return visit_freq
 
 
+def nourishment_time(walk_data, raster_size, sigma=0.7):
+    """Determine the nourishment time of a particle injection
+
+    Function will measure the average length of time particles spend in each
+    area of the domain for a given seed location, as indicated by the history
+    of particle travel times in walk_data. Returns a heatmap raster, in
+    which values indicate the average length of time each cell was occupied by
+    a particle (after spatial filtering to reduce noise in the random walk).
+
+    **Inputs** :
+
+        walk_data : `dict`
+            Dictionary of all prior x locations, y locations, and travel
+            times (the output of run_iteration)
+
+        raster_size : `tuple`
+            Tuple (L,W) of the domain dimensions, i.e. the output of
+            numpy.shape(raster).
+
+        sigma : `float`, optional
+            Degree of spatial smoothing of the area, implemented using a
+            Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
+            Default is light smoothing with sigma = 0.7 (to turn off smoothing,
+            set sigma = 0)
+
+    **Outputs** :
+
+        mean_time : `numpy.ndarray`
+            Array of mean occupation time, with cell values representing the 
+            mean time particles spent in that cell. If sigma > 0, the array
+            values include spatial filtering
+
+    """
+    if sigma > 0:
+        from scipy.ndimage import gaussian_filter
+    
+    # Measure visit frequency
+    visit_freq = np.zeros(raster_size)
+    time_total = visit_freq.copy()
+    for ii in list(range(len(walk_data['xinds']))):
+        for jj in list(range(1, len(walk_data['xinds'][ii])-1)):
+            # Running total of particles in this cell to find average
+            visit_freq[walk_data['xinds'][ii][jj],
+                       walk_data['yinds'][ii][jj]] += 1
+            # Count the time in this cell as 0.5*last_dt + 0.5*next_dt
+            last_dt = (walk_data['travel_times'][ii][jj] - \
+                       walk_data['travel_times'][ii][jj-1])
+            next_dt = (walk_data['travel_times'][ii][jj+1] - \
+                       walk_data['travel_times'][ii][jj])
+            time_total[walk_data['xinds'][ii][jj],
+                       walk_data['yinds'][ii][jj]] += 0.5*(last_dt + next_dt)
+    # Find mean time in each cell
+    mean_time = time_total / visit_freq
+    mean_time[visit_freq == 0] = 0
+    # Prone to numerical outliers, so clip out extremes
+    vmax = float(np.nanpercentile(mean_time, 99.5))
+    mean_time = np.clip(mean_time, 0, vmax)
+    
+    # If applicable, do smoothing
+    if sigma > 0:
+        mean_time = gaussian_filter(mean_time, sigma=sigma)
+        mean_time[mean_time==np.min(mean_time)] = np.nan
+    else:
+        mean_time[mean_time==0] = np.nan
+    
+    return mean_time
+
+
 def unstruct2grid(coordinates,
                   quantity,
                   cellsize,

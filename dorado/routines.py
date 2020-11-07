@@ -998,7 +998,7 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
             is True, but only if 'walk_data' is also provided.
 
         seed_color : `str`, optional
-            Name of Matplotlib color used for the marker seed, if shown. Default
+            Name of matplotlib color used for the marker seed, if shown. Default
             is a light blue to contrast with the 'Reds' heatmap.
 
     **Outputs** :
@@ -1038,4 +1038,102 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
         ax.scatter(walk_data['yinds'][0][0], walk_data['xinds'][0][0],
                    c=seed_color, edgecolors='black', s=10, linewidths=0.5)
     
+    return ax
+
+
+def show_nourishment_time(mean_times, grid=None, walk_data=None,
+                          cmap='magma', show_colorbar=True, min_alpha=0.3,
+                          show_seed=True, seed_color='dodgerblue'):
+    """Plot a smoothed heatmap of mean particle visit time
+
+    Function will plot the history of mean particle travel times in walk_data
+    as a heatmap overtop the specified grid, using the output of
+    particle_track.nourishment_time(). Colors indicate the average length of
+    time particles spent in each cell (potentially after smoothing)
+
+    **Inputs** :
+
+        mean_times : `numpy.ndarray`
+            Array of mean occupation times in each cell, i.e. the output of
+            the dorado.particle_track.nourishment_time() function
+
+        grid : `numpy.ndarray`, optional
+            An optional 2-D grid upon which the particles will be plotted.
+            Recommended to use `dorado.particle_track.modelParams.topography`
+
+        walk_data : `dict`, optional
+            The dictionary with the particle information, which is used to
+            show the seed location. This is the output from one of the other
+            routines or the :obj:dorado.particle_track.run_iteration() function.
+
+        cmap : `str`, optional
+            Name of Matplotlib colormap used for the foreground (heatmap).
+            Default is 'magma'
+
+        show_colorbar : `bool`, optional
+            Controls whether to plot a colorbar for mean_times, default is False
+
+        min_alpha : `float`, optional
+            Minimum alpha value of the heatmap, representing the cells which
+            spent the least amount of time occupied, default is 0.3
+
+        show_seed : `bool`, optional
+            Determines whether resulting plot shows a marker indicating the
+            (first) seed location. Uses indices of walk_data[:][0][0]. Default
+            is True, but only if 'walk_data' is also provided.
+
+        seed_color : `str`, optional
+            Name of matplotlib color used for the marker seed, if shown. Default
+            is a light blue.
+
+    **Outputs** :
+
+        ax : `matplotlib.axes`
+            A `matplotlib.axes` upon which the nourishment times are drawn
+
+    """
+    from matplotlib.colors import Normalize
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    # Plot heatmap with alpha based on times
+    amax = np.nanpercentile(mean_times, 20)
+    alphas = Normalize(0, amax, clip=True)(mean_times) # Normalize alphas
+    alphas = np.clip(alphas, min_alpha, 1)
+    colors = Normalize(np.nanmin(mean_times),
+                       np.nanmax(mean_times))(mean_times) # Normalize colors
+    cmap = plt.cm.get_cmap(cmap)
+    colors = cmap(colors)
+    colors[..., -1] = alphas
+
+    # Plot figure
+    if len(plt.get_fignums()) < 1:
+        # Create new figure axes if none are open
+        fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=300)
+    else:
+        ax = plt.gca() # Otherwise grab existing
+    ax.set_facecolor('k') # Set facecolor black
+    if grid is not None:
+        # Grid background intentionally dark:
+        im = ax.imshow(grid, cmap='gist_gray', vmax=np.max(grid)*3)
+    # Show nourishment times
+    nt = ax.imshow(colors)
+    plt.title('Nourishment Times')
+
+    # Optionally plot colorbar
+    if show_colorbar:
+        # Requires a few extra steps due to how we made the heatmap
+        norm = matplotlib.colors.Normalize(vmin=np.nanmin(mean_times),
+                                           vmax=np.nanmax(mean_times))
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        divider = make_axes_locatable(ax) # Make the right size
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(sm, cax=cax)
+        cbar.set_label('Mean Nourishment Time [s]')
+
+    # Optionally show seed location
+    if (show_seed) & (walk_data is not None):
+        ax.scatter(walk_data['yinds'][0][0], walk_data['xinds'][0][0],
+                   c=seed_color, edgecolors='black', s=10, linewidths=0.5)
+
     return ax
