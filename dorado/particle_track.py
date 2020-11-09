@@ -903,7 +903,7 @@ def exposure_time(walk_data,
     return exposure_times.tolist()
 
 
-def nourishment_area(walk_data, raster_size, sigma=0.7):
+def nourishment_area(walk_data, raster_size, sigma=0.7, clip=99.5):
     """Determine the nourishment area of a particle injection
 
     Function will measure the regions of the domain 'fed' by a seed location,
@@ -928,6 +928,12 @@ def nourishment_area(walk_data, raster_size, sigma=0.7):
             Default is light smoothing with sigma = 0.7 (to turn off smoothing,
             set sigma = 0)
 
+        clip : `float`, optional
+            Percentile at which to truncate the distribution. Particles which
+            get stuck can lead to errors at the high-extreme, so this 
+            parameter is used to normalize by a "near-max". Default is the
+            99.5th percentile. To use true max, specify clip = 100
+
     **Outputs** :
 
         visit_freq : `numpy.ndarray`
@@ -946,29 +952,31 @@ def nourishment_area(walk_data, raster_size, sigma=0.7):
             visit_freq[walk_data['xinds'][ii][jj],
                        walk_data['yinds'][ii][jj]] += 1
 
+    # Clip out highest percentile to correct possible outliers
+    vmax = float(np.nanpercentile(visit_freq, clip))
+    visit_freq = np.clip(visit_freq, 0, vmax)
+
     # If applicable, do smoothing
     if sigma > 0:
         visit_freq = gaussian_filter(visit_freq, sigma=sigma)
         visit_freq[visit_freq==np.min(visit_freq)] = np.nan
     else:
         visit_freq[visit_freq==0] = np.nan
-    
-    # Make normalization robust to extrema by using high percentile
-    vmax = float(np.nanpercentile(visit_freq, 99.5))
-    visit_freq = visit_freq/vmax
-    visit_freq = np.clip(visit_freq, 0, 1)
-    
+
+    # Normalize to 0-1
+    visit_freq = visit_freq/np.nanmax(visit_freq)
+
     return visit_freq
 
 
-def nourishment_time(walk_data, raster_size, sigma=0.7):
+def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
     """Determine the nourishment time of a particle injection
 
     Function will measure the average length of time particles spend in each
     area of the domain for a given seed location, as indicated by the history
     of particle travel times in walk_data. Returns a heatmap raster, in
-    which values indicate the average length of time each cell was occupied by
-    a particle (after spatial filtering to reduce noise in the random walk).
+    which values indicate the average length of time particles tend to remain
+    in each cell (after spatial filtering to reduce noise in the random walk).
 
     **Inputs** :
 
@@ -985,6 +993,12 @@ def nourishment_time(walk_data, raster_size, sigma=0.7):
             Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
             Default is light smoothing with sigma = 0.7 (to turn off smoothing,
             set sigma = 0)
+
+        clip : `float`, optional
+            Percentile at which to truncate the distribution. Particles which
+            get stuck can lead to errors at the high-extreme, so this 
+            parameter is used to normalize by a "near-max". Default is the
+            99.5th percentile. To use true max, specify clip = 100
 
     **Outputs** :
 
@@ -1016,7 +1030,7 @@ def nourishment_time(walk_data, raster_size, sigma=0.7):
     mean_time = time_total / visit_freq
     mean_time[visit_freq == 0] = 0
     # Prone to numerical outliers, so clip out extremes
-    vmax = float(np.nanpercentile(mean_time, 99.5))
+    vmax = float(np.nanpercentile(mean_time, clip))
     mean_time = np.clip(mean_time, 0, vmax)
     
     # If applicable, do smoothing
