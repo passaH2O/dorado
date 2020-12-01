@@ -255,3 +255,168 @@ def test_make_weight_deep():
     np.random.seed(0)
     # make assertion
     assert lw.get_weight(particles, ind) == 8
+
+
+def test_make_weight_shallow():
+    '''
+    Test calculating weights when all neighboring cells are dry
+    '''
+    tools = pt.modelParams()
+    # define a bunch of expected values
+    tools.stage = np.zeros((5, 5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5, 5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances*np.nan
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy()
+    tools.depth[1, 1] = 10.0  # particle location will be wet
+    tools.seed_xloc = [1]
+    tools.seed_yloc = [1]
+    tools.Np_tracer = 1
+    tools.dx = 1
+    # define particles
+    particles = pt.Particles(tools)
+    # set the current index
+    ind = (1, 1)
+    # set seed
+    np.random.seed(0)
+    # make assertions about weights
+    # at index, index[4] (self) will be 1 while neighbors will be 0
+    assert particles.weight[1, 1, 4] == 1.0
+    assert np.sum(particles.weight[1, 1, :]) == 1.0
+    # weights at boundary cells should be 0
+    assert np.all(np.sum(particles.weight[0, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[-1, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, 0, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, -1, 4]) == 0.0)
+
+
+def test_make_weight_equal_opportunity():
+    '''
+    Test calculating weights
+    '''
+    tools = pt.modelParams()
+    # define a bunch of expected values
+    tools.stage = np.zeros((5, 5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5, 5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances*np.nan
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy()
+    tools.depth[1, 1] = 10.0  # same depth at some neighboring cells
+    tools.depth[1, 2] = 10.0  # same depth at some neighboring cells
+    tools.depth[2, 2] = 10.0  # same depth at some neighboring cells
+    tools.seed_xloc = [1]
+    tools.seed_yloc = [1]
+    tools.Np_tracer = 1
+    tools.dx = 1
+    # define particles
+    particles = pt.Particles(tools)
+    # set the current index
+    ind = (1, 1)
+    # set seed
+    np.random.seed(0)
+    # make assertions about weights
+    # at index, 3 neighbors will be equiprobable
+    assert np.sum(particles.weight[1, 1, :]) == 3.0
+    # at other wet locations, 3 neighbors will be equiprobable
+    assert np.sum(particles.weight[1, 2, :]) == 3.0
+    assert np.sum(particles.weight[2, 2, :]) == 3.0
+    # weights at boundary cells should be 0
+    assert np.all(np.sum(particles.weight[0, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[-1, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, 0, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, -1, 4]) == 0.0)
+
+
+def test_make_weight_unequal_opportunity():
+    '''
+    Test calculating weights w/ different depths in cells
+    '''
+    tools = pt.modelParams()
+    # define a bunch of expected values
+    tools.stage = np.zeros((5, 5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5, 5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances*np.nan
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy()
+    tools.depth[1, 1] = 10.0  # same depth at some neighboring cells
+    tools.depth[1, 2] = 5.0  # less depth at some neighboring cells
+    tools.depth[2, 2] = 5.0  # less depth at some neighboring cells
+    tools.seed_xloc = [1]
+    tools.seed_yloc = [1]
+    tools.Np_tracer = 1
+    tools.dx = 1
+    # define particles
+    particles = pt.Particles(tools)
+    # set the current index
+    ind = (1, 1)
+    # set seed
+    np.random.seed(0)
+    # make assertions about weights
+    # at index, staying put index[4] higher probability than neighbors
+    assert particles.weight[1, 1, 4] > particles.weight[1, 1, 5]
+    assert particles.weight[1, 1, 4] > particles.weight[1, 1, 8]
+    # but the two neighbors should be equiprobable
+    assert particles.weight[1, 1, 5] == particles.weight[1, 1, 8]
+    # weights at boundary cells should be 0
+    assert np.all(np.sum(particles.weight[0, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[-1, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, 0, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, -1, 4]) == 0.0)
+
+
+def test_wet_boundary_no_weight():
+    '''
+    Confirm that even if the boundary cell is deep enough, its weight == 0.
+    '''
+    tools = pt.modelParams()
+    # define a bunch of expected values
+    tools.stage = np.ones((5, 5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5, 5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances*np.nan
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy() * 10.0
+    tools.seed_xloc = [1]
+    tools.seed_yloc = [1]
+    tools.Np_tracer = 1
+    tools.dx = 1
+    # define particles
+    particles = pt.Particles(tools)
+    # set seed
+    np.random.seed(0)
+    # assert weights at boundary cells should be 0
+    assert np.all(np.sum(particles.weight[0, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[-1, :, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, 0, 4]) == 0.0)
+    assert np.all(np.sum(particles.weight[:, -1, 4]) == 0.0)
+    # assert that weights everywhere else are not 0
+    assert np.all(np.sum(particles.weight[1:-1, 1:-1, 4]) != 0.0)
+    # assert that depths everywhere are 10.0
+    assert np.all(particles.depth == 10.0)
