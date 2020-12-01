@@ -379,6 +379,9 @@ class Particles():
         # initialize the walk_data
         self.walk_data = None
 
+        # create weights
+        lw.make_weight(self)
+
     # function to clear walk data if you've made a mistake while generating it
     def clear_walk_data(self):
         """Manually reset self.walk_data back to None."""
