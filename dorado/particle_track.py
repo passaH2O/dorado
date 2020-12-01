@@ -379,7 +379,7 @@ class Particles():
         # initialize the walk_data
         self.walk_data = None
 
-        # create weights
+        # create weights - this might take a bit of time for large domains
         lw.make_weight(self)
 
     # function to clear walk data if you've made a mistake while generating it

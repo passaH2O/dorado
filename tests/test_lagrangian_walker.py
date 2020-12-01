@@ -222,3 +222,36 @@ def test_get_weight_deep():
     np.random.seed(0)
     # make assertion
     assert lw.get_weight(particles, ind) == 8
+
+
+def test_make_weight_deep():
+    '''
+    Test for function make_weight within lagrangian_walker
+    '''
+    tools = pt.modelParams()
+    # define a bunch of expected values
+    tools.stage = np.ones((5, 5))
+    tools.cell_type = np.zeros_like(tools.stage)
+    tools.qy = tools.stage.copy()
+    tools.qx = np.zeros((5, 5))
+    tools.ivec = ivec
+    tools.jvec = jvec
+    tools.distances = distances*np.nan
+    tools.dry_depth = 0.1
+    tools.gamma = 0.02
+    tools.theta = 1
+    tools.steepest_descent = True
+    tools.depth = tools.stage.copy()
+    tools.depth[2,2] = 10.0  # define index 8 as the deepest
+    tools.seed_xloc = [1]
+    tools.seed_yloc = [1]
+    tools.Np_tracer = 1
+    tools.dx = 1
+    # define particles
+    particles = pt.Particles(tools)
+    # set the current index
+    ind = (1,1)
+    # set seed
+    np.random.seed(0)
+    # make assertion
+    assert lw.get_weight(particles, ind) == 8
