@@ -41,6 +41,9 @@ def random_pick_seed(choices, probs=None):
 
 def make_weight(Particles):
     """Make an array with the routing weights."""
+    # local namespace function imports
+    from numpy import maximum
+    from numpy import nansum
     # init the weight array
     L, W = np.shape(Particles.stage)
     Particles.weight = np.zeros((L, W, 9))
@@ -53,14 +56,14 @@ def make_weight(Particles):
             stage_ind = Particles.stage[i-1:i+2, j-1:j+2]
 
             # calculate surface slope weights
-            weight_sfc = np.maximum(0,
-                                    (Particles.stage[i, j]-stage_ind) /
-                                    Particles.distances)
+            weight_sfc = maximum(0,
+                                 (Particles.stage[i, j]-stage_ind) /
+                                 Particles.distances)
 
             # calculate inertial component weights
-            weight_int = np.maximum(0, ((Particles.qx[i, j] * Particles.jvec +
-                                         Particles.qy[i, j] * Particles.ivec) /
-                                    Particles.distances))
+            weight_int = maximum(0, ((Particles.qx[i, j] * Particles.jvec +
+                                      Particles.qy[i, j] * Particles.ivec) /
+                                 Particles.distances))
 
             # get depth and cell types for neighboring cells
             depth_ind = Particles.depth[i-1:i+2, j-1:j+2]
@@ -71,12 +74,12 @@ def make_weight(Particles):
             weight_int[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
 
             # if sum of weights is above 0 normalize by sum of weights
-            if np.nansum(weight_sfc) > 0:
-                weight_sfc = weight_sfc / np.nansum(weight_sfc)
+            if nansum(weight_sfc) > 0:
+                weight_sfc = weight_sfc / nansum(weight_sfc)
 
             # if sum of weight is above 0 normalize by sum of weights
-            if np.nansum(weight_int) > 0:
-                weight_int = weight_int / np.nansum(weight_int)
+            if nansum(weight_int) > 0:
+                weight_int = weight_int / nansum(weight_int)
 
             # define actual weight by using gamma, and weight components
             weight = Particles.gamma * weight_sfc + \
@@ -91,7 +94,7 @@ def make_weight(Particles):
                 = np.nan
 
             # if it's a dead end with only nans and 0's, choose deepest cell
-            if np.nansum(weight) <= 0:
+            if nansum(weight) <= 0:
                 weight = np.zeros_like(weight)
                 weight[depth_ind == np.max(depth_ind)] = 1.0
 
