@@ -1,2 +1,0 @@
-background/index.rst:63: [redirected with Found] https://freshkiss3d.gforge.inria.fr/ to http://freshkiss3d.gforge.inria.fr
-background/index.rst:61: [redirected with Found] https://doi.org/10.5194/gmd-11-1405-2018 to https://gmd.copernicus.org/articles/11/1405/2018/
