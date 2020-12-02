@@ -124,6 +124,31 @@ def test_exact_locations():
     assert all_walk_data['xinds'][0] == seed_xloc
     assert all_walk_data['yinds'][0] == seed_yloc
 
+def test_exact_locations_overflow():
+    """Test where number of particles exceeds number of seed locations."""
+    num_ps = 3
+    particle = particle_track.Particles(params)
+    particle.generate_particles(num_ps, [0, 1], [0, 1], method='exact')
+    all_walk_data = particle.run_iteration()
+    assert len(all_walk_data['xinds']) == num_ps
+    assert len(all_walk_data['yinds']) == num_ps
+
+def test_no_explicit_generation():
+    """Test reading of Np_tracer from self if some walk_data exists."""
+    # create some walk data (would exist from a previous run)
+    walk_data = {'xinds': [[1], [1]], 'yinds': [[1], [1]],
+                 'travel_times': [[0.0], [0.0]]}
+    # init particle class and stick walk data in it
+    # init defines Np_tracer as 0, but it is 2 in walk_data
+    particle = particle_track.Particles(params)
+    particle.walk_data = walk_data
+    # assert that Np_tracer is 0
+    assert particle.Np_tracer == 0
+    # run an iteration and see if Np_tracer is corrected
+    particle.run_iteration()
+    # assert that number of particles has been correctly identified
+    assert particle.Np_tracer == 2
+
 def test_travel_time():
     # Particle doesn't travel in the 3x3 space due to the 'sticky' edge
     # conditions so check that travel time is 0 and particle hasn't moved

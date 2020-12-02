@@ -9,6 +9,7 @@ from builtins import range, map
 from math import cos
 import numpy as np
 from numpy.random import random
+from tqdm import tqdm
 
 
 def random_pick_seed(choices, probs=None):
@@ -38,11 +39,76 @@ def random_pick_seed(choices, probs=None):
     return choices[idx]
 
 
-def get_weight(Particles, ind):
-    """Assign weights to cells surrounding current index.
+def make_weight(Particles):
+    """Make an array with the routing weights."""
+    # local namespace function imports
+    from numpy import maximum
+    from numpy import nansum
+    # init the weight array
+    L, W = np.shape(Particles.stage)
+    Particles.weight = np.zeros((L, W, 9))
+    # do weighting calculation for each cell
+    print('Calculating routing weights ...')
+    for i in tqdm(list(range(1, L-1)), ascii=True):
+        for j in list(range(1, W-1)):
+            # weights for each location in domain
+            # get stage values for neighboring cells
+            stage_ind = Particles.stage[i-1:i+2, j-1:j+2]
 
-    Function to assign weights to the surrounding 8 cells around the
-    current index and randomly choose one of those cells.
+            # calculate surface slope weights
+            weight_sfc = maximum(0,
+                                 (Particles.stage[i, j]-stage_ind) /
+                                 Particles.distances)
+
+            # calculate inertial component weights
+            weight_int = maximum(0, ((Particles.qx[i, j] * Particles.jvec +
+                                      Particles.qy[i, j] * Particles.ivec) /
+                                 Particles.distances))
+
+            # get depth and cell types for neighboring cells
+            depth_ind = Particles.depth[i-1:i+2, j-1:j+2]
+            ct_ind = Particles.cell_type[i-1:i+2, j-1:j+2]
+
+            # set weights for cells that are too shallow, or invalid 0
+            weight_sfc[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
+            weight_int[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
+
+            # if sum of weights is above 0 normalize by sum of weights
+            if nansum(weight_sfc) > 0:
+                weight_sfc = weight_sfc / nansum(weight_sfc)
+
+            # if sum of weight is above 0 normalize by sum of weights
+            if nansum(weight_int) > 0:
+                weight_int = weight_int / nansum(weight_int)
+
+            # define actual weight by using gamma, and weight components
+            weight = Particles.gamma * weight_sfc + \
+                (1 - Particles.gamma) * weight_int
+
+            # modify the weight by the depth and theta weighting parameter
+            weight = depth_ind ** Particles.theta * weight
+
+            # if the depth is below the minimum depth then location is not
+            # considered therefore set the associated weight to nan
+            weight[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] \
+                = np.nan
+
+            # if it's a dead end with only nans and 0's, choose deepest cell
+            if nansum(weight) <= 0:
+                weight = np.zeros_like(weight)
+                weight[depth_ind == np.max(depth_ind)] = 1.0
+
+            # set weight in the true weight array
+            Particles.weight[i, j, :] = weight.ravel()
+
+    print('Finished routing weight calculation.')
+
+
+def get_weight(Particles, ind):
+    """Choose new cell location given an initial location.
+
+    Function to randomly choose 1 of the surrounding 8 cells around the
+    current index using the pre-calculated routing weights.
 
     **Inputs** :
 
@@ -58,54 +124,12 @@ def get_weight(Particles, ind):
             New location given as a value between 1 and 8 (inclusive)
 
     """
-    # pull surrounding cell values from stage array
-    stage_ind = Particles.stage[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
-    # define water surface gradient weight component (minimum of 0)
-    weight_sfc = np.maximum(0,
-                            (Particles.stage[ind] - stage_ind) /
-                            Particles.distances)
-
-    # define flow inertial weighting component (minimum of 0)
-    weight_int = np.maximum(0, (Particles.qx[ind] * Particles.jvec +
-                                Particles.qy[ind] * Particles.ivec) /
-                            Particles.distances)
-
-    # pull surrounding cell values from depth and cell type arrays
-    depth_ind = Particles.depth[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
-    ct_ind = Particles.cell_type[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
-
-    # if the depth is below minimum depth for cell to be weight
-    # or it is a cell type that is not water, then make it impossible for
-    # the parcel to travel there by setting associated weight to 0
-    weight_sfc[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
-    weight_int[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
-
-    # if sum of weights is above 0 normalize by sum of weights
-    if np.nansum(weight_sfc) > 0:
-        weight_sfc = weight_sfc / np.nansum(weight_sfc)
-    # if sum of weight is above 0 normalize by sum of weights
-    if np.nansum(weight_int) > 0:
-        weight_int = weight_int / np.nansum(weight_int)
-
-    # define actual weight by using gamma, and defined weight components
-    Particles.weight = Particles.gamma * weight_sfc + \
-        (1 - Particles.gamma) * weight_int
-    # modify the weight by the depth and theta weighting parameter
-    Particles.weight = depth_ind ** Particles.theta * Particles.weight
-    # if the depth is below the minimum depth then location is not
-    # considered therefore set the associated weight to nan
-    Particles.weight[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] \
-        = np.nan
-    # if it's a dead end with only nans and 0's, choose deepest cell
-    if np.nansum(Particles.weight) <= 0:
-        Particles.weight = np.zeros_like(Particles.weight)
-        Particles.weight[depth_ind == np.max(depth_ind)] = 1.0
     # randomly pick the new cell for the particle to move to using the
-    # random_pick function and the set of weights just defined
+    # random_pick function and the set of weights
     if Particles.steepest_descent is not True:
-        new_cell = random_pick(Particles.weight)
+        new_cell = random_pick(Particles.weight[ind[0], ind[1], :])
     elif Particles.steepest_descent is True:
-        new_cell = steep_descent(Particles.weight)
+        new_cell = steep_descent(Particles.weight[ind[0], ind[1], :])
 
     return new_cell
 
@@ -311,8 +335,8 @@ def steep_descent(probs):
 
     """
     max_val = np.nanmax(probs)
-    # remove location 1,1 from consideration
-    probs[1, 1] = 0
+    # remove initial location (index 4) from consideration
+    probs[4] = 0
     # remove any locations from consideration beneath max value
     probs[probs < max_val] = 0
     # any nans become ignored too

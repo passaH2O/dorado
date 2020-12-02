@@ -53,6 +53,14 @@ Defining the `Particles`
 
 Defining a :obj:`dorado.particle_track.Particles` class is a key step in using `dorado` to perform particle routing. To define a set of particles, the model parameters must first be defined as described above. The `Particles` class is initialized using an instance of the model parameters. From there, particles can be generated and routed.
 
+.. Note::
+    When :obj:`dorado.particle_track.Particles` is initialized, all of the
+    routing weights are automatically calculated. This may take some time for
+    larger model domains, but allows for faster particle routing when particles
+    are actually moved through the domain. There is a progress bar associated
+    with this process so you don't feel like Python has gotten stuck in the
+    object initialization.
+
 Particle Generation and Routing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
