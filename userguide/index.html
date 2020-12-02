@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>User Guide &#8212; dorado 2.1.1 documentation</title>
+    <title>User Guide &#8212; dorado 2.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -78,6 +78,15 @@
 <div class="section" id="defining-the-particles">
 <h2>Defining the <cite>Particles</cite><a class="headerlink" href="#defining-the-particles" title="Permalink to this headline">¶</a></h2>
 <p>Defining a <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class is a key step in using <cite>dorado</cite> to perform particle routing. To define a set of particles, the model parameters must first be defined as described above. The <cite>Particles</cite> class is initialized using an instance of the model parameters. From there, particles can be generated and routed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> is initialized, all of the
+routing weights are automatically calculated. This may take some time for
+larger model domains, but allows for faster particle routing when particles
+are actually moved through the domain. There is a progress bar associated
+with this process so you don’t feel like Python has gotten stuck in the
+object initialization.</p>
+</div>
 <div class="section" id="particle-generation-and-routing">
 <h3>Particle Generation and Routing<a class="headerlink" href="#particle-generation-and-routing" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">

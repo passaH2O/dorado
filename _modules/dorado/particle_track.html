@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.1.1 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.2.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -411,7 +411,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># initialize the walk_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># create weights - this might take a bit of time for large domains</span>
+        <span class="n">lw</span><span class="o">.</span><span class="n">make_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="c1"># function to clear walk data if you&#39;ve made a mistake while generating it</span>
 <div class="viewcode-block" id="Particles.clear_walk_data"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles.clear_walk_data">[docs]</a>    <span class="k">def</span> <span class="nf">clear_walk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.lagrangian_walker &#8212; dorado 2.1.1 documentation</title>
+    <title>dorado.lagrangian_walker &#8212; dorado 2.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -131,9 +131,9 @@ indices so those particles will not travel this iteration</p>
 <dl class="function">
 <dt id="dorado.lagrangian_walker.get_weight">
 <code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">get_weight</code><span class="sig-paren">(</span><em>Particles</em>, <em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#get_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.get_weight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign weights to cells surrounding current index.</p>
-<p>Function to assign weights to the surrounding 8 cells around the
-current index and randomly choose one of those cells.</p>
+<dd><p>Choose new cell location given an initial location.</p>
+<p>Function to randomly choose 1 of the surrounding 8 cells around the
+current index using the pre-calculated routing weights.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
@@ -150,6 +150,12 @@ current index and randomly choose one of those cells.</p>
 </dd>
 </dl>
 </div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.make_weight">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">make_weight</code><span class="sig-paren">(</span><em>Particles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#make_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.make_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make an array with the routing weights.</p>
 </dd></dl>
 
 <dl class="function">

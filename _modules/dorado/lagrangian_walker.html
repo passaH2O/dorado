@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.lagrangian_walker &#8212; dorado 2.1.1 documentation</title>
+    <title>dorado.lagrangian_walker &#8212; dorado 2.2.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -43,6 +43,7 @@
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 
 <div class="viewcode-block" id="random_pick_seed"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.random_pick_seed">[docs]</a><span class="k">def</span> <span class="nf">random_pick_seed</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">probs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -72,11 +73,76 @@
     <span class="k">return</span> <span class="n">choices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="get_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.get_weight">[docs]</a><span class="k">def</span> <span class="nf">get_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Assign weights to cells surrounding current index.</span>
+<div class="viewcode-block" id="make_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.make_weight">[docs]</a><span class="k">def</span> <span class="nf">make_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make an array with the routing weights.&quot;&quot;&quot;</span>
+    <span class="c1"># local namespace function imports</span>
+    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">maximum</span>
+    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">nansum</span>
+    <span class="c1"># init the weight array</span>
+    <span class="n">L</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span>
+    <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+    <span class="c1"># do weighting calculation for each cell</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Calculating routing weights ...&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">W</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="c1"># weights for each location in domain</span>
+            <span class="c1"># get stage values for neighboring cells</span>
+            <span class="n">stage_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
 
-<span class="sd">    Function to assign weights to the surrounding 8 cells around the</span>
-<span class="sd">    current index and randomly choose one of those cells.</span>
+            <span class="c1"># calculate surface slope weights</span>
+            <span class="n">weight_sfc</span> <span class="o">=</span> <span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>
+                                 <span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="n">stage_ind</span><span class="p">)</span> <span class="o">/</span>
+                                 <span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">)</span>
+
+            <span class="c1"># calculate inertial component weights</span>
+            <span class="n">weight_int</span> <span class="o">=</span> <span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">((</span><span class="n">Particles</span><span class="o">.</span><span class="n">qx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">jvec</span> <span class="o">+</span>
+                                      <span class="n">Particles</span><span class="o">.</span><span class="n">qy</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">ivec</span><span class="p">)</span> <span class="o">/</span>
+                                 <span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">))</span>
+
+            <span class="c1"># get depth and cell types for neighboring cells</span>
+            <span class="n">depth_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">depth</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">ct_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">cell_type</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="c1"># set weights for cells that are too shallow, or invalid 0</span>
+            <span class="n">weight_sfc</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">weight_int</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># if sum of weights is above 0 normalize by sum of weights</span>
+            <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">weight_sfc</span> <span class="o">=</span> <span class="n">weight_sfc</span> <span class="o">/</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span>
+
+            <span class="c1"># if sum of weight is above 0 normalize by sum of weights</span>
+            <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">weight_int</span> <span class="o">=</span> <span class="n">weight_int</span> <span class="o">/</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span>
+
+            <span class="c1"># define actual weight by using gamma, and weight components</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">weight_sfc</span> <span class="o">+</span> \
+                <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_int</span>
+
+            <span class="c1"># modify the weight by the depth and theta weighting parameter</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">depth_ind</span> <span class="o">**</span> <span class="n">Particles</span><span class="o">.</span><span class="n">theta</span> <span class="o">*</span> <span class="n">weight</span>
+
+            <span class="c1"># if the depth is below the minimum depth then location is not</span>
+            <span class="c1"># considered therefore set the associated weight to nan</span>
+            <span class="n">weight</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> \
+                <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+            <span class="c1"># if it&#39;s a dead end with only nans and 0&#39;s, choose deepest cell</span>
+            <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+                <span class="n">weight</span><span class="p">[</span><span class="n">depth_ind</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">depth_ind</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+            <span class="c1"># set weight in the true weight array</span>
+            <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">weight</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished routing weight calculation.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.get_weight">[docs]</a><span class="k">def</span> <span class="nf">get_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Choose new cell location given an initial location.</span>
+
+<span class="sd">    Function to randomly choose 1 of the surrounding 8 cells around the</span>
+<span class="sd">    current index using the pre-calculated routing weights.</span>
 
 <span class="sd">    **Inputs** :</span>
 
@@ -92,54 +158,12 @@
 <span class="sd">            New location given as a value between 1 and 8 (inclusive)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pull surrounding cell values from stage array</span>
-    <span class="n">stage_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-    <span class="c1"># define water surface gradient weight component (minimum of 0)</span>
-    <span class="n">weight_sfc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>
-                            <span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">stage_ind</span><span class="p">)</span> <span class="o">/</span>
-                            <span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">)</span>
-
-    <span class="c1"># define flow inertial weighting component (minimum of 0)</span>
-    <span class="n">weight_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">qx</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">jvec</span> <span class="o">+</span>
-                                <span class="n">Particles</span><span class="o">.</span><span class="n">qy</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">ivec</span><span class="p">)</span> <span class="o">/</span>
-                            <span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">)</span>
-
-    <span class="c1"># pull surrounding cell values from depth and cell type arrays</span>
-    <span class="n">depth_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">depth</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">ct_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">cell_type</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-
-    <span class="c1"># if the depth is below minimum depth for cell to be weight</span>
-    <span class="c1"># or it is a cell type that is not water, then make it impossible for</span>
-    <span class="c1"># the parcel to travel there by setting associated weight to 0</span>
-    <span class="n">weight_sfc</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">weight_int</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="c1"># if sum of weights is above 0 normalize by sum of weights</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">weight_sfc</span> <span class="o">=</span> <span class="n">weight_sfc</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span>
-    <span class="c1"># if sum of weight is above 0 normalize by sum of weights</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">weight_int</span> <span class="o">=</span> <span class="n">weight_int</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span>
-
-    <span class="c1"># define actual weight by using gamma, and defined weight components</span>
-    <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">weight_sfc</span> <span class="o">+</span> \
-        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_int</span>
-    <span class="c1"># modify the weight by the depth and theta weighting parameter</span>
-    <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">depth_ind</span> <span class="o">**</span> <span class="n">Particles</span><span class="o">.</span><span class="n">theta</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span>
-    <span class="c1"># if the depth is below the minimum depth then location is not</span>
-    <span class="c1"># considered therefore set the associated weight to nan</span>
-    <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> \
-        <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="c1"># if it&#39;s a dead end with only nans and 0&#39;s, choose deepest cell</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
-        <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">depth_ind</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">depth_ind</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="c1"># randomly pick the new cell for the particle to move to using the</span>
-    <span class="c1"># random_pick function and the set of weights just defined</span>
+    <span class="c1"># random_pick function and the set of weights</span>
     <span class="k">if</span> <span class="n">Particles</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">new_cell</span> <span class="o">=</span> <span class="n">random_pick</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">new_cell</span> <span class="o">=</span> <span class="n">random_pick</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:])</span>
     <span class="k">elif</span> <span class="n">Particles</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">new_cell</span> <span class="o">=</span> <span class="n">steep_descent</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">new_cell</span> <span class="o">=</span> <span class="n">steep_descent</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:])</span>
 
     <span class="k">return</span> <span class="n">new_cell</span></div>
 
@@ -345,8 +369,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
-    <span class="c1"># remove location 1,1 from consideration</span>
-    <span class="n">probs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># remove initial location (index 4) from consideration</span>
+    <span class="n">probs</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># remove any locations from consideration beneath max value</span>
     <span class="n">probs</span><span class="p">[</span><span class="n">probs</span> <span class="o">&lt;</span> <span class="n">max_val</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># any nans become ignored too</span>
