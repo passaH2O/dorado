@@ -133,6 +133,17 @@ def test_exact_locations_overflow():
     assert len(all_walk_data['xinds']) == num_ps
     assert len(all_walk_data['yinds']) == num_ps
 
+def test_exact_locations_multidims():
+    """Test case where seed locs given as multi-dimensional arrays."""
+    num_ps = 5
+    particle = particle_track.Particles(params)
+    x_seed = np.array(((0, 0), (1, 1)))
+    y_seed = np.array(((0, 0), (1, 1)))
+    particle.generate_particles(num_ps, x_seed, y_seed, method='exact')
+    all_walk_data = particle.run_iteration()
+    assert len(all_walk_data['xinds']) == num_ps
+    assert len(all_walk_data['yinds']) == num_ps
+
 def test_no_explicit_generation():
     """Test reading of Np_tracer from self if some walk_data exists."""
     # create some walk data (would exist from a previous run)
