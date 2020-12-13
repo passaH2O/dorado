@@ -64,7 +64,7 @@ Defining a :obj:`dorado.particle_track.Particles` class is a key step in using `
 Particle Generation and Routing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Particles can be generated using the `particle_generator` function, this allows for random and exact placement of particles
+* Particles can be generated using the :obj:`dorado.particle_track.Particles.generate_particles` function, this allows for random and exact placement of particles
 
 * Particles can be routed using either the High-Level or Low-Level API functionalities described below
 
