@@ -1027,7 +1027,8 @@ def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
             time_total[walk_data['xinds'][ii][jj],
                        walk_data['yinds'][ii][jj]] += 0.5*(last_dt + next_dt)
     # Find mean time in each cell
-    mean_time = time_total / visit_freq
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mean_time = time_total / visit_freq
     mean_time[visit_freq == 0] = 0
     # Prone to numerical outliers, so clip out extremes
     vmax = float(np.nanpercentile(mean_time, clip))

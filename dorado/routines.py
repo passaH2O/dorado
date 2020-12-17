@@ -416,7 +416,7 @@ def get_time_state(walk_data, target_time):
         walk_data : `dict`
             Dictionary of all x and y locations and travel times
 
-        target_time : `float`, optional
+        target_time : `float`
             Travel time at which to slice the dictionary.
 
     **Outputs** :
