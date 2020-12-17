@@ -459,21 +459,16 @@ class Particles():
                                   in list(range(Np_tracer))]
 
         elif method == 'exact':
-            # step through seed lists to create exact list of start locations
-            # if number of particles exceeds length of seed lists, loop back
-            # to beginning of the seed lists and continue from there
-            Np_to_seed = Np_tracer
-            new_start_xindices = []
-            new_start_yindices = []
-            while Np_to_seed > 0:
-                for i in range(0, len(seed_xloc)):
-                    # condition if we run out of particles within this loop
-                    if Np_to_seed <= 0:
-                        break
-                    # otherwise keep on seeding
-                    new_start_xindices = new_start_xindices + [seed_xloc[i]]
-                    new_start_yindices = new_start_yindices + [seed_yloc[i]]
-                    Np_to_seed -= 1  # reduce number of particles left to seed
+            # create exact start indices based on x, y locations and np_tracer
+            # get number of particles per location and remainder left out
+            Np_divy = divmod(Np_tracer, len(seed_xloc))
+            # assign the start locations for the evenly divided particles
+            new_start_xindices = seed_xloc * Np_divy[0]
+            new_start_yindices = seed_yloc * Np_divy[0]
+            # add the remainder ones to the list one by one via looping
+            for i in range(0, Np_divy[1]):
+                new_start_xindices = new_start_xindices + [seed_xloc[i]]
+                new_start_yindices = new_start_yindices + [seed_yloc[i]]
 
         # Now initialize vectors that will create the structured list
         new_xinds = [[new_start_xindices[i]] for i in
