@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.2.0 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.3.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -493,21 +493,16 @@
                                   <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">))]</span>
 
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;exact&#39;</span><span class="p">:</span>
-            <span class="c1"># step through seed lists to create exact list of start locations</span>
-            <span class="c1"># if number of particles exceeds length of seed lists, loop back</span>
-            <span class="c1"># to beginning of the seed lists and continue from there</span>
-            <span class="n">Np_to_seed</span> <span class="o">=</span> <span class="n">Np_tracer</span>
-            <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">while</span> <span class="n">Np_to_seed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seed_xloc</span><span class="p">)):</span>
-                    <span class="c1"># condition if we run out of particles within this loop</span>
-                    <span class="k">if</span> <span class="n">Np_to_seed</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">break</span>
-                    <span class="c1"># otherwise keep on seeding</span>
-                    <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="n">new_start_xindices</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed_xloc</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-                    <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="n">new_start_yindices</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed_yloc</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-                    <span class="n">Np_to_seed</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># reduce number of particles left to seed</span>
+            <span class="c1"># create exact start indices based on x, y locations and np_tracer</span>
+            <span class="c1"># get number of particles per location and remainder left out</span>
+            <span class="n">Np_divy</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seed_xloc</span><span class="p">))</span>
+            <span class="c1"># assign the start locations for the evenly divided particles</span>
+            <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="n">seed_xloc</span> <span class="o">*</span> <span class="n">Np_divy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="n">seed_yloc</span> <span class="o">*</span> <span class="n">Np_divy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># add the remainder ones to the list one by one via looping</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Np_divy</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">new_start_xindices</span> <span class="o">=</span> <span class="n">new_start_xindices</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed_xloc</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                <span class="n">new_start_yindices</span> <span class="o">=</span> <span class="n">new_start_yindices</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed_yloc</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
 
         <span class="c1"># Now initialize vectors that will create the structured list</span>
         <span class="n">new_xinds</span> <span class="o">=</span> <span class="p">[[</span><span class="n">new_start_xindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
