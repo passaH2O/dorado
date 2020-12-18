@@ -12,9 +12,6 @@ from __future__ import division, print_function, absolute_import
 from builtins import range
 from math import pi
 import numpy as np
-import scipy
-from scipy import interpolate
-import matplotlib
 from tqdm import tqdm
 import dorado.lagrangian_walker as lw
 
@@ -1102,6 +1099,10 @@ def unstruct2grid(coordinates,
             Array of quantity after interpolation.
 
     """
+    import matplotlib
+    import scipy
+    from scipy import interpolate
+
     cellsize = float(cellsize)
 
     # Make sure all input values are floats
