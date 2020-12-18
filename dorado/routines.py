@@ -443,22 +443,16 @@ def get_time_state(walk_data, target_time):
     times = []
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
-        for jj in list(range(len(walk_data['travel_times'][ii])-1)):
-            this_time = walk_data['travel_times'][ii][jj]
-            next_time = walk_data['travel_times'][ii][jj+1]
-            # Save once the next step takes us farther from the target time
-            # than we are right now
-            if abs(this_time - target_time) <= abs(next_time - target_time):
-                xinds.append(walk_data['xinds'][ii][jj])
-                yinds.append(walk_data['yinds'][ii][jj])
-                times.append(walk_data['travel_times'][ii][jj])
-                break
-            # If we made it to the end without getting there, save last
-            elif (jj == len(walk_data['travel_times'][ii])-1):
-                xinds.append(walk_data['xinds'][ii][jj+1])
-                yinds.append(walk_data['yinds'][ii][jj+1])
-                times.append(walk_data['travel_times'][ii][jj+1])
-                print('Note: Particle '+str(ii)+' never reached target_time')
+        times_ii = np.array(walk_data['travel_times'][ii])
+        # Find iteration nearest to target_time
+        tt = np.argmin(np.abs(times_ii - target_time))
+
+        xinds.append(walk_data['xinds'][ii][tt])
+        yinds.append(walk_data['yinds'][ii][tt])
+        times.append(walk_data['travel_times'][ii][tt])
+
+        if times_ii[-1] < target_time:
+            print('Note: Particle '+str(ii)+' never reached target_time')
 
     return xinds, yinds, times
 
@@ -786,7 +780,7 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
         walk_data : `dict`
             The dictionary with the particle information. This is the output
             from one of the other routines or the
-            :obj:dorado.particle_track.run_iteration() function.
+            :obj:'dorado.particle_track.Particles.run_iteration()' function.
 
         iteration : `int`, optional
             Iteration number at which to plot the particles. Default is -1,
@@ -977,7 +971,8 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
         walk_data : `dict`, optional
             The dictionary with the particle information, which is used to
             show the seed location. This is the output from one of the other
-            routines or the :obj:dorado.particle_track.run_iteration() function.
+            routines or the
+            :obj:'dorado.particle_track.Particles.run_iteration()' function.
 
         cmap : `str`, optional
             Name of Matplotlib colormap used for the foreground (heatmap).
@@ -1064,7 +1059,8 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
         walk_data : `dict`, optional
             The dictionary with the particle information, which is used to
             show the seed location. This is the output from one of the other
-            routines or the :obj:dorado.particle_track.run_iteration() function.
+            routines or the
+            :obj:'dorado.particle_track.Particles.run_iteration()' function.
 
         cmap : `str`, optional
             Name of Matplotlib colormap used for the foreground (heatmap).
