@@ -14,6 +14,7 @@ from math import pi
 import numpy as np
 import scipy
 from scipy import interpolate
+import matplotlib
 from tqdm import tqdm
 import dorado.lagrangian_walker as lw
 
@@ -1048,7 +1049,8 @@ def unstruct2grid(coordinates,
                   quantity,
                   cellsize,
                   k_nearest_neighbors=3,
-                  boundary=None):
+                  boundary=None,
+                  crop=True):
     """Convert unstructured model outputs into gridded arrays.
 
     Interpolates model variables (e.g. depth, velocity) from an
@@ -1081,6 +1083,10 @@ def unstruct2grid(coordinates,
             List [] of (x,y) coordinates used to delineate the boundary of
             interpolation. Points outside the polygon will be assigned as nan.
             Format needs to match requirements of matplotlib.path.Path()
+
+        crop : `bool`, optional
+            If a boundary is specified, setting crop to True will eliminate
+            any all-NaN borders from the interpolated rasters.
 
     **Outputs** :
 
@@ -1123,8 +1129,6 @@ def unstruct2grid(coordinates,
     if boundary is not None:
         path = matplotlib.path.Path(boundary)
         outside = ~path.contains_points(gridXY_array)
-    else:
-        outside = np.zeros_like(gridXY_array, dtype=int)
 
     # Create Interpolation function
     if k_nearest_neighbors == 1:  # Only use nearest neighbor
@@ -1136,10 +1140,15 @@ def unstruct2grid(coordinates,
         def interp_func(data):
             if isinstance(data, list):
                 data = np.array(data)
-            gridded_data = data[gridqInd]
-            gridded_data[outside] = np.nan # Crop to bounds
+            gridded_data = data[gridqInd].astype(float)
+            if boundary is not None:
+                gridded_data[outside] = np.nan # Crop to bounds
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
+            if boundary is not None and crop is True:
+                mask = ~np.isnan(gridded_data) # Delete all-nan border
+                gridded_data = gridded_data[np.ix_(mask.any(1),
+                                                   mask.any(0))]
             return gridded_data
     else:
         # Inverse-distance interpolation
@@ -1156,11 +1165,16 @@ def unstruct2grid(coordinates,
             num = 0.
             for i in list(range(k_nearest_neighbors)):
                 denom += nn_wts[:, i]
-                num += data[nn_inds[:, i]]*nn_wts[:, i]
+                num += data[nn_inds[:, i]].astype(float)*nn_wts[:, i]
             gridded_data = (num/denom)
-            gridded_data[outside] = np.nan # Crop to bounds
+            if boundary is not None:
+                gridded_data[outside] = np.nan # Crop to bounds
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
+            if boundary is not None and crop is True:
+                mask = ~np.isnan(gridded_data) # Delete all-nan border
+                gridded_data = gridded_data[np.ix_(mask.any(1),
+                                                   mask.any(0))]
             return gridded_data
 
     # Finally, call the interpolation function to create array:

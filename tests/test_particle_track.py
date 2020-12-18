@@ -490,3 +490,23 @@ def test_unstruct2grid_k3():
                                             [2., 2.68254467, 2.10026059],
                                             [1.96968263, 1.6122416,
                                              1.65818041]]))
+
+def test_unstruct2grid_bounds():
+    coords = [(10.5, 10.1),
+              (10.1, 15.1),
+              (15.2, 20.2)]
+    quantity = [1, 2, 3]
+    cellsize = 1.0
+    boundary = [[12, 12], [12, 19], [15, 19], [15, 12]]
+    interp_func, gridd = particle_track.unstruct2grid(coords, quantity,
+                                                      cellsize,
+                                                      k_nearest_neighbors=1,
+                                                      boundary=boundary,
+                                                      crop=True)
+    assert np.all(gridd == np.array([[2., 3., 3.],
+                                     [2., 2., 3.],
+                                     [2., 2., 2.],
+                                     [2., 2., 2.],
+                                     [2., 2., 2.],
+                                     [2., 2., 2.],
+                                     [1., 1., 1.]]))
