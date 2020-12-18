@@ -1,4 +1,4 @@
-# This workflow installs and tests dorado on mulitple python versions and operating systems.
+# This workflow installs and tests dorado on multiple python versions and operating systems.
 
 name: build
 
@@ -105,6 +105,7 @@ jobs:
         python examples/true_random_walk.py
         python examples/parallel_comparison.py
         python examples/traveltime_straight_channel.py
+        python examples/nourishment_example.py
         cd examples
         python unsteady_example.py
 

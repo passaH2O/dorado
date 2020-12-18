@@ -432,6 +432,28 @@ def test_exposure_reenter():
     exp_times = particle_track.exposure_time(walk_data, roi)
     assert exp_times[0] == 3.0
 
+def test_nourishment_area():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2]]
+    walk_data['xinds'] = [[0, 1, 2]]
+    walk_data['travel_times'] = [[2, 4, 6]]
+    visit_freq = particle_track.nourishment_area(walk_data, (3,3),
+                                                 sigma=0, clip=100)
+    assert np.all(visit_freq == np.array([[1., 0., 0.],
+                                          [0., 1., 0.],
+                                          [0., 0., 1.]]))
+
+def test_nourishment_time():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['xinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 15, 20]]
+    answer = np.diag([0., 2., 2., 4.5, 6., 0.])
+    answer[answer == 0.] = np.nan
+    nt = dorado.particle_track.nourishment_time(walk_data, (6, 6),
+                                                sigma=0, clip=100)
+    assert ((nt == answer) | (np.isnan(nt) & np.isnan(answer))).all()
+
 def test_unstruct2grid_k1():
     coords = [(10.5, 10.1),
               (10.1, 15.1),
