@@ -4,4 +4,4 @@
 Paper
 =====
 
-A paper accompanying this software package is currently being submitted to the Journal of Open Source Software. The paper Markdown file has been rendered as a ReStructured Text file (although not all formatting translates well) for inclusion in the documentation prior to publication. It can be viewed :ref:`here<paperrst>`.
+A paper accompanying this software package has been published in the Journal of Open Source Software. It can be viewed `here <https://joss.theoj.org/papers/10.21105/joss.02585>`_

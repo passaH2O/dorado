@@ -117,10 +117,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         persist-credentials: false
-    - name: Set up Python 3.8
+    - name: Set up Python 3.x
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.x'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -145,7 +145,7 @@ jobs:
         echo ${{ github.ref == 'refs/heads/master' }}
         echo ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@3.5.5
+      uses: JamesIves/github-pages-deploy-action@3.7.1
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
