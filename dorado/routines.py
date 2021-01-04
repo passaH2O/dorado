@@ -780,7 +780,7 @@ def plot_state(grid, walk_data, iteration=-1, target_time=None, c='b'):
         walk_data : `dict`
             The dictionary with the particle information. This is the output
             from one of the other routines or the
-            :obj:'dorado.particle_track.Particles.run_iteration()' function.
+            :obj:`dorado.particle_track.Particles.run_iteration()` function.
 
         iteration : `int`, optional
             Iteration number at which to plot the particles. Default is -1,
@@ -952,14 +952,15 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
 
     Function will plot the history of particle travel locations in walk_data
     as a heatmap overtop the specified grid, using the output of
-    particle_track.nourishment_area(). Colors indicate number of instances
-    in which that cell was occupied by a particle.
+    :obj:`dorado.particle_track.nourishment_area()`. Colors indicate number
+    of instances in which that cell was occupied by a particle.
 
     **Inputs** :
 
         visit_freq : `numpy.ndarray`
             A 2-D grid of normalized particle visit frequencies, i.e. the
-            output of the dorado.particle_track.nourishment_area() function
+            output of the :obj:`dorado.particle_track.nourishment_area()`
+            function
 
         grid : `numpy.ndarray`, optional
             An optional 2-D grid upon which the particles will be plotted.
@@ -972,7 +973,7 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
             The dictionary with the particle information, which is used to
             show the seed location. This is the output from one of the other
             routines or the
-            :obj:'dorado.particle_track.Particles.run_iteration()' function.
+            :obj:`dorado.particle_track.Particles.run_iteration()` function.
 
         cmap : `str`, optional
             Name of Matplotlib colormap used for the foreground (heatmap).
@@ -1043,14 +1044,14 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
 
     Function will plot the history of mean particle travel times in walk_data
     as a heatmap overtop the specified grid, using the output of
-    particle_track.nourishment_time(). Colors indicate the average length of
-    time particles spent in each cell (potentially after smoothing)
+    :obj:`dorado.particle_track.nourishment_time()`. Colors indicate the mean
+    length of time particles spent in each cell (potentially after smoothing)
 
     **Inputs** :
 
         mean_times : `numpy.ndarray`
             Array of mean occupation times in each cell, i.e. the output of
-            the dorado.particle_track.nourishment_time() function
+            the :obj:`dorado.particle_track.nourishment_time()` function
 
         grid : `numpy.ndarray`, optional
             An optional 2-D grid upon which the particles will be plotted.
@@ -1060,7 +1061,7 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
             The dictionary with the particle information, which is used to
             show the seed location. This is the output from one of the other
             routines or the
-            :obj:'dorado.particle_track.Particles.run_iteration()' function.
+            :obj:`dorado.particle_track.Particles.run_iteration()` function.
 
         cmap : `str`, optional
             Name of Matplotlib colormap used for the foreground (heatmap).

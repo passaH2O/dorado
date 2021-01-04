@@ -1,7 +1,7 @@
 .. _example14:
 
 Example 14 - Nourishment Area and Time Functions
-===============================================
+================================================
 
 In this example, we analyze the travel history of a particle injection by computing the "nourishment area" and "nourishment time" for a given seed location.
 
