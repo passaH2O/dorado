@@ -472,12 +472,23 @@ def test_nourishment_area():
     walk_data = dict()
     walk_data['yinds'] = [[0, 1, 2]]
     walk_data['xinds'] = [[0, 1, 2]]
-    walk_data['travel_times'] = [[2, 4, 6]]
     answer = np.diag([1., 1., 1.])
     answer[answer == 0.] = np.nan
     vf = particle_track.nourishment_area(walk_data, (3,3),
                                          sigma=0, clip=100)
     assert ((vf == answer) | (np.isnan(vf) & np.isnan(answer))).all()
+
+def test_nourishment_area_sigma():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2]]
+    walk_data['xinds'] = [[0, 1, 2]]
+    answer = np.array([[1, 0.222, 0],
+                       [0.222, 0.793, 0.222],
+                       [0, 0.222, 1]])
+    vf = particle_track.nourishment_area(walk_data, (3,3),
+                                         sigma=0.5, clip=100)
+    vf[np.isnan(vf)] = 0
+    assert (pytest.approx(vf, 0.001) == answer).all()
 
 def test_nourishment_time():
     walk_data = dict()
@@ -489,6 +500,22 @@ def test_nourishment_time():
     nt = particle_track.nourishment_time(walk_data, (6, 6),
                                          sigma=0, clip=100)
     assert ((nt == answer) | (np.isnan(nt) & np.isnan(answer))).all()
+
+def test_nourishment_time_sigma():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['xinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 15, 20]]
+    answer = np.array([[0.023, 0.168, 0.023, 0, 0, 0],
+                       [0.168, 1.26, 0.335, 0.024, 0, 0],
+                       [0.023, 0.335, 1.311, 0.544, 0.053, 0],
+                       [0, 0.024, 0.544, 2.875, 0.879, 0.069],
+                       [0, 0, 0.053, 0.879, 3.763, 0.504],
+                       [0, 0, 0, 0.069, 0.504, 0.068]])
+    nt = particle_track.nourishment_time(walk_data, (6, 6),
+                                         sigma=0.5, clip=100)
+    nt[np.isnan(nt)] = 0
+    assert (pytest.approx(nt, 0.001) == answer).all()
 
 def test_unstruct2grid_k1():
     coords = [(10.5, 10.1),
