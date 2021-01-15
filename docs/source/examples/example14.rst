@@ -44,7 +44,7 @@ Now, we will route the particles for 120 iterations. Notice that we have used mo
 
    >>> walk_data = dorado.routines.steady_plots(particles, 120, 'nourishment_example')
 
-Now that we have an existing `walk_data` dictionary, let's visualize some bulk information about the travel history. First, we can compute which regions of the domain were most visited by particles. This metric is often referred to as the `Nourishment Area <https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015JF003653>`_ of a sample location, as it represents regions which are "nourished" by material from that location. We can compute how frequently cells were visited by particles using the `nourishment_area` function, and visualize the results using the `show_nourishment_area` routine.
+Now that we have an existing `walk_data` dictionary, let's visualize some bulk information about the travel history. First, we can compute which regions of the domain were most visited by particles. This metric is often referred to as the `Nourishment Area` (e.g. Liang et al., 2016, doi.org/10.1002/2015JF003653) of a sample location, as it represents regions which are "nourished" by material from that location. We can compute how frequently cells were visited by particles using the `nourishment_area` function, and visualize the results using the `show_nourishment_area` routine.
 
 .. doctest::
 
