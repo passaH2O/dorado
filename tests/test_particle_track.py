@@ -468,6 +468,55 @@ def test_exposure_reenter():
     exp_times = particle_track.exposure_time(walk_data, roi)
     assert exp_times[0] == 3.0
 
+def test_nourishment_area():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2]]
+    walk_data['xinds'] = [[0, 1, 2]]
+    answer = np.diag([1., 1., 1.])
+    answer[answer == 0.] = np.nan
+    vf = particle_track.nourishment_area(walk_data, (3,3),
+                                         sigma=0, clip=100)
+    assert ((vf == answer) | (np.isnan(vf) & np.isnan(answer))).all()
+
+def test_nourishment_area_sigma():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2]]
+    walk_data['xinds'] = [[0, 1, 2]]
+    answer = np.array([[1, 0.222, 0],
+                       [0.222, 0.793, 0.222],
+                       [0, 0.222, 1]])
+    vf = particle_track.nourishment_area(walk_data, (3,3),
+                                         sigma=0.5, clip=100)
+    vf[np.isnan(vf)] = 0
+    assert pytest.approx(vf == answer, 0.001)
+
+def test_nourishment_time():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['xinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 15, 20]]
+    answer = np.diag([0., 2., 2., 4.5, 6., 0.])
+    answer[answer == 0.] = np.nan
+    nt = particle_track.nourishment_time(walk_data, (6, 6),
+                                         sigma=0, clip=100)
+    assert ((nt == answer) | (np.isnan(nt) & np.isnan(answer))).all()
+
+def test_nourishment_time_sigma():
+    walk_data = dict()
+    walk_data['yinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['xinds'] = [[0, 1, 2, 3, 4, 5]]
+    walk_data['travel_times'] = [[2, 4, 6, 8, 15, 20]]
+    answer = np.array([[0.023, 0.168, 0.023, 0, 0, 0],
+                       [0.168, 1.26, 0.335, 0.024, 0, 0],
+                       [0.023, 0.335, 1.311, 0.544, 0.053, 0],
+                       [0, 0.024, 0.544, 2.875, 0.879, 0.069],
+                       [0, 0, 0.053, 0.879, 3.763, 0.504],
+                       [0, 0, 0, 0.069, 0.504, 0.068]])
+    nt = particle_track.nourishment_time(walk_data, (6, 6),
+                                         sigma=0.5, clip=100)
+    nt[np.isnan(nt)] = 0
+    assert pytest.approx(nt == answer, 0.001)
+
 def test_unstruct2grid_k1():
     coords = [(10.5, 10.1),
               (10.1, 15.1),
@@ -504,3 +553,23 @@ def test_unstruct2grid_k3():
                                             [2., 2.68254467, 2.10026059],
                                             [1.96968263, 1.6122416,
                                              1.65818041]]))
+
+def test_unstruct2grid_bounds():
+    coords = [(10.5, 10.1),
+              (10.1, 15.1),
+              (15.2, 20.2)]
+    quantity = [1, 2, 3]
+    cellsize = 1.0
+    boundary = [[12, 12], [12, 19], [15, 19], [15, 12]]
+    interp_func, gridd = particle_track.unstruct2grid(coords, quantity,
+                                                      cellsize,
+                                                      k_nearest_neighbors=1,
+                                                      boundary=boundary,
+                                                      crop=True)
+    assert np.all(gridd == np.array([[2., 3., 3.],
+                                     [2., 2., 3.],
+                                     [2., 2., 2.],
+                                     [2., 2., 2.],
+                                     [2., 2., 2.],
+                                     [2., 2., 2.],
+                                     [1., 1., 1.]]))

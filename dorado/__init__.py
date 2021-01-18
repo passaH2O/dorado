@@ -1,4 +1,5 @@
-__version__ = "2.3.0"
+__version__ = "2.4.0"
+
 
 from . import lagrangian_walker
 from . import parallel_routing

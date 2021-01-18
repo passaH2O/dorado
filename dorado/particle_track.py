@@ -12,8 +12,6 @@ from __future__ import division, print_function, absolute_import
 from builtins import range
 from math import pi
 import numpy as np
-import scipy
-from scipy import interpolate
 from tqdm import tqdm
 import dorado.lagrangian_walker as lw
 
@@ -901,10 +899,153 @@ def exposure_time(walk_data,
     return exposure_times.tolist()
 
 
+def nourishment_area(walk_data, raster_size, sigma=0.7, clip=99.5):
+    """Determine the nourishment area of a particle injection
+
+    Function will measure the regions of the domain 'fed' by a seed location,
+    as indicated by the history of particle travel locations in walk_data.
+    Returns a heatmap raster, in which values indicate number of occasions
+    each cell was occupied by a particle (after spatial filtering to reduce
+    noise in the random walk, and normalizing by number of particles).
+
+    **Inputs** :
+
+        walk_data : `dict`
+            Dictionary of all prior x locations, y locations, and travel
+            times (the output of run_iteration)
+
+        raster_size : `tuple`
+            Tuple (L,W) of the domain dimensions, i.e. the output of
+            numpy.shape(raster).
+
+        sigma : `float`, optional
+            Degree of spatial smoothing of the area, implemented using a
+            Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
+            Default is light smoothing with sigma = 0.7 (to turn off smoothing,
+            set sigma = 0)
+
+        clip : `float`, optional
+            Percentile at which to truncate the distribution. Particles which
+            get stuck can lead to errors at the high-extreme, so this 
+            parameter is used to normalize by a "near-max". Default is the
+            99.5th percentile. To use true max, specify clip = 100
+
+    **Outputs** :
+
+        visit_freq : `numpy.ndarray`
+            Array of normalized particle visit frequency, with cells in the
+            range [0, 1] representing the number of instances particles visited
+            that cell. If sigma > 0, the array values include spatial filtering
+
+    """
+    if sigma > 0:
+        from scipy.ndimage import gaussian_filter
+    
+    # Measure visit frequency
+    visit_freq = np.zeros(raster_size)
+    for ii in list(range(len(walk_data['xinds']))):
+        for jj in list(range(len(walk_data['xinds'][ii]))):
+            visit_freq[walk_data['xinds'][ii][jj],
+                       walk_data['yinds'][ii][jj]] += 1
+
+    # Clip out highest percentile to correct possible outliers
+    vmax = float(np.nanpercentile(visit_freq, clip))
+    visit_freq = np.clip(visit_freq, 0, vmax)
+
+    # If applicable, do smoothing
+    if sigma > 0:
+        visit_freq = gaussian_filter(visit_freq, sigma=sigma)
+        visit_freq[visit_freq==np.min(visit_freq)] = np.nan
+    else:
+        visit_freq[visit_freq==0] = np.nan
+
+    # Normalize to 0-1
+    visit_freq = visit_freq/np.nanmax(visit_freq)
+
+    return visit_freq
+
+
+def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
+    """Determine the nourishment time of a particle injection
+
+    Function will measure the average length of time particles spend in each
+    area of the domain for a given seed location, as indicated by the history
+    of particle travel times in walk_data. Returns a heatmap raster, in
+    which values indicate the average length of time particles tend to remain
+    in each cell (after spatial filtering to reduce noise in the random walk).
+
+    **Inputs** :
+
+        walk_data : `dict`
+            Dictionary of all prior x locations, y locations, and travel
+            times (the output of run_iteration)
+
+        raster_size : `tuple`
+            Tuple (L,W) of the domain dimensions, i.e. the output of
+            numpy.shape(raster).
+
+        sigma : `float`, optional
+            Degree of spatial smoothing of the area, implemented using a
+            Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
+            Default is light smoothing with sigma = 0.7 (to turn off smoothing,
+            set sigma = 0)
+
+        clip : `float`, optional
+            Percentile at which to truncate the distribution. Particles which
+            get stuck can lead to errors at the high-extreme, so this 
+            parameter is used to normalize by a "near-max". Default is the
+            99.5th percentile. To use true max, specify clip = 100
+
+    **Outputs** :
+
+        mean_time : `numpy.ndarray`
+            Array of mean occupation time, with cell values representing the 
+            mean time particles spent in that cell. If sigma > 0, the array
+            values include spatial filtering
+
+    """
+    if sigma > 0:
+        from scipy.ndimage import gaussian_filter
+    
+    # Measure visit frequency
+    visit_freq = np.zeros(raster_size)
+    time_total = visit_freq.copy()
+    for ii in list(range(len(walk_data['xinds']))):
+        for jj in list(range(1, len(walk_data['xinds'][ii])-1)):
+            # Running total of particles in this cell to find average
+            visit_freq[walk_data['xinds'][ii][jj],
+                       walk_data['yinds'][ii][jj]] += 1
+            # Count the time in this cell as 0.5*last_dt + 0.5*next_dt
+            last_dt = (walk_data['travel_times'][ii][jj] - \
+                       walk_data['travel_times'][ii][jj-1])
+            next_dt = (walk_data['travel_times'][ii][jj+1] - \
+                       walk_data['travel_times'][ii][jj])
+            time_total[walk_data['xinds'][ii][jj],
+                       walk_data['yinds'][ii][jj]] += 0.5*(last_dt + next_dt)
+    # Find mean time in each cell
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mean_time = time_total / visit_freq
+    mean_time[visit_freq == 0] = 0
+    # Prone to numerical outliers, so clip out extremes
+    vmax = float(np.nanpercentile(mean_time, clip))
+    mean_time = np.clip(mean_time, 0, vmax)
+    
+    # If applicable, do smoothing
+    if sigma > 0:
+        mean_time = gaussian_filter(mean_time, sigma=sigma)
+        mean_time[mean_time==np.min(mean_time)] = np.nan
+    else:
+        mean_time[mean_time==0] = np.nan
+    
+    return mean_time
+
+
 def unstruct2grid(coordinates,
                   quantity,
                   cellsize,
-                  k_nearest_neighbors=3):
+                  k_nearest_neighbors=3,
+                  boundary=None,
+                  crop=True):
     """Convert unstructured model outputs into gridded arrays.
 
     Interpolates model variables (e.g. depth, velocity) from an
@@ -929,9 +1070,18 @@ def unstruct2grid(coordinates,
         cellsize : `float or int`
             Length along one square cell face.
 
-        k_nearest_neighbors : `int`
+        k_nearest_neighbors : `int`, optional
             Number of nearest neighbors to use in the interpolation.
             If k>1, inverse-distance-weighted interpolation is used.
+
+        boundary : `list`, optional
+            List [] of (x,y) coordinates used to delineate the boundary of
+            interpolation. Points outside the polygon will be assigned as nan.
+            Format needs to match requirements of matplotlib.path.Path()
+
+        crop : `bool`, optional
+            If a boundary is specified, setting crop to True will eliminate
+            any all-NaN borders from the interpolated rasters.
 
     **Outputs** :
 
@@ -947,6 +1097,10 @@ def unstruct2grid(coordinates,
             Array of quantity after interpolation.
 
     """
+    import matplotlib
+    import scipy
+    from scipy import interpolate
+
     cellsize = float(cellsize)
 
     # Make sure all input values are floats
@@ -969,6 +1123,11 @@ def unstruct2grid(coordinates,
     gridXY_array = np.array([np.concatenate(gridX),
                              np.concatenate(gridY)]).transpose()
     gridXY_array = np.ascontiguousarray(gridXY_array)
+    
+    # If a boundary has been specified, create array to index outside it
+    if boundary is not None:
+        path = matplotlib.path.Path(boundary)
+        outside = ~path.contains_points(gridXY_array)
 
     # Create Interpolation function
     if k_nearest_neighbors == 1:  # Only use nearest neighbor
@@ -980,9 +1139,15 @@ def unstruct2grid(coordinates,
         def interp_func(data):
             if isinstance(data, list):
                 data = np.array(data)
-            gridded_data = data[gridqInd]
+            gridded_data = data[gridqInd].astype(float)
+            if boundary is not None:
+                gridded_data[outside] = np.nan # Crop to bounds
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
+            if boundary is not None and crop is True:
+                mask = ~np.isnan(gridded_data) # Delete all-nan border
+                gridded_data = gridded_data[np.ix_(mask.any(1),
+                                                   mask.any(0))]
             return gridded_data
     else:
         # Inverse-distance interpolation
@@ -999,10 +1164,16 @@ def unstruct2grid(coordinates,
             num = 0.
             for i in list(range(k_nearest_neighbors)):
                 denom += nn_wts[:, i]
-                num += data[nn_inds[:, i]]*nn_wts[:, i]
+                num += data[nn_inds[:, i]].astype(float)*nn_wts[:, i]
             gridded_data = (num/denom)
+            if boundary is not None:
+                gridded_data[outside] = np.nan # Crop to bounds
             gridded_data.shape = (len(yvect), len(xvect))
             gridded_data = np.flipud(gridded_data)
+            if boundary is not None and crop is True:
+                mask = ~np.isnan(gridded_data) # Delete all-nan border
+                gridded_data = gridded_data[np.ix_(mask.any(1),
+                                                   mask.any(0))]
             return gridded_data
 
     # Finally, call the interpolation function to create array:
