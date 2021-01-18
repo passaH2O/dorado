@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Example 14 - Nourishment Area and Time Functions &#8212; dorado 2.4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License" href="../misc/license.html" />
+    <link rel="prev" title="Example 13 - Using Unstructured Grids" href="example13.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="example-14-nourishment-area-and-time-functions">
+<span id="example14"></span><h1>Example 14 - Nourishment Area and Time Functions<a class="headerlink" href="#example-14-nourishment-area-and-time-functions" title="Permalink to this headline">¶</a></h1>
+<p>In this example, we analyze the travel history of a particle injection by computing the “nourishment area” and “nourishment time” for a given seed location.</p>
+<p>Full example script available <a class="reference download internal" download="" href="../_downloads/5839f676cadb633e4514f0876a22b109/nourishment_example.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<p>We will again make use of the DeltaRCM example data used in <a class="reference internal" href="example02.html#example02"><span class="std std-ref">Example 2 - Particles in Steady Flow (DeltaRCM)</span></a>, but in this case we will slightly change the settings used in the random walk. In particular, this time we will include discharge fields, in order to obtain more useful travel time information.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;ex_deltarcm_data.npz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we will create the parameter class and assign attributes to it.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;qx&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">qy</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;qy&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">50.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;DeltaRCM&#39;</span>
+</pre></div>
+</div>
+<p>Now that the parameters have all been defined, we will define the particles class and generate a set of particles.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">137</span><span class="p">,</span> <span class="mi">140</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, we will route the particles for 120 iterations. Notice that we have used more particles and iterations than in <a class="reference internal" href="example02.html#example02"><span class="std std-ref">Example 2 - Particles in Steady Flow (DeltaRCM)</span></a> – this helps us obtain more statistically representative results later on.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="s1">&#39;nourishment_example&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now that we have an existing <cite>walk_data</cite> dictionary, let’s visualize some bulk information about the travel history. First, we can compute which regions of the domain were most visited by particles. This metric is often referred to as the <cite>Nourishment Area</cite> (e.g. Liang et al., 2016, doi.org/10.1002/2015JF003653) of a sample location, as it represents regions which are “nourished” by material from that location. We can compute how frequently cells were visited by particles using the <cite>nourishment_area</cite> function, and visualize the results using the <cite>show_nourishment_area</cite> routine.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">visit_freq</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">nourishment_area</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">show_nourishment_area</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/NourishmentArea.png" src="../_images/NourishmentArea.png" />
+<p>The result is visualized in the figure above. Flow depth serves as the background in this figure, on top of which the Nourishment Area is shown, with regions colored by how frequently each cell was occupied by particles. Because we are often interested in where particles can go in general, rather than exactly where they have gone, by default this function will perform a small amount of Gaussian filtering, to smooth out some of the stochasticity in the travel paths. This smoothing can be turned off or ramped up depending on the application. Additionally, the plotting routine comes with many optional settings which can be used to change the aesthetics of the resulting figure.</p>
+<p>Because the Nourishment Area is a time-integrated measure of where particles are going, we may also want to know how long particles tend to stay there once they get there. For this question, we have provided a second function, which we are calling the Nourishment Time, which computes how long on average particles spend in each cell they travel through. In steady model runs (such as this one), the result is trivially related to the flow velocity of each cell – however, for unsteady runs, in which the underlying flow field might be changing in between particle iterations, the results of this function can be more interesting.</p>
+<p>Similar to before, we compute this by calling on the <cite>nourishment_time</cite> function, and visualize the results using the <cite>show_nourishment_time</cite> routine.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean_times</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">nourishment_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="mi">95</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">show_nourishment_time</span><span class="p">(</span><span class="n">mean_times</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/NourishmentTime.png" src="../_images/NourishmentTime.png" />
+<p>The result is visualized above. As with the previous function, some amount of spatial filtering has been applied. From comparing these two figures, some interesting trends emerge. For example, even though the main distributary channels are frequently visited by particles, the particles on average don’t spend very much time there. Depending on the material or question of interest, perhaps these can provide useful insights!</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">dorado</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quickstart</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/index.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/index.html">Paper</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../userguide/index.html">User Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example01.html">Example 1 - Particles in Steady Flow (ANUGA)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example02.html">Example 2 - Particles in Steady Flow (DeltaRCM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example03.html">Example 3 - Using the Built-In Animation Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example04.html">Example 4 - Toggling Steepest Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example05.html">Example 5 - Visualizing Particle Travel Times</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example06.html">Example 6 - Set Travel Time Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example07.html">Example 7 - Drawing Particle Travel Paths (DeltaRCM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example08.html">Example 8 - Drawing Particle Travel Paths (ANUGA)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example09.html">Example 9 - True Random Walk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example10.html">Example 10 - Routing Particles in Parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example11.html">Example 11 - The Travel Time Diffusion Coefficient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example12.html">Example 12 - Unsteady Flow Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example13.html">Example 13 - Using Unstructured Grids</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example 14 - Nourishment Area and Time Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#external-examples">External Examples</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../misc/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apiref/index.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/acknowledgments.html">Acknowledgments</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Examples</a><ul>
+      <li>Previous: <a href="example13.html" title="previous chapter">Example 13 - Using Unstructured Grids</a></li>
+      <li>Next: <a href="../misc/license.html" title="next chapter">License</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/examples/example14.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

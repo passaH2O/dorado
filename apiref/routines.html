@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.routines &#8212; dorado 2.3.0 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.4.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -138,7 +138,7 @@ This function provides a shortcut to ‘smart’ indexing of the dict.</p>
 <div><dl>
 <dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all x and y locations and travel times</p>
 </dd>
-<dt>target_time<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Travel time at which to slice the dictionary.</p>
+<dt>target_time<span class="classifier"><cite>float</cite></span></dt><dd><p>Travel time at which to slice the dictionary.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -210,7 +210,7 @@ grids that might be nice to use are
 </dd>
 <dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>The dictionary with the particle information. This is the output
 from one of the other routines or the
-:obj:dorado.particle_track.run_iteration() function.</p>
+<a class="reference internal" href="particletrack.html#dorado.particle_track.Particles.run_iteration" title="dorado.particle_track.Particles.run_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles.run_iteration()</span></code></a> function.</p>
 </dd>
 <dt>iteration<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Iteration number at which to plot the particles. Default is -1,
 i.e. the most recent step</p>
@@ -227,6 +227,108 @@ figure, default is ‘b’ for blue</p>
 <blockquote>
 <div><dl>
 <dt>ax<span class="classifier"><cite>matplotlib.axes</cite></span></dt><dd><p>A <cite>matplotlib.axes</cite> with the intended plot drawn on it</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.routines.show_nourishment_area">
+<code class="descclassname">dorado.routines.</code><code class="descname">show_nourishment_area</code><span class="sig-paren">(</span><em>visit_freq</em>, <em>grid=None</em>, <em>walk_data=None</em>, <em>cmap='Reds'</em>, <em>sigma=0.7</em>, <em>min_alpha=0</em>, <em>show_seed=True</em>, <em>seed_color='dodgerblue'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.show_nourishment_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a smoothed, normalized heatmap of particle visit frequency</p>
+<p>Function will plot the history of particle travel locations in walk_data
+as a heatmap overtop the specified grid, using the output of
+<a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_area" title="dorado.particle_track.nourishment_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.nourishment_area()</span></code></a>. Colors indicate number
+of instances in which that cell was occupied by a particle.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>visit_freq<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>A 2-D grid of normalized particle visit frequencies, i.e. the
+output of the <a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_area" title="dorado.particle_track.nourishment_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.nourishment_area()</span></code></a>
+function</p>
+</dd>
+<dt>grid<span class="classifier"><cite>numpy.ndarray</cite>, optional</span></dt><dd><p>An optional 2-D grid upon which the particles will be plotted.
+Examples of grids that might be nice to use are
+<cite>dorado.particle_track.modelParams.depth</cite>,
+<cite>dorado.particle_track.modelParams.stage</cite>,
+<cite>dorado.particle_track.modelParams.topography</cite>.</p>
+</dd>
+<dt>walk_data<span class="classifier"><cite>dict</cite>, optional</span></dt><dd><p>The dictionary with the particle information, which is used to
+show the seed location. This is the output from one of the other
+routines or the
+<a class="reference internal" href="particletrack.html#dorado.particle_track.Particles.run_iteration" title="dorado.particle_track.Particles.run_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles.run_iteration()</span></code></a> function.</p>
+</dd>
+<dt>cmap<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of Matplotlib colormap used for the foreground (heatmap).
+Default is ‘Reds’</p>
+</dd>
+<dt>sigma<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Degree of spatial smoothing of the heatmap used in the
+dorado.particle_track.nourishment_area() function, only used to
+adjust the plot asthetics for low sigma’s</p>
+</dd>
+<dt>min_alpha<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Minimum alpha value of the heatmap, representing the least
+frequented cell locations, default is full transparency</p>
+</dd>
+<dt>show_seed<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Determines whether resulting plot shows a marker indicating the
+(first) seed location. Uses indices of walk_data[:][0][0]. Default
+is True, but only if ‘walk_data’ is also provided.</p>
+</dd>
+<dt>seed_color<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of matplotlib color used for the marker seed, if shown. Default
+is a light blue to contrast with the ‘Reds’ heatmap.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>ax<span class="classifier"><cite>matplotlib.axes</cite></span></dt><dd><p>A <cite>matplotlib.axes</cite> upon which the nourishment area is drawn</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.routines.show_nourishment_time">
+<code class="descclassname">dorado.routines.</code><code class="descname">show_nourishment_time</code><span class="sig-paren">(</span><em>mean_times</em>, <em>grid=None</em>, <em>walk_data=None</em>, <em>cmap='magma'</em>, <em>show_colorbar=True</em>, <em>min_alpha=0.3</em>, <em>show_seed=True</em>, <em>seed_color='dodgerblue'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.show_nourishment_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a smoothed heatmap of mean particle visit time</p>
+<p>Function will plot the history of mean particle travel times in walk_data
+as a heatmap overtop the specified grid, using the output of
+<a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_time" title="dorado.particle_track.nourishment_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.nourishment_time()</span></code></a>. Colors indicate the mean
+length of time particles spent in each cell (potentially after smoothing)</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>mean_times<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Array of mean occupation times in each cell, i.e. the output of
+the <a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_time" title="dorado.particle_track.nourishment_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.nourishment_time()</span></code></a> function</p>
+</dd>
+<dt>grid<span class="classifier"><cite>numpy.ndarray</cite>, optional</span></dt><dd><p>An optional 2-D grid upon which the particles will be plotted.
+Recommended to use <cite>dorado.particle_track.modelParams.topography</cite></p>
+</dd>
+<dt>walk_data<span class="classifier"><cite>dict</cite>, optional</span></dt><dd><p>The dictionary with the particle information, which is used to
+show the seed location. This is the output from one of the other
+routines or the
+<a class="reference internal" href="particletrack.html#dorado.particle_track.Particles.run_iteration" title="dorado.particle_track.Particles.run_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles.run_iteration()</span></code></a> function.</p>
+</dd>
+<dt>cmap<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of Matplotlib colormap used for the foreground (heatmap).
+Default is ‘magma’</p>
+</dd>
+<dt>show_colorbar<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Controls whether to plot a colorbar for mean_times, default is False</p>
+</dd>
+<dt>min_alpha<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Minimum alpha value of the heatmap, representing the cells which
+spent the least amount of time occupied, default is 0.3</p>
+</dd>
+<dt>show_seed<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Determines whether resulting plot shows a marker indicating the
+(first) seed location. Uses indices of walk_data[:][0][0]. Default
+is True, but only if ‘walk_data’ is also provided.</p>
+</dd>
+<dt>seed_color<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of matplotlib color used for the marker seed, if shown. Default
+is a light blue.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>ax<span class="classifier"><cite>matplotlib.axes</cite></span></dt><dd><p>A <cite>matplotlib.axes</cite> upon which the nourishment times are drawn</p>
 </dd>
 </dl>
 </div></blockquote>

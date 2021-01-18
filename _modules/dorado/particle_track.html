@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.3.0 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.4.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,8 +46,6 @@
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">dorado.lagrangian_walker</span> <span class="k">as</span> <span class="nn">lw</span>
 
@@ -935,10 +933,153 @@
     <span class="k">return</span> <span class="n">exposure_times</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="nourishment_area"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.nourishment_area">[docs]</a><span class="k">def</span> <span class="nf">nourishment_area</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">raster_size</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="mf">99.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Determine the nourishment area of a particle injection</span>
+
+<span class="sd">    Function will measure the regions of the domain &#39;fed&#39; by a seed location,</span>
+<span class="sd">    as indicated by the history of particle travel locations in walk_data.</span>
+<span class="sd">    Returns a heatmap raster, in which values indicate number of occasions</span>
+<span class="sd">    each cell was occupied by a particle (after spatial filtering to reduce</span>
+<span class="sd">    noise in the random walk, and normalizing by number of particles).</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        walk_data : `dict`</span>
+<span class="sd">            Dictionary of all prior x locations, y locations, and travel</span>
+<span class="sd">            times (the output of run_iteration)</span>
+
+<span class="sd">        raster_size : `tuple`</span>
+<span class="sd">            Tuple (L,W) of the domain dimensions, i.e. the output of</span>
+<span class="sd">            numpy.shape(raster).</span>
+
+<span class="sd">        sigma : `float`, optional</span>
+<span class="sd">            Degree of spatial smoothing of the area, implemented using a</span>
+<span class="sd">            Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter</span>
+<span class="sd">            Default is light smoothing with sigma = 0.7 (to turn off smoothing,</span>
+<span class="sd">            set sigma = 0)</span>
+
+<span class="sd">        clip : `float`, optional</span>
+<span class="sd">            Percentile at which to truncate the distribution. Particles which</span>
+<span class="sd">            get stuck can lead to errors at the high-extreme, so this </span>
+<span class="sd">            parameter is used to normalize by a &quot;near-max&quot;. Default is the</span>
+<span class="sd">            99.5th percentile. To use true max, specify clip = 100</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        visit_freq : `numpy.ndarray`</span>
+<span class="sd">            Array of normalized particle visit frequency, with cells in the</span>
+<span class="sd">            range [0, 1] representing the number of instances particles visited</span>
+<span class="sd">            that cell. If sigma &gt; 0, the array values include spatial filtering</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
+    
+    <span class="c1"># Measure visit frequency</span>
+    <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">raster_size</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]))):</span>
+        <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">]))):</span>
+            <span class="n">visit_freq</span><span class="p">[</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">],</span>
+                       <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Clip out highest percentile to correct possible outliers</span>
+    <span class="n">vmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="n">clip</span><span class="p">))</span>
+    <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
+
+    <span class="c1"># If applicable, do smoothing</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">visit_freq</span><span class="p">[</span><span class="n">visit_freq</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">visit_freq</span><span class="p">[</span><span class="n">visit_freq</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># Normalize to 0-1</span>
+    <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">visit_freq</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">visit_freq</span></div>
+
+
+<div class="viewcode-block" id="nourishment_time"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.nourishment_time">[docs]</a><span class="k">def</span> <span class="nf">nourishment_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">raster_size</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="mf">99.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Determine the nourishment time of a particle injection</span>
+
+<span class="sd">    Function will measure the average length of time particles spend in each</span>
+<span class="sd">    area of the domain for a given seed location, as indicated by the history</span>
+<span class="sd">    of particle travel times in walk_data. Returns a heatmap raster, in</span>
+<span class="sd">    which values indicate the average length of time particles tend to remain</span>
+<span class="sd">    in each cell (after spatial filtering to reduce noise in the random walk).</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        walk_data : `dict`</span>
+<span class="sd">            Dictionary of all prior x locations, y locations, and travel</span>
+<span class="sd">            times (the output of run_iteration)</span>
+
+<span class="sd">        raster_size : `tuple`</span>
+<span class="sd">            Tuple (L,W) of the domain dimensions, i.e. the output of</span>
+<span class="sd">            numpy.shape(raster).</span>
+
+<span class="sd">        sigma : `float`, optional</span>
+<span class="sd">            Degree of spatial smoothing of the area, implemented using a</span>
+<span class="sd">            Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter</span>
+<span class="sd">            Default is light smoothing with sigma = 0.7 (to turn off smoothing,</span>
+<span class="sd">            set sigma = 0)</span>
+
+<span class="sd">        clip : `float`, optional</span>
+<span class="sd">            Percentile at which to truncate the distribution. Particles which</span>
+<span class="sd">            get stuck can lead to errors at the high-extreme, so this </span>
+<span class="sd">            parameter is used to normalize by a &quot;near-max&quot;. Default is the</span>
+<span class="sd">            99.5th percentile. To use true max, specify clip = 100</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        mean_time : `numpy.ndarray`</span>
+<span class="sd">            Array of mean occupation time, with cell values representing the </span>
+<span class="sd">            mean time particles spent in that cell. If sigma &gt; 0, the array</span>
+<span class="sd">            values include spatial filtering</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
+    
+    <span class="c1"># Measure visit frequency</span>
+    <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">raster_size</span><span class="p">)</span>
+    <span class="n">time_total</span> <span class="o">=</span> <span class="n">visit_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]))):</span>
+        <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="c1"># Running total of particles in this cell to find average</span>
+            <span class="n">visit_freq</span><span class="p">[</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">],</span>
+                       <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Count the time in this cell as 0.5*last_dt + 0.5*next_dt</span>
+            <span class="n">last_dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">]</span> <span class="o">-</span> \
+                       <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">next_dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> \
+                       <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">])</span>
+            <span class="n">time_total</span><span class="p">[</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">],</span>
+                       <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">jj</span><span class="p">]]</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">last_dt</span> <span class="o">+</span> <span class="n">next_dt</span><span class="p">)</span>
+    <span class="c1"># Find mean time in each cell</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="n">mean_time</span> <span class="o">=</span> <span class="n">time_total</span> <span class="o">/</span> <span class="n">visit_freq</span>
+    <span class="n">mean_time</span><span class="p">[</span><span class="n">visit_freq</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># Prone to numerical outliers, so clip out extremes</span>
+    <span class="n">vmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="n">clip</span><span class="p">))</span>
+    <span class="n">mean_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
+    
+    <span class="c1"># If applicable, do smoothing</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">mean_time</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">mean_time</span><span class="p">[</span><span class="n">mean_time</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">mean_time</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mean_time</span><span class="p">[</span><span class="n">mean_time</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    
+    <span class="k">return</span> <span class="n">mean_time</span></div>
+
+
 <div class="viewcode-block" id="unstruct2grid"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.unstruct2grid">[docs]</a><span class="k">def</span> <span class="nf">unstruct2grid</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span>
                   <span class="n">quantity</span><span class="p">,</span>
                   <span class="n">cellsize</span><span class="p">,</span>
-                  <span class="n">k_nearest_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+                  <span class="n">k_nearest_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                  <span class="n">boundary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">crop</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert unstructured model outputs into gridded arrays.</span>
 
 <span class="sd">    Interpolates model variables (e.g. depth, velocity) from an</span>
@@ -963,9 +1104,18 @@
 <span class="sd">        cellsize : `float or int`</span>
 <span class="sd">            Length along one square cell face.</span>
 
-<span class="sd">        k_nearest_neighbors : `int`</span>
+<span class="sd">        k_nearest_neighbors : `int`, optional</span>
 <span class="sd">            Number of nearest neighbors to use in the interpolation.</span>
 <span class="sd">            If k&gt;1, inverse-distance-weighted interpolation is used.</span>
+
+<span class="sd">        boundary : `list`, optional</span>
+<span class="sd">            List [] of (x,y) coordinates used to delineate the boundary of</span>
+<span class="sd">            interpolation. Points outside the polygon will be assigned as nan.</span>
+<span class="sd">            Format needs to match requirements of matplotlib.path.Path()</span>
+
+<span class="sd">        crop : `bool`, optional</span>
+<span class="sd">            If a boundary is specified, setting crop to True will eliminate</span>
+<span class="sd">            any all-NaN borders from the interpolated rasters.</span>
 
 <span class="sd">    **Outputs** :</span>
 
@@ -981,6 +1131,10 @@
 <span class="sd">            Array of quantity after interpolation.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+    <span class="kn">import</span> <span class="nn">scipy</span>
+    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+
     <span class="n">cellsize</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cellsize</span><span class="p">)</span>
 
     <span class="c1"># Make sure all input values are floats</span>
@@ -1003,6 +1157,11 @@
     <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridX</span><span class="p">),</span>
                              <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridY</span><span class="p">)])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
     <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">gridXY_array</span><span class="p">)</span>
+    
+    <span class="c1"># If a boundary has been specified, create array to index outside it</span>
+    <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>
+        <span class="n">outside</span> <span class="o">=</span> <span class="o">~</span><span class="n">path</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">gridXY_array</span><span class="p">)</span>
 
     <span class="c1"># Create Interpolation function</span>
     <span class="k">if</span> <span class="n">k_nearest_neighbors</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Only use nearest neighbor</span>
@@ -1014,9 +1173,15 @@
         <span class="k">def</span> <span class="nf">interp_func</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">gridqInd</span><span class="p">]</span>
+            <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">gridqInd</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">gridded_data</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># Crop to bounds</span>
             <span class="n">gridded_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yvect</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">xvect</span><span class="p">))</span>
             <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">crop</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">)</span> <span class="c1"># Delete all-nan border</span>
+                <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                                   <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="mi">0</span><span class="p">))]</span>
             <span class="k">return</span> <span class="n">gridded_data</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Inverse-distance interpolation</span>
@@ -1033,10 +1198,16 @@
             <span class="n">num</span> <span class="o">=</span> <span class="mf">0.</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">k_nearest_neighbors</span><span class="p">)):</span>
                 <span class="n">denom</span> <span class="o">+=</span> <span class="n">nn_wts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
-                <span class="n">num</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">nn_inds</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]]</span><span class="o">*</span><span class="n">nn_wts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+                <span class="n">num</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">nn_inds</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">*</span><span class="n">nn_wts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
             <span class="n">gridded_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">num</span><span class="o">/</span><span class="n">denom</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">gridded_data</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># Crop to bounds</span>
             <span class="n">gridded_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yvect</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">xvect</span><span class="p">))</span>
             <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">crop</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">)</span> <span class="c1"># Delete all-nan border</span>
+                <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                                   <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="mi">0</span><span class="p">))]</span>
             <span class="k">return</span> <span class="n">gridded_data</span>
 
     <span class="c1"># Finally, call the interpolation function to create array:</span>

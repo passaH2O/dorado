@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.3.0 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.4.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -368,8 +368,90 @@ handled on a case-by-case basis.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="dorado.particle_track.nourishment_area">
+<code class="descclassname">dorado.particle_track.</code><code class="descname">nourishment_area</code><span class="sig-paren">(</span><em>walk_data</em>, <em>raster_size</em>, <em>sigma=0.7</em>, <em>clip=99.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#nourishment_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.nourishment_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the nourishment area of a particle injection</p>
+<p>Function will measure the regions of the domain ‘fed’ by a seed location,
+as indicated by the history of particle travel locations in walk_data.
+Returns a heatmap raster, in which values indicate number of occasions
+each cell was occupied by a particle (after spatial filtering to reduce
+noise in the random walk, and normalizing by number of particles).</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all prior x locations, y locations, and travel
+times (the output of run_iteration)</p>
+</dd>
+<dt>raster_size<span class="classifier"><cite>tuple</cite></span></dt><dd><p>Tuple (L,W) of the domain dimensions, i.e. the output of
+numpy.shape(raster).</p>
+</dd>
+<dt>sigma<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Degree of spatial smoothing of the area, implemented using a
+Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
+Default is light smoothing with sigma = 0.7 (to turn off smoothing,
+set sigma = 0)</p>
+</dd>
+<dt>clip<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Percentile at which to truncate the distribution. Particles which
+get stuck can lead to errors at the high-extreme, so this
+parameter is used to normalize by a “near-max”. Default is the
+99.5th percentile. To use true max, specify clip = 100</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>visit_freq<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Array of normalized particle visit frequency, with cells in the
+range [0, 1] representing the number of instances particles visited
+that cell. If sigma &gt; 0, the array values include spatial filtering</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.particle_track.nourishment_time">
+<code class="descclassname">dorado.particle_track.</code><code class="descname">nourishment_time</code><span class="sig-paren">(</span><em>walk_data</em>, <em>raster_size</em>, <em>sigma=0.7</em>, <em>clip=99.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#nourishment_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.nourishment_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the nourishment time of a particle injection</p>
+<p>Function will measure the average length of time particles spend in each
+area of the domain for a given seed location, as indicated by the history
+of particle travel times in walk_data. Returns a heatmap raster, in
+which values indicate the average length of time particles tend to remain
+in each cell (after spatial filtering to reduce noise in the random walk).</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all prior x locations, y locations, and travel
+times (the output of run_iteration)</p>
+</dd>
+<dt>raster_size<span class="classifier"><cite>tuple</cite></span></dt><dd><p>Tuple (L,W) of the domain dimensions, i.e. the output of
+numpy.shape(raster).</p>
+</dd>
+<dt>sigma<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Degree of spatial smoothing of the area, implemented using a
+Gaussian kernal of the same sigma, via scipy.ndimage.gaussian_filter
+Default is light smoothing with sigma = 0.7 (to turn off smoothing,
+set sigma = 0)</p>
+</dd>
+<dt>clip<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Percentile at which to truncate the distribution. Particles which
+get stuck can lead to errors at the high-extreme, so this
+parameter is used to normalize by a “near-max”. Default is the
+99.5th percentile. To use true max, specify clip = 100</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>mean_time<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Array of mean occupation time, with cell values representing the
+mean time particles spent in that cell. If sigma &gt; 0, the array
+values include spatial filtering</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
 <dt id="dorado.particle_track.unstruct2grid">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">unstruct2grid</code><span class="sig-paren">(</span><em>coordinates</em>, <em>quantity</em>, <em>cellsize</em>, <em>k_nearest_neighbors=3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#unstruct2grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.unstruct2grid" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.particle_track.</code><code class="descname">unstruct2grid</code><span class="sig-paren">(</span><em>coordinates</em>, <em>quantity</em>, <em>cellsize</em>, <em>k_nearest_neighbors=3</em>, <em>boundary=None</em>, <em>crop=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#unstruct2grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.unstruct2grid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert unstructured model outputs into gridded arrays.</p>
 <p>Interpolates model variables (e.g. depth, velocity) from an
 unstructured grid onto a Cartesian grid using inverse-distance-weighted
@@ -390,8 +472,15 @@ depth, list would be formatted as [d1, d2, … , dn].</p>
 </dd>
 <dt>cellsize<span class="classifier"><cite>float or int</cite></span></dt><dd><p>Length along one square cell face.</p>
 </dd>
-<dt>k_nearest_neighbors<span class="classifier"><cite>int</cite></span></dt><dd><p>Number of nearest neighbors to use in the interpolation.
+<dt>k_nearest_neighbors<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Number of nearest neighbors to use in the interpolation.
 If k&gt;1, inverse-distance-weighted interpolation is used.</p>
+</dd>
+<dt>boundary<span class="classifier"><cite>list</cite>, optional</span></dt><dd><p>List [] of (x,y) coordinates used to delineate the boundary of
+interpolation. Points outside the polygon will be assigned as nan.
+Format needs to match requirements of matplotlib.path.Path()</p>
+</dd>
+<dt>crop<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>If a boundary is specified, setting crop to True will eliminate
+any all-NaN borders from the interpolated rasters.</p>
 </dd>
 </dl>
 </div></blockquote>
