@@ -10,7 +10,6 @@ from math import cos
 import numpy as np
 from numpy.random import random
 from numpy import maximum, nansum
-from tqdm import tqdm
 
 
 def random_pick_seed(choices, probs=None):
@@ -96,7 +95,7 @@ def get_weight(Particles, ind):
     """Choose new cell location given an initial location.
 
     Function to randomly choose 1 of the surrounding 8 cells around the
-    current index using the pre-calculated routing weights.
+    current index using the routing weights from make_weight.
 
     **Inputs** :
 
