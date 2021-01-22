@@ -378,7 +378,7 @@ class Particles():
         self.walk_data = None
 
         # initialize routing weights array
-        self.weight = np.zeroes((self.stage.shape[0], self.stage.shape[1], 9))
+        self.weight = np.zeros((self.stage.shape[0], self.stage.shape[1], 9))
 
     # function to clear walk data if you've made a mistake while generating it
     def clear_walk_data(self):
