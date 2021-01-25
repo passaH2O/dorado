@@ -377,8 +377,8 @@ class Particles():
         # initialize the walk_data
         self.walk_data = None
 
-        # create weights - this might take a bit of time for large domains
-        lw.make_weight(self)
+        # initialize routing weights array
+        self.weight = np.zeros((self.stage.shape[0], self.stage.shape[1], 9))
 
     # function to clear walk data if you've made a mistake while generating it
     def clear_walk_data(self):

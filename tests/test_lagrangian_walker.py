@@ -286,6 +286,11 @@ def test_make_weight_shallow():
     ind = (1, 1)
     # set seed
     np.random.seed(0)
+    # do weighting calculation for each cell
+    L, W = np.shape(particles.stage)
+    for i in list(range(1, L-1)):
+        for j in list(range(1, W-1)):
+            lw.make_weight(particles, (i, j))
     # make assertions about weights
     # at index, index[4] (self) will be 1 while neighbors will be 0
     assert particles.weight[1, 1, 4] == 1.0
@@ -328,6 +333,11 @@ def test_make_weight_equal_opportunity():
     ind = (1, 1)
     # set seed
     np.random.seed(0)
+    # do weighting calculation for each cell
+    L, W = np.shape(particles.stage)
+    for i in list(range(1, L-1)):
+        for j in list(range(1, W-1)):
+            lw.make_weight(particles, (i, j))
     # make assertions about weights
     # at index, 3 neighbors will be equiprobable
     assert np.sum(particles.weight[1, 1, :]) == 3.0
@@ -372,6 +382,11 @@ def test_make_weight_unequal_opportunity():
     ind = (1, 1)
     # set seed
     np.random.seed(0)
+    # do weighting calculation for each cell
+    L, W = np.shape(particles.stage)
+    for i in list(range(1, L-1)):
+        for j in list(range(1, W-1)):
+            lw.make_weight(particles, (i, j))
     # make assertions about weights
     # at index, staying put index[4] higher probability than neighbors
     assert particles.weight[1, 1, 4] > particles.weight[1, 1, 5]
@@ -411,6 +426,11 @@ def test_wet_boundary_no_weight():
     particles = pt.Particles(tools)
     # set seed
     np.random.seed(0)
+    # do weighting calculation for each cell
+    L, W = np.shape(particles.stage)
+    for i in list(range(1, L-1)):
+        for j in list(range(1, W-1)):
+            lw.make_weight(particles, (i, j))
     # assert weights at boundary cells should be 0
     assert np.all(np.sum(particles.weight[0, :, 4]) == 0.0)
     assert np.all(np.sum(particles.weight[-1, :, 4]) == 0.0)
