@@ -397,7 +397,7 @@ def get_state(walk_data, iteration=-1):
             yinds.append(walk_data['yinds'][ii][-1])
             times.append(walk_data['travel_times'][ii][-1])
             iter_exceeds_warning += 1
-    
+
     if iter_exceeds_warning > 0:
         print('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
@@ -515,21 +515,22 @@ def plot_exposure_time(walk_data,
     else:
         timeunit = '[' + str(timedelta) + ' s]'
 
-    # Handle directories
-    if folder_name is None:
-        folder_name = os.getcwd()
-    if os.path.exists(folder_name):
-        print('Saving files in existing directory')
-    else:
-        os.makedirs(folder_name)
-    if not os.path.exists(folder_name+os.sep+'figs'):
-        os.makedirs(folder_name+os.sep+'figs')
-    if not os.path.exists(folder_name+os.sep+'data'):
-        os.makedirs(folder_name+os.sep+'data')
+    if save_output:
+        # Handle directories
+        if folder_name is None:
+            folder_name = os.getcwd()
+        if os.path.exists(folder_name):
+            print('Saving files in existing directory')
+        else:
+            os.makedirs(folder_name)
+        if not os.path.exists(folder_name+os.sep+'figs'):
+            os.makedirs(folder_name+os.sep+'figs')
+        if not os.path.exists(folder_name+os.sep+'data'):
+            os.makedirs(folder_name+os.sep+'data')
 
-    # Save exposure times by particle ID
-    fpath = folder_name+os.sep+'data'+os.sep+'exposure_times.txt'
-    json.dump(exposure_times, open(fpath, 'w'))
+        # Save exposure times by particle ID
+        fpath = folder_name+os.sep+'data'+os.sep+'exposure_times.txt'
+        json.dump(exposure_times, open(fpath, 'w'))
     exposure_times = np.array(exposure_times)
 
     # Set end of ETD as the minimum travel time of particles
@@ -555,15 +556,15 @@ def plot_exposure_time(walk_data,
     frac_exited = np.append(frac_exited,
                             [float(num_particles_included)/float(Np_tracer)])
 
+    # Plot the cumulative ETD in its exact form
+    plt.figure(figsize=(5, 3), dpi=150)
+    plt.step(full_time_vect/timedelta, frac_exited, where='post')
+    plt.title('Cumulative Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('F(t) [-]')
+    plt.xlim([0, end_time/timedelta])
+    plt.ylim([0, 1])
     if save_output:
-        # Plot the cumulative ETD in its exact form
-        plt.figure(figsize=(5, 3), dpi=150)
-        plt.step(full_time_vect/timedelta, frac_exited, where='post')
-        plt.title('Cumulative Exposure Time Distribution')
-        plt.xlabel('Time ' + timeunit)
-        plt.ylabel('F(t) [-]')
-        plt.xlim([0, end_time/timedelta])
-        plt.ylim([0, 1])
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'Exact_CETD.png',
                     bbox_inches='tight')
         plt.close()
@@ -714,7 +715,7 @@ def draw_travel_path(grid, walk_data,
             Default it to show every iteration
 
         plot_legend : `bool`, optional
-            Controls whether resulting plot includes a legend of particle IDs. 
+            Controls whether resulting plot includes a legend of particle IDs.
             Default is False
 
     **Outputs** :
@@ -734,21 +735,21 @@ def draw_travel_path(grid, walk_data,
     ax = plt.gca()
     im = ax.imshow(grid, cmap='bone', alpha=0.9)
     ax.set_title('Particle Paths')
-    
+
     paths = [] # Place to store particle paths
     colors = [] # Place to store colors
     for i in tqdm(particles_to_follow):
         # Set color for this particle
         c = np.random.rand(3,)
         colors.append([c[0], c[1], c[2], 0.9])
-        
+
         x = walk_data['xinds'][i][0::interval]
         y = walk_data['yinds'][i][0::interval]
         lineseg = list(zip(y, x))
         paths.append(lineseg)
 
     # Add new line collection to our figure, apply a background shadow
-    lc = LineCollection(paths, colors=colors, 
+    lc = LineCollection(paths, colors=colors,
                         linewidths=1.2, capstyle='round',
                         path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
                                                                     alpha=0.2,
@@ -820,10 +821,10 @@ def snake_plots(grid,
                 rgba_start=[1, 0.4, 0.2, 1],
                 rgba_end=[1, 0.3, 0.1, 0]):
     """Plot particle positions with a trailing tail
-    
+
     Loops through existing walk_data history and creates a series of
     plots of the particle locations, with recent locations shown as a
-    trailing tail. Default is for the tails to fade away, but they 
+    trailing tail. Default is for the tails to fade away, but they
     can also change color. Currently this function can only sync up
     particles by iteration number, not travel_times.
 
@@ -848,7 +849,7 @@ def snake_plots(grid,
 
         interval : `int`, optional
             Interval of iterations to skip over between each plot. Also
-            determines how "smooth" each particle trajectory appears. 
+            determines how "smooth" each particle trajectory appears.
             Default is to show every 4th iteration
 
         tail_length : `int`, optional
@@ -1033,7 +1034,7 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     if (show_seed) & (walk_data is not None):
         ax.scatter(walk_data['yinds'][0][0], walk_data['xinds'][0][0],
                    c=seed_color, edgecolors='black', s=10, linewidths=0.5)
-    
+
     return ax
 
 
