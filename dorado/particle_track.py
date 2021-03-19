@@ -860,6 +860,8 @@ def exposure_time(walk_data,
     Np_tracer = len(walk_data['xinds'])  # Number of particles
     # Array to be populated
     exposure_times = np.zeros([Np_tracer], dtype='float')
+    # list of particles that don't exit ROI
+    _short_list = []
 
     # Loop through particles to measure exposure time
     for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
@@ -892,9 +894,13 @@ def exposure_time(walk_data,
             # (which can bias result)
             if jj == len(walk_data['travel_times'][ii])-1:
                 if current_reg == 1:
-                    print('Warning: Particle ' + str(ii) + ' is still within'
-                          ' ROI at final timestep. \n' +
-                          'Run more iterations to get tail of ETD')
+                    _short_list.append(ii)  # add particle number to list
+
+    # single print statement
+    if len(_short_list) > 0:
+        print(str(len(_short_list)) + ' Particles within ROI at final'
+              ' timestep.\n' + 'Particles are: ' + str(_short_list) +
+              '\nRun more iterations to get full tail of ETD.')
 
     return exposure_times.tolist()
 
@@ -926,7 +932,7 @@ def nourishment_area(walk_data, raster_size, sigma=0.7, clip=99.5):
 
         clip : `float`, optional
             Percentile at which to truncate the distribution. Particles which
-            get stuck can lead to errors at the high-extreme, so this 
+            get stuck can lead to errors at the high-extreme, so this
             parameter is used to normalize by a "near-max". Default is the
             99.5th percentile. To use true max, specify clip = 100
 
@@ -940,7 +946,7 @@ def nourishment_area(walk_data, raster_size, sigma=0.7, clip=99.5):
     """
     if sigma > 0:
         from scipy.ndimage import gaussian_filter
-    
+
     # Measure visit frequency
     visit_freq = np.zeros(raster_size)
     for ii in list(range(len(walk_data['xinds']))):
@@ -992,21 +998,21 @@ def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
 
         clip : `float`, optional
             Percentile at which to truncate the distribution. Particles which
-            get stuck can lead to errors at the high-extreme, so this 
+            get stuck can lead to errors at the high-extreme, so this
             parameter is used to normalize by a "near-max". Default is the
             99.5th percentile. To use true max, specify clip = 100
 
     **Outputs** :
 
         mean_time : `numpy.ndarray`
-            Array of mean occupation time, with cell values representing the 
+            Array of mean occupation time, with cell values representing the
             mean time particles spent in that cell. If sigma > 0, the array
             values include spatial filtering
 
     """
     if sigma > 0:
         from scipy.ndimage import gaussian_filter
-    
+
     # Measure visit frequency
     visit_freq = np.zeros(raster_size)
     time_total = visit_freq.copy()
@@ -1029,14 +1035,14 @@ def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
     # Prone to numerical outliers, so clip out extremes
     vmax = float(np.nanpercentile(mean_time, clip))
     mean_time = np.clip(mean_time, 0, vmax)
-    
+
     # If applicable, do smoothing
     if sigma > 0:
         mean_time = gaussian_filter(mean_time, sigma=sigma)
         mean_time[mean_time==np.min(mean_time)] = np.nan
     else:
         mean_time[mean_time==0] = np.nan
-    
+
     return mean_time
 
 
@@ -1123,7 +1129,7 @@ def unstruct2grid(coordinates,
     gridXY_array = np.array([np.concatenate(gridX),
                              np.concatenate(gridY)]).transpose()
     gridXY_array = np.ascontiguousarray(gridXY_array)
-    
+
     # If a boundary has been specified, create array to index outside it
     if boundary is not None:
         path = matplotlib.path.Path(boundary)
