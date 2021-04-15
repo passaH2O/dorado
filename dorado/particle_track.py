@@ -9,6 +9,7 @@ through the domain.
 Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
+import warnings
 from builtins import range
 from math import pi
 import numpy as np
@@ -266,12 +267,12 @@ class Particles():
 
         try:
             if params.diff_coeff < 0:
-                print("Warning: Specified diffusion coefficient is negative."
-                      " Rounding up to zero")
+                warnings.warn("Specified diffusion coefficient is negative."
+                              " Rounding up to zero")
                 params.diff_coeff = 0.0
             elif params.diff_coeff >= 2:
-                print("Warning: Diffusion behaves non-physically when"
-                      " coefficient >= 2")
+                warnings.warn("Diffusion behaves non-physically when"
+                              " coefficient >= 2")
             self.diff_coeff = float(params.diff_coeff)
         except Exception:
             if getattr(params, 'steepest_descent', False) is True:
@@ -607,6 +608,9 @@ class Particles():
                     est_next_dt = 0.1
                 count = 1
 
+                # init list for too many particle iterations
+                _iter_particles = []
+
                 # Only iterate if this particle isn't already at a boundary:
                 if -1 not in self.cell_type[all_xinds[ii][-1]-1:
                                             all_xinds[ii][-1]+2,
@@ -638,15 +642,21 @@ class Particles():
                                           all_times[ii][-2])
                         count += 1
                         if count > 1e4:
-                            print('Warning: Particle iterations exceeded limit'
-                                  ' before reaching target time. Try smaller'
-                                  ' time-step')
+                            _iter_particles.append(ii)
                             break
 
             # Store travel information in all_walk_data
             all_walk_data['xinds'] = all_xinds
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
+
+            # write out warning if particles exceed step limit
+            if len(_iter_particles) > 0:
+                warnings.warn(str(len(_iter_particles)) + "Particles"
+                              " exceeded iteration limit before reaching the"
+                              " target time, consider using a smaller"
+                              " time-step. Particles are: " +
+                              str(_iter_particles))
 
             # re-write the walk_data attribute of self
             self.walk_data = all_walk_data

@@ -53,12 +53,14 @@ def test_theta():
 
 def test_neg_diffcoeff():
     params.diff_coeff = -1.0
-    particle = particle_track.Particles(params)
+    with pytest.warns(UserWarning, match="Specified diffusion coefficient is negative. Rounding up to zero"):
+        particle = particle_track.Particles(params)
     assert particle.diff_coeff == 0.0
 
 def test_big_diffcoeff():
     params.diff_coeff = 3.0
-    particle = particle_track.Particles(params)
+    with pytest.warns(UserWarning, match="Diffusion behaves non-physically when coefficient >= 2"):
+        particle = particle_track.Particles(params)
     assert particle.diff_coeff == 3.0
 
 def test_dry_depth():
