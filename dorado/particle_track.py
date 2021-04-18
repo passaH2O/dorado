@@ -391,6 +391,7 @@ class Particles():
                            Np_tracer,
                            seed_xloc,
                            seed_yloc,
+                           seed_time=0,
                            method='random',
                            previous_walk_data=None):
         """Generate a set of particles in defined locations.
@@ -421,6 +422,14 @@ class Particles():
                 List of y-coordinates over which to initially distribute the
                 particles.
 
+            seed_time : `float`, `int`, optional
+                Seed time to apply to all newly seeded particles. This can be
+                useful if you are generating new particles and adding them to
+                a pre-existing set of particles and you want to run them in
+                a group to a "target-time". The default value is 0, as new
+                particles have not traveled for any time, but a savy user
+                might have need to seed this value with something else.
+
             method : `str`, optional
                 Specify the type of particle generation you wish to use.
                 Current options are 'random' and 'exact' for seeding particles
@@ -440,15 +449,19 @@ class Particles():
         """
         # if the values in self are invalid the input checked will catch them
         # do input type checking
-        Np_tracer, seed_xloc, seed_yloc = gen_input_check(Np_tracer,
-                                                          seed_xloc,
-                                                          seed_yloc,
-                                                          method)
+        Np_tracer, seed_xloc, seed_yloc, seed_time = gen_input_check(Np_tracer,
+                                                                     seed_xloc,
+                                                                     seed_yloc,
+                                                                     seed_time,
+                                                                     method)
 
         init_walk_data = dict()  # create init_walk_data dictionary
 
         # initialize new travel times list
-        new_start_times = [0.]*Np_tracer
+        if seed_time != 0:
+            warnings.warn("Particle seed time is nonzero,"
+                          " be aware when post-processing.")
+        new_start_times = [seed_time]*Np_tracer
 
         if method == 'random':
             # create random start indices based on x, y locations and np_tracer
@@ -664,7 +677,7 @@ class Particles():
         return all_walk_data
 
 
-def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
+def gen_input_check(Np_tracer, seed_xloc, seed_yloc, seed_time, method):
     """Check the inputs provided to :obj:`generate_particles()`.
 
     This function does input type checking and either succeeds or returns
@@ -683,6 +696,9 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
         seed_yloc : `list`
             List of y-coordinates over which to initially distribute the
             particles
+
+        seed_time : `int`, `float`
+            Value to set as initial travel time for newly seeded particles.
 
         method : `str`, optional
             Type of particle generation to use, either 'random' or 'exact'.
@@ -721,13 +737,16 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
         seed_yloc = [int(y) for y in list(seed_yloc)]
     except Exception:
         raise TypeError("seed_yloc input type was not a list.")
+    if (isinstance(seed_time, float) is False) and \
+      (isinstance(seed_time, int) is False):
+        raise TypeError('seed_time provided was not a float or int')
     if isinstance(method, str) is False:
         raise TypeError('Method provided was not a string.')
     elif method not in ['random', 'exact']:
         raise ValueError('Method input is not a valid method, must be'
                          ' "random" or "exact".')
 
-    return Np_tracer, seed_xloc, seed_yloc
+    return Np_tracer, seed_xloc, seed_yloc, seed_time
 
 
 def coord2ind(coordinates, raster_origin, raster_size, cellsize):

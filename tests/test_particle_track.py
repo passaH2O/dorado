@@ -125,6 +125,31 @@ def test_exact_locations():
     all_walk_data = particle.run_iteration()
     assert all_walk_data['xinds'][0] == seed_xloc
     assert all_walk_data['yinds'][0] == seed_yloc
+    assert all_walk_data['travel_times'][0] == [0]
+
+def test_seed_time_int():
+    num_ps = 2
+    particle = particle_track.Particles(params)
+    with pytest.warns(UserWarning, match="Particle seed time is nonzero, be aware when post-processing."):
+        particle.generate_particles(num_ps, seed_xloc, seed_yloc,
+                                    seed_time=10, method='exact')
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data['xinds'][0] == seed_xloc
+    assert all_walk_data['yinds'][0] == seed_yloc
+    assert all_walk_data['travel_times'][0] == [10]
+    assert all_walk_data['travel_times'][1] == [10]
+
+def test_seed_time_float():
+    num_ps = 2
+    particle = particle_track.Particles(params)
+    with pytest.warns(UserWarning, match="Particle seed time is nonzero, be aware when post-processing."):
+        particle.generate_particles(num_ps, seed_xloc, seed_yloc,
+                                    seed_time=11.1, method='exact')
+    all_walk_data = particle.run_iteration()
+    assert all_walk_data['xinds'][0] == seed_xloc
+    assert all_walk_data['yinds'][0] == seed_yloc
+    assert all_walk_data['travel_times'][0] == [11.1]
+    assert all_walk_data['travel_times'][1] == [11.1]
 
 def test_exact_locations_overflow():
     """Test where number of particles exceeds number of seed locations."""
@@ -386,6 +411,12 @@ class TestValueErrors:
         particle = particle_track.Particles(goodparams)
         with pytest.raises(TypeError):
             particle.generate_particles(1, seed_xloc, 'invalid')
+
+    def test_invalid_seedtime(self):
+        particle = particle_track.Particles(goodparams)
+        with pytest.raises(TypeError):
+            particle.generate_particles(1, seed_xloc, seed_yloc,
+                                        seed_time='invalid')
 
     def test_bad_method(self):
         particle = particle_track.Particles(goodparams)
