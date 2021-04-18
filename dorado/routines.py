@@ -736,8 +736,8 @@ def draw_travel_path(grid, walk_data,
     im = ax.imshow(grid, cmap='bone', alpha=0.9)
     ax.set_title('Particle Paths')
 
-    paths = [] # Place to store particle paths
-    colors = [] # Place to store colors
+    paths = []  # Place to store particle paths
+    colors = []  # Place to store colors
     for i in tqdm(particles_to_follow):
         # Set color for this particle
         c = np.random.rand(3,)
@@ -751,9 +751,8 @@ def draw_travel_path(grid, walk_data,
     # Add new line collection to our figure, apply a background shadow
     lc = LineCollection(paths, colors=colors,
                         linewidths=1.2, capstyle='round',
-                        path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
-                                                                    alpha=0.2,
-                                                                    linewidth=1.6),
+                        path_effects=[path_effects.SimpleLineShadow(
+                            offset=(0.5, -0.5), alpha=0.2, linewidth=1.6),
                                       path_effects.Normal()])
     ax.add_collection(lc)
     if plot_legend:
@@ -820,7 +819,7 @@ def snake_plots(grid,
                 tail_length=12,
                 rgba_start=[1, 0.4, 0.2, 1],
                 rgba_end=[1, 0.3, 0.1, 0]):
-    """Plot particle positions with a trailing tail
+    """Plot particle positions with a trailing tail.
 
     Loops through existing walk_data history and creates a series of
     plots of the particle locations, with recent locations shown as a
@@ -889,12 +888,12 @@ def snake_plots(grid,
     # Color list repeats for each particle when plotted
     colors = np.zeros((tail_length, 4))
     for c in list(range(4)):
-        colors[:,c] = np.linspace(rgba_start[c], rgba_end[c],
-                                  tail_length).T
+        colors[:, c] = np.linspace(rgba_start[c], rgba_end[c],
+                                   tail_length).T
 
     # Loop through specified number of steps
     for ii in list(range(interval, num_steps*interval, interval)):
-        paths = [] # Initialize place to store paths
+        paths = []  # Initialize place to store paths
         # Recent chunk of the path we're going to plot
         chunks = list(range(ii, ii-tail_length*interval, -1*interval))
 
@@ -909,11 +908,11 @@ def snake_plots(grid,
             x = walk_data['xinds'][jj]
             y = walk_data['yinds'][jj]
             lineseg = list(zip(y, x))
-            newest_segment = lineseg[0:2] # Use first segment as backup
+            newest_segment = lineseg[0:2]  # Use first segment as backup
 
             # Check that this particle had enough iterations
             if ii > len(lineseg):
-                continue # If not, skip
+                continue  # If not, skip
 
             # Loop through history in reverse order and grab segments
             for c in chunks:
@@ -934,14 +933,12 @@ def snake_plots(grid,
         # Add new line collection to our figure, apply a background shadow
         lc = LineCollection(paths, colors=colors,
                             linewidths=1.2, capstyle='round',
-                            path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
-                                                                        alpha=0.1,
-                                                                        linewidth=1.6),
+                            path_effects=[path_effects.SimpleLineShadow(
+                                offset=(0.5, -0.5), alpha=0.1, linewidth=1.6),
                                           path_effects.Normal()])
         ax.add_collection(lc)
         ax.set_title('Iteration %s' % ii)
-        plt.savefig(folder_name+os.sep+'figs'
-                    +os.sep+'snakefig'+str(ii)+'.png',
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'snakefig'+str(ii)+'.png',
                     bbox_inches='tight')
         plt.close()
 
@@ -949,7 +946,7 @@ def snake_plots(grid,
 def show_nourishment_area(visit_freq, grid=None, walk_data=None,
                           cmap='Reds', sigma=0.7, min_alpha=0,
                           show_seed=True, seed_color='dodgerblue'):
-    """Plot a smoothed, normalized heatmap of particle visit frequency
+    """Plot a smoothed, normalized heatmap of particle visit frequency.
 
     Function will plot the history of particle travel locations in walk_data
     as a heatmap overtop the specified grid, using the output of
@@ -995,8 +992,8 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
             is True, but only if 'walk_data' is also provided.
 
         seed_color : `str`, optional
-            Name of matplotlib color used for the marker seed, if shown. Default
-            is a light blue to contrast with the 'Reds' heatmap.
+            Name of matplotlib color used for the marker seed, if shown.
+            Default is a light blue to contrast with the 'Reds' heatmap.
 
     **Outputs** :
 
@@ -1007,13 +1004,13 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     from matplotlib.colors import Normalize
 
     # Plot heatmap with alpha based on visit_freq
-    if sigma >= 0.125: # This is just a visual trial-and-error thing
+    if sigma >= 0.125:  # This is just a visual trial-and-error thing
         amax = np.nanpercentile(visit_freq, 60)
     else:
         amax = np.nanpercentile(visit_freq, 30)
-    alphas = Normalize(0, amax, clip=True)(visit_freq) # Normalize alphas
+    alphas = Normalize(0, amax, clip=True)(visit_freq)  # Normalize alphas
     alphas = np.clip(alphas, min_alpha, 1)
-    colors = Normalize(np.nanmin(visit_freq), 1)(visit_freq) # Normalize colors
+    colors = Normalize(np.nanmin(visit_freq), 1)(visit_freq)  # Normalize color
     cmap = plt.cm.get_cmap(cmap)
     colors = cmap(colors)
     colors[..., -1] = alphas
@@ -1021,10 +1018,10 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     # Plot figure
     if len(plt.get_fignums()) < 1:
         # Create new figure axes if none are open
-        fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=300)
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5), dpi=300)
     else:
-        ax = plt.gca() # Otherwise grab existing
-    ax.set_facecolor('k') # Set facecolor black
+        ax = plt.gca()  # Otherwise grab existing
+    ax.set_facecolor('k')  # Set facecolor black
     if grid is not None:
         # Grid background intentionally dark:
         im = ax.imshow(grid, cmap='gist_gray', vmax=np.max(grid)*3)
@@ -1041,7 +1038,7 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
 def show_nourishment_time(mean_times, grid=None, walk_data=None,
                           cmap='magma', show_colorbar=True, min_alpha=0.3,
                           show_seed=True, seed_color='dodgerblue'):
-    """Plot a smoothed heatmap of mean particle visit time
+    """Plot a smoothed heatmap of mean particle visit time.
 
     Function will plot the history of mean particle travel times in walk_data
     as a heatmap overtop the specified grid, using the output of
@@ -1069,7 +1066,8 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
             Default is 'magma'
 
         show_colorbar : `bool`, optional
-            Controls whether to plot a colorbar for mean_times, default is False
+            Controls whether to plot a colorbar for mean_times,
+            default is False
 
         min_alpha : `float`, optional
             Minimum alpha value of the heatmap, representing the cells which
@@ -1081,8 +1079,8 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
             is True, but only if 'walk_data' is also provided.
 
         seed_color : `str`, optional
-            Name of matplotlib color used for the marker seed, if shown. Default
-            is a light blue.
+            Name of matplotlib color used for the marker seed, if shown.
+            Default is a light blue.
 
     **Outputs** :
 
@@ -1095,10 +1093,10 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
 
     # Plot heatmap with alpha based on times
     amax = np.nanpercentile(mean_times, 20)
-    alphas = Normalize(0, amax, clip=True)(mean_times) # Normalize alphas
+    alphas = Normalize(0, amax, clip=True)(mean_times)  # Normalize alphas
     alphas = np.clip(alphas, min_alpha, 1)
     colors = Normalize(np.nanmin(mean_times),
-                       np.nanmax(mean_times))(mean_times) # Normalize colors
+                       np.nanmax(mean_times))(mean_times)  # Normalize colors
     cmap = plt.cm.get_cmap(cmap)
     colors = cmap(colors)
     colors[..., -1] = alphas
@@ -1106,10 +1104,10 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
     # Plot figure
     if len(plt.get_fignums()) < 1:
         # Create new figure axes if none are open
-        fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=300)
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5), dpi=300)
     else:
-        ax = plt.gca() # Otherwise grab existing
-    ax.set_facecolor('k') # Set facecolor black
+        ax = plt.gca()  # Otherwise grab existing
+    ax.set_facecolor('k')  # Set facecolor black
     if grid is not None:
         # Grid background intentionally dark:
         im = ax.imshow(grid, cmap='gist_gray', vmax=np.max(grid)*3)
@@ -1124,7 +1122,7 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
                                            vmax=np.nanmax(mean_times))
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         sm.set_array([])
-        divider = make_axes_locatable(ax) # Make the right size
+        divider = make_axes_locatable(ax)  # Make the right size
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(sm, cax=cax)
         cbar.set_label('Mean Nourishment Time [s]')
