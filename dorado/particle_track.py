@@ -138,6 +138,12 @@ class Particles():
         possible/sensible
 
         """
+        # pass verbose
+        if getattr(params, 'verbose', None) is None:
+            self.verbose = True  # set verbosity on if somehow missing
+        else:
+            self.verbose = params.verbose
+
         # REQUIRED PARAMETERS #
         # Define the length along one cell face (assuming square cells)
         if getattr(params, 'dx', None) is None:
@@ -397,6 +403,7 @@ class Particles():
 
         # initialize routing weights array
         self.weight = np.zeros((self.stage.shape[0], self.stage.shape[1], 9))
+
 
     # function to clear walk data if you've made a mistake while generating it
     def clear_walk_data(self):
