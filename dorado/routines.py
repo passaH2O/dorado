@@ -232,7 +232,8 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
         if i == 0:
             particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
         else:
-            particle.generate_particles(0, [], [], 'random', walk_data)
+            particle.generate_particles(0, [], [], method='random',
+                                        previous_walk_data=walk_data)
 
         walk_data = particle.run_iteration(target_time=target_times[i])
 
