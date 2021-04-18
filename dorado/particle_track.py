@@ -93,6 +93,11 @@ class modelParams:
             weighted random walk. If True, then the highest weighted cells are
             used to route the particles. Default value is False.
 
+        verbose : `bool`, optional
+            Toggles whether or not warnings and print output are output to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     This list of expected parameter values can also be obtained by querying the
     class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
     `vars(modelParams)`.
@@ -115,6 +120,7 @@ class modelParams:
         self.qy = None
         self.u = None
         self.v = None
+        self.verbose = True  # print things by default
 
 
 class Particles():
@@ -252,7 +258,8 @@ class Particles():
         try:
             self.theta = float(params.theta)
         except Exception:
-            print("Theta parameter not specified - using 1.0")
+            if self.verbose:
+                print("Theta parameter not specified - using 1.0")
             self.theta = 1.0  # if unspecified use 1
 
         # Gamma parameter used to weight the random walk
@@ -262,38 +269,45 @@ class Particles():
         try:
             self.gamma = float(params.gamma)
         except Exception:
-            print("Gamma parameter not specified - using 0.05")
+            if self.verbose:
+                print("Gamma parameter not specified - using 0.05")
             self.gamma = 0.05
 
         try:
             if params.diff_coeff < 0:
-                warnings.warn("Specified diffusion coefficient is negative."
-                              " Rounding up to zero")
+                if self.verbose:
+                    warnings.warn("Specified diffusion coefficient is negative"
+                                  ". Rounding up to zero")
                 params.diff_coeff = 0.0
             elif params.diff_coeff >= 2:
-                warnings.warn("Diffusion behaves non-physically when"
-                              " coefficient >= 2")
+                if self.verbose:
+                    warnings.warn("Diffusion behaves non-physically when"
+                                  " coefficient >= 2")
             self.diff_coeff = float(params.diff_coeff)
         except Exception:
             if getattr(params, 'steepest_descent', False) is True:
-                print("Diffusion disabled for steepest descent")
+                if self.verbose:
+                    print("Diffusion disabled for steepest descent")
                 self.diff_coeff = 0.0
             else:
-                print("Diffusion coefficient not specified - using 0.2")
+                if self.verbose:
+                    print("Diffusion coefficient not specified - using 0.2")
                 self.diff_coeff = 0.2
 
         # Minimum depth for cell to be considered wet
         try:
             self.dry_depth = params.dry_depth
         except Exception:
-            print("minimum depth for wetness not defined - using 10 cm")
+            if self.verbose:
+                print("minimum depth for wetness not defined - using 10 cm")
             self.dry_depth = 0.1
 
         # Cell types: 2 = land, 1 = channel, 0 = ocean, -1 = edge
         try:
             self.cell_type = params.cell_type
         except Exception:
-            print("Cell Types not specified - Estimating from depth")
+            if self.verbose:
+                print("Cell Types not specified - Estimating from depth")
             self.cell_type = np.zeros_like(self.depth, dtype='int')
             self.cell_type[self.depth < self.dry_depth] = 2
             self.cell_type = np.pad(self.cell_type[1:-1, 1:-1], 1, 'constant',
@@ -304,13 +318,16 @@ class Particles():
         # note: chooses randomly in event of ties
         try:
             if params.steepest_descent is True:
-                print("Using steepest descent")
+                if self.verbose:
+                    print("Using steepest descent")
                 self.steepest_descent = True
             else:
-                print("Using weighted random walk")
+                if self.verbose:
+                    print("Using weighted random walk")
                 self.steepest_descent = False
         except Exception:
-            print("Using weighted random walk")
+            if self.verbose:
+                print("Using weighted random walk")
             self.steepest_descent = False
 
         # DEFAULT PARAMETERS (Can be defined otherwise) #
@@ -458,7 +475,7 @@ class Particles():
         init_walk_data = dict()  # create init_walk_data dictionary
 
         # initialize new travel times list
-        if seed_time != 0:
+        if (seed_time != 0) and (self.verbose is True):
             warnings.warn("Particle seed time is nonzero,"
                           " be aware when post-processing.")
         new_start_times = [seed_time]*Np_tracer
@@ -634,10 +651,9 @@ class Particles():
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times = lw.particle_stepper(self,
-                                                    [[all_xinds[ii][-1],
-                                                      all_yinds[ii][-1]]],
-                                                    [all_times[ii][-1]])
+                        new_inds, travel_times = lw.particle_stepper(
+                            self, [[all_xinds[ii][-1], all_yinds[ii][-1]]],
+                            [all_times[ii][-1]])
 
                         # Don't duplicate location
                         # if particle is standing still at a boundary
@@ -664,7 +680,7 @@ class Particles():
             all_walk_data['travel_times'] = all_times
 
             # write out warning if particles exceed step limit
-            if len(_iter_particles) > 0:
+            if (len(_iter_particles) > 0) and (self.verbose is True):
                 warnings.warn(str(len(_iter_particles)) + "Particles"
                               " exceeded iteration limit before reaching the"
                               " target time, consider using a smaller"
