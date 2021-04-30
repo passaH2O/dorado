@@ -4,10 +4,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.routines &#8212; dorado 2.4.1 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
@@ -266,7 +267,8 @@
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">)</span>
+            <span class="n">particle</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">,</span>
+                                        <span class="n">previous_walk_data</span><span class="o">=</span><span class="n">walk_data</span><span class="p">)</span>
 
         <span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="n">target_times</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
@@ -431,7 +433,7 @@
             <span class="n">yinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">iter_exceeds_warning</span> <span class="o">+=</span> <span class="mi">1</span>
-    
+
     <span class="k">if</span> <span class="n">iter_exceeds_warning</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Note: </span><span class="si">%s</span><span class="s1"> particles have not reached </span><span class="si">%s</span><span class="s1"> iterations&#39;</span> <span class="o">%</span> \
               <span class="p">(</span><span class="n">iter_exceeds_warning</span><span class="p">,</span> <span class="n">iteration</span><span class="p">))</span>
@@ -549,21 +551,22 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">timeunit</span> <span class="o">=</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timedelta</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; s]&#39;</span>
 
-    <span class="c1"># Handle directories</span>
-    <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saving files in existing directory&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
+        <span class="c1"># Handle directories</span>
+        <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saving files in existing directory&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Save exposure times by particle ID</span>
-    <span class="n">fpath</span> <span class="o">=</span> <span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;exposure_times.txt&#39;</span>
-    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">exposure_times</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span>
+        <span class="c1"># Save exposure times by particle ID</span>
+        <span class="n">fpath</span> <span class="o">=</span> <span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;data&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;exposure_times.txt&#39;</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">exposure_times</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span>
     <span class="n">exposure_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">exposure_times</span><span class="p">)</span>
 
     <span class="c1"># Set end of ETD as the minimum travel time of particles</span>
@@ -589,15 +592,15 @@
     <span class="n">frac_exited</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frac_exited</span><span class="p">,</span>
                             <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">num_particles_included</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">)])</span>
 
+    <span class="c1"># Plot the cumulative ETD in its exact form</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">full_time_vect</span><span class="o">/</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">frac_exited</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Cumulative Exposure Time Distribution&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time &#39;</span> <span class="o">+</span> <span class="n">timeunit</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;F(t) [-]&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="o">/</span><span class="n">timedelta</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
-        <span class="c1"># Plot the cumulative ETD in its exact form</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">full_time_vect</span><span class="o">/</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">frac_exited</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Cumulative Exposure Time Distribution&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time &#39;</span> <span class="o">+</span> <span class="n">timeunit</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;F(t) [-]&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="o">/</span><span class="n">timedelta</span><span class="p">])</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;Exact_CETD.png&#39;</span><span class="p">,</span>
                     <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -748,7 +751,7 @@
 <span class="sd">            Default it to show every iteration</span>
 
 <span class="sd">        plot_legend : `bool`, optional</span>
-<span class="sd">            Controls whether resulting plot includes a legend of particle IDs. </span>
+<span class="sd">            Controls whether resulting plot includes a legend of particle IDs.</span>
 <span class="sd">            Default is False</span>
 
 <span class="sd">    **Outputs** :</span>
@@ -768,25 +771,24 @@
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
     <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bone&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Particle Paths&#39;</span><span class="p">)</span>
-    
-    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># Place to store particle paths</span>
-    <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># Place to store colors</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Place to store particle paths</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Place to store colors</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">particles_to_follow</span><span class="p">):</span>
         <span class="c1"># Set color for this particle</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
         <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mf">0.9</span><span class="p">])</span>
-        
+
         <span class="n">x</span> <span class="o">=</span> <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">::</span><span class="n">interval</span><span class="p">]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">::</span><span class="n">interval</span><span class="p">]</span>
         <span class="n">lineseg</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
         <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lineseg</span><span class="p">)</span>
 
     <span class="c1"># Add new line collection to our figure, apply a background shadow</span>
-    <span class="n">lc</span> <span class="o">=</span> <span class="n">LineCollection</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> 
+    <span class="n">lc</span> <span class="o">=</span> <span class="n">LineCollection</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
                         <span class="n">linewidths</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">capstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span>
-                        <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">path_effects</span><span class="o">.</span><span class="n">SimpleLineShadow</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">),</span>
-                                                                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-                                                                    <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+                        <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">path_effects</span><span class="o">.</span><span class="n">SimpleLineShadow</span><span class="p">(</span>
+                            <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
                                       <span class="n">path_effects</span><span class="o">.</span><span class="n">Normal</span><span class="p">()])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">plot_legend</span><span class="p">:</span>
@@ -853,11 +855,11 @@
                 <span class="n">tail_length</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
                 <span class="n">rgba_start</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                 <span class="n">rgba_end</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Plot particle positions with a trailing tail</span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot;Plot particle positions with a trailing tail.</span>
+
 <span class="sd">    Loops through existing walk_data history and creates a series of</span>
 <span class="sd">    plots of the particle locations, with recent locations shown as a</span>
-<span class="sd">    trailing tail. Default is for the tails to fade away, but they </span>
+<span class="sd">    trailing tail. Default is for the tails to fade away, but they</span>
 <span class="sd">    can also change color. Currently this function can only sync up</span>
 <span class="sd">    particles by iteration number, not travel_times.</span>
 
@@ -882,7 +884,7 @@
 
 <span class="sd">        interval : `int`, optional</span>
 <span class="sd">            Interval of iterations to skip over between each plot. Also</span>
-<span class="sd">            determines how &quot;smooth&quot; each particle trajectory appears. </span>
+<span class="sd">            determines how &quot;smooth&quot; each particle trajectory appears.</span>
 <span class="sd">            Default is to show every 4th iteration</span>
 
 <span class="sd">        tail_length : `int`, optional</span>
@@ -922,12 +924,12 @@
     <span class="c1"># Color list repeats for each particle when plotted</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tail_length</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)):</span>
-        <span class="n">colors</span><span class="p">[:,</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">rgba_start</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">rgba_end</span><span class="p">[</span><span class="n">c</span><span class="p">],</span>
-                                  <span class="n">tail_length</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">colors</span><span class="p">[:,</span> <span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">rgba_start</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">rgba_end</span><span class="p">[</span><span class="n">c</span><span class="p">],</span>
+                                   <span class="n">tail_length</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
 
     <span class="c1"># Loop through specified number of steps</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">*</span><span class="n">interval</span><span class="p">,</span> <span class="n">interval</span><span class="p">)):</span>
-        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># Initialize place to store paths</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Initialize place to store paths</span>
         <span class="c1"># Recent chunk of the path we&#39;re going to plot</span>
         <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">ii</span><span class="o">-</span><span class="n">tail_length</span><span class="o">*</span><span class="n">interval</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">interval</span><span class="p">))</span>
 
@@ -942,11 +944,11 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">jj</span><span class="p">]</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">jj</span><span class="p">]</span>
             <span class="n">lineseg</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
-            <span class="n">newest_segment</span> <span class="o">=</span> <span class="n">lineseg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Use first segment as backup</span>
+            <span class="n">newest_segment</span> <span class="o">=</span> <span class="n">lineseg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Use first segment as backup</span>
 
             <span class="c1"># Check that this particle had enough iterations</span>
             <span class="k">if</span> <span class="n">ii</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lineseg</span><span class="p">):</span>
-                <span class="k">continue</span> <span class="c1"># If not, skip</span>
+                <span class="k">continue</span>  <span class="c1"># If not, skip</span>
 
             <span class="c1"># Loop through history in reverse order and grab segments</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
@@ -967,14 +969,12 @@
         <span class="c1"># Add new line collection to our figure, apply a background shadow</span>
         <span class="n">lc</span> <span class="o">=</span> <span class="n">LineCollection</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
                             <span class="n">linewidths</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">capstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span>
-                            <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">path_effects</span><span class="o">.</span><span class="n">SimpleLineShadow</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">),</span>
-                                                                        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                                                                        <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+                            <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">path_effects</span><span class="o">.</span><span class="n">SimpleLineShadow</span><span class="p">(</span>
+                                <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
                                           <span class="n">path_effects</span><span class="o">.</span><span class="n">Normal</span><span class="p">()])</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Iteration </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ii</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span>
-                    <span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;snakefig&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;snakefig&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span>
                     <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
@@ -982,7 +982,7 @@
 <div class="viewcode-block" id="show_nourishment_area"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.show_nourishment_area">[docs]</a><span class="k">def</span> <span class="nf">show_nourishment_area</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Reds&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">min_alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                           <span class="n">show_seed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed_color</span><span class="o">=</span><span class="s1">&#39;dodgerblue&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot a smoothed, normalized heatmap of particle visit frequency</span>
+    <span class="sd">&quot;&quot;&quot;Plot a smoothed, normalized heatmap of particle visit frequency.</span>
 
 <span class="sd">    Function will plot the history of particle travel locations in walk_data</span>
 <span class="sd">    as a heatmap overtop the specified grid, using the output of</span>
@@ -1028,8 +1028,8 @@
 <span class="sd">            is True, but only if &#39;walk_data&#39; is also provided.</span>
 
 <span class="sd">        seed_color : `str`, optional</span>
-<span class="sd">            Name of matplotlib color used for the marker seed, if shown. Default</span>
-<span class="sd">            is a light blue to contrast with the &#39;Reds&#39; heatmap.</span>
+<span class="sd">            Name of matplotlib color used for the marker seed, if shown.</span>
+<span class="sd">            Default is a light blue to contrast with the &#39;Reds&#39; heatmap.</span>
 
 <span class="sd">    **Outputs** :</span>
 
@@ -1040,13 +1040,13 @@
     <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">Normalize</span>
 
     <span class="c1"># Plot heatmap with alpha based on visit_freq</span>
-    <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;=</span> <span class="mf">0.125</span><span class="p">:</span> <span class="c1"># This is just a visual trial-and-error thing</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;=</span> <span class="mf">0.125</span><span class="p">:</span>  <span class="c1"># This is just a visual trial-and-error thing</span>
         <span class="n">amax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">amax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-    <span class="n">alphas</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">amax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">visit_freq</span><span class="p">)</span> <span class="c1"># Normalize alphas</span>
+    <span class="n">alphas</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">amax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">visit_freq</span><span class="p">)</span>  <span class="c1"># Normalize alphas</span>
     <span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">min_alpha</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">colors</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">),</span> <span class="mi">1</span><span class="p">)(</span><span class="n">visit_freq</span><span class="p">)</span> <span class="c1"># Normalize colors</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">),</span> <span class="mi">1</span><span class="p">)(</span><span class="n">visit_freq</span><span class="p">)</span>  <span class="c1"># Normalize color</span>
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
     <span class="n">colors</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">alphas</span>
@@ -1054,10 +1054,10 @@
     <span class="c1"># Plot figure</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_fignums</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="c1"># Create new figure axes if none are open</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span> <span class="c1"># Otherwise grab existing</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span> <span class="c1"># Set facecolor black</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Otherwise grab existing</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>  <span class="c1"># Set facecolor black</span>
     <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Grid background intentionally dark:</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gist_gray&#39;</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
@@ -1067,14 +1067,14 @@
     <span class="k">if</span> <span class="p">(</span><span class="n">show_seed</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
                    <span class="n">c</span><span class="o">=</span><span class="n">seed_color</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-    
+
     <span class="k">return</span> <span class="n">ax</span></div>
 
 
 <div class="viewcode-block" id="show_nourishment_time"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.show_nourishment_time">[docs]</a><span class="k">def</span> <span class="nf">show_nourishment_time</span><span class="p">(</span><span class="n">mean_times</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma&#39;</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                           <span class="n">show_seed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed_color</span><span class="o">=</span><span class="s1">&#39;dodgerblue&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot a smoothed heatmap of mean particle visit time</span>
+    <span class="sd">&quot;&quot;&quot;Plot a smoothed heatmap of mean particle visit time.</span>
 
 <span class="sd">    Function will plot the history of mean particle travel times in walk_data</span>
 <span class="sd">    as a heatmap overtop the specified grid, using the output of</span>
@@ -1102,7 +1102,8 @@
 <span class="sd">            Default is &#39;magma&#39;</span>
 
 <span class="sd">        show_colorbar : `bool`, optional</span>
-<span class="sd">            Controls whether to plot a colorbar for mean_times, default is False</span>
+<span class="sd">            Controls whether to plot a colorbar for mean_times,</span>
+<span class="sd">            default is False</span>
 
 <span class="sd">        min_alpha : `float`, optional</span>
 <span class="sd">            Minimum alpha value of the heatmap, representing the cells which</span>
@@ -1114,8 +1115,8 @@
 <span class="sd">            is True, but only if &#39;walk_data&#39; is also provided.</span>
 
 <span class="sd">        seed_color : `str`, optional</span>
-<span class="sd">            Name of matplotlib color used for the marker seed, if shown. Default</span>
-<span class="sd">            is a light blue.</span>
+<span class="sd">            Name of matplotlib color used for the marker seed, if shown.</span>
+<span class="sd">            Default is a light blue.</span>
 
 <span class="sd">    **Outputs** :</span>
 
@@ -1128,10 +1129,10 @@
 
     <span class="c1"># Plot heatmap with alpha based on times</span>
     <span class="n">amax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">mean_times</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-    <span class="n">alphas</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">amax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">mean_times</span><span class="p">)</span> <span class="c1"># Normalize alphas</span>
+    <span class="n">alphas</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">amax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">mean_times</span><span class="p">)</span>  <span class="c1"># Normalize alphas</span>
     <span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">min_alpha</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">mean_times</span><span class="p">),</span>
-                       <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">mean_times</span><span class="p">))(</span><span class="n">mean_times</span><span class="p">)</span> <span class="c1"># Normalize colors</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">mean_times</span><span class="p">))(</span><span class="n">mean_times</span><span class="p">)</span>  <span class="c1"># Normalize colors</span>
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
     <span class="n">colors</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">alphas</span>
@@ -1139,10 +1140,10 @@
     <span class="c1"># Plot figure</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_fignums</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="c1"># Create new figure axes if none are open</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span> <span class="c1"># Otherwise grab existing</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span> <span class="c1"># Set facecolor black</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Otherwise grab existing</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>  <span class="c1"># Set facecolor black</span>
     <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Grid background intentionally dark:</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gist_gray&#39;</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
@@ -1157,7 +1158,7 @@
                                            <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">mean_times</span><span class="p">))</span>
         <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
         <span class="n">sm</span><span class="o">.</span><span class="n">set_array</span><span class="p">([])</span>
-        <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="c1"># Make the right size</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>  <span class="c1"># Make the right size</span>
         <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
         <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">)</span>
         <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">&#39;Mean Nourishment Time [s]&#39;</span><span class="p">)</span>

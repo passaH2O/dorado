@@ -4,10 +4,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.4.1 documentation</title>
+    <title>dorado.particle_track &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
@@ -43,6 +44,7 @@
 <span class="sd">Project Homepage: https://github.com/passaH2O/dorado</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -126,6 +128,11 @@
 <span class="sd">            weighted random walk. If True, then the highest weighted cells are</span>
 <span class="sd">            used to route the particles. Default value is False.</span>
 
+<span class="sd">        verbose : `bool`, optional</span>
+<span class="sd">            Toggles whether or not warnings and print output are output to the</span>
+<span class="sd">            console. If False, nothing is output, if True, messages are output.</span>
+<span class="sd">            Default value is True. Errors are always raised.</span>
+
 <span class="sd">    This list of expected parameter values can also be obtained by querying the</span>
 <span class="sd">    class attributes with `dir(modelParams)`, `modelParams.__dict__`, or</span>
 <span class="sd">    `vars(modelParams)`.</span>
@@ -147,7 +154,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qy</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># print things by default</span></div></div>
 
 
 <div class="viewcode-block" id="Particles"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles">[docs]</a><span class="k">class</span> <span class="nc">Particles</span><span class="p">():</span>
@@ -165,6 +173,12 @@
 <span class="sd">        possible/sensible</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pass verbose</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;verbose&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># set verbosity on if somehow missing</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">verbose</span>
+
         <span class="c1"># REQUIRED PARAMETERS #</span>
         <span class="c1"># Define the length along one cell face (assuming square cells)</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;dx&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -285,7 +299,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Theta parameter not specified - using 1.0&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Theta parameter not specified - using 1.0&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># if unspecified use 1</span>
 
         <span class="c1"># Gamma parameter used to weight the random walk</span>
@@ -295,38 +310,45 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gamma parameter not specified - using 0.05&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gamma parameter not specified - using 0.05&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.05</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Specified diffusion coefficient is negative.&quot;</span>
-                      <span class="s2">&quot; Rounding up to zero&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Specified diffusion coefficient is negative&quot;</span>
+                                  <span class="s2">&quot;. Rounding up to zero&quot;</span><span class="p">)</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">=</span> <span class="mf">0.0</span>
             <span class="k">elif</span> <span class="n">params</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Diffusion behaves non-physically when&quot;</span>
-                      <span class="s2">&quot; coefficient &gt;= 2&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Diffusion behaves non-physically when&quot;</span>
+                                  <span class="s2">&quot; coefficient &gt;= 2&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">diff_coeff</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;steepest_descent&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Diffusion disabled for steepest descent&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Diffusion disabled for steepest descent&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">=</span> <span class="mf">0.0</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Diffusion coefficient not specified - using 0.2&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Diffusion coefficient not specified - using 0.2&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">=</span> <span class="mf">0.2</span>
 
         <span class="c1"># Minimum depth for cell to be considered wet</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dry_depth</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">dry_depth</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;minimum depth for wetness not defined - using 10 cm&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;minimum depth for wetness not defined - using 10 cm&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dry_depth</span> <span class="o">=</span> <span class="mf">0.1</span>
 
         <span class="c1"># Cell types: 2 = land, 1 = channel, 0 = ocean, -1 = edge</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">cell_type</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cell Types not specified - Estimating from depth&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cell Types not specified - Estimating from depth&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_type</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_type</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;constant&#39;</span><span class="p">,</span>
@@ -337,13 +359,16 @@
         <span class="c1"># note: chooses randomly in event of ties</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using steepest descent&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using steepest descent&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using weighted random walk&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using weighted random walk&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using weighted random walk&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using weighted random walk&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># DEFAULT PARAMETERS (Can be defined otherwise) #</span>
@@ -414,6 +439,7 @@
         <span class="c1"># initialize routing weights array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">9</span><span class="p">))</span></div>
 
+
     <span class="c1"># function to clear walk data if you&#39;ve made a mistake while generating it</span>
 <div class="viewcode-block" id="Particles.clear_walk_data"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.Particles.clear_walk_data">[docs]</a>    <span class="k">def</span> <span class="nf">clear_walk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Manually reset self.walk_data back to None.&quot;&quot;&quot;</span>
@@ -424,6 +450,7 @@
                            <span class="n">Np_tracer</span><span class="p">,</span>
                            <span class="n">seed_xloc</span><span class="p">,</span>
                            <span class="n">seed_yloc</span><span class="p">,</span>
+                           <span class="n">seed_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">,</span>
                            <span class="n">previous_walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a set of particles in defined locations.</span>
@@ -454,6 +481,14 @@
 <span class="sd">                List of y-coordinates over which to initially distribute the</span>
 <span class="sd">                particles.</span>
 
+<span class="sd">            seed_time : `float`, `int`, optional</span>
+<span class="sd">                Seed time to apply to all newly seeded particles. This can be</span>
+<span class="sd">                useful if you are generating new particles and adding them to</span>
+<span class="sd">                a pre-existing set of particles and you want to run them in</span>
+<span class="sd">                a group to a &quot;target-time&quot;. The default value is 0, as new</span>
+<span class="sd">                particles have not traveled for any time, but a savy user</span>
+<span class="sd">                might have need to seed this value with something else.</span>
+
 <span class="sd">            method : `str`, optional</span>
 <span class="sd">                Specify the type of particle generation you wish to use.</span>
 <span class="sd">                Current options are &#39;random&#39; and &#39;exact&#39; for seeding particles</span>
@@ -473,15 +508,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># if the values in self are invalid the input checked will catch them</span>
         <span class="c1"># do input type checking</span>
-        <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span> <span class="o">=</span> <span class="n">gen_input_check</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span>
-                                                          <span class="n">seed_xloc</span><span class="p">,</span>
-                                                          <span class="n">seed_yloc</span><span class="p">,</span>
-                                                          <span class="n">method</span><span class="p">)</span>
+        <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">seed_time</span> <span class="o">=</span> <span class="n">gen_input_check</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span>
+                                                                     <span class="n">seed_xloc</span><span class="p">,</span>
+                                                                     <span class="n">seed_yloc</span><span class="p">,</span>
+                                                                     <span class="n">seed_time</span><span class="p">,</span>
+                                                                     <span class="n">method</span><span class="p">)</span>
 
         <span class="n">init_walk_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># create init_walk_data dictionary</span>
 
         <span class="c1"># initialize new travel times list</span>
-        <span class="n">new_start_times</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span><span class="o">*</span><span class="n">Np_tracer</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">seed_time</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Particle seed time is nonzero,&quot;</span>
+                          <span class="s2">&quot; be aware when post-processing.&quot;</span><span class="p">)</span>
+        <span class="n">new_start_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">seed_time</span><span class="p">]</span><span class="o">*</span><span class="n">Np_tracer</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
             <span class="c1"># create random start indices based on x, y locations and np_tracer</span>
@@ -641,6 +680,9 @@
                     <span class="n">est_next_dt</span> <span class="o">=</span> <span class="mf">0.1</span>
                 <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
 
+                <span class="c1"># init list for too many particle iterations</span>
+                <span class="n">_iter_particles</span> <span class="o">=</span> <span class="p">[]</span>
+
                 <span class="c1"># Only iterate if this particle isn&#39;t already at a boundary:</span>
                 <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_type</span><span class="p">[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                                             <span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span>
@@ -651,10 +693,9 @@
                     <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_time</span><span class="p">)</span> <span class="o">&gt;=</span> \
                           <span class="nb">abs</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">est_next_dt</span> <span class="o">-</span> <span class="n">target_time</span><span class="p">):</span>
                         <span class="c1"># for particle ii, take a step from most recent index</span>
-                        <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                                                    <span class="p">[[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-                                                      <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]],</span>
-                                                    <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+                        <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="p">,</span> <span class="p">[[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]],</span>
+                            <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
 
                         <span class="c1"># Don&#39;t duplicate location</span>
                         <span class="c1"># if particle is standing still at a boundary</span>
@@ -672,9 +713,7 @@
                                           <span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
                         <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
                         <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mf">1e4</span><span class="p">:</span>
-                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Warning: Particle iterations exceeded limit&#39;</span>
-                                  <span class="s1">&#39; before reaching target time. Try smaller&#39;</span>
-                                  <span class="s1">&#39; time-step&#39;</span><span class="p">)</span>
+                            <span class="n">_iter_particles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
                             <span class="k">break</span>
 
             <span class="c1"># Store travel information in all_walk_data</span>
@@ -682,13 +721,21 @@
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_yinds</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_times</span>
 
+            <span class="c1"># write out warning if particles exceed step limit</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_iter_particles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_iter_particles</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;Particles&quot;</span>
+                              <span class="s2">&quot; exceeded iteration limit before reaching the&quot;</span>
+                              <span class="s2">&quot; target time, consider using a smaller&quot;</span>
+                              <span class="s2">&quot; time-step. Particles are: &quot;</span> <span class="o">+</span>
+                              <span class="nb">str</span><span class="p">(</span><span class="n">_iter_particles</span><span class="p">))</span>
+
             <span class="c1"># re-write the walk_data attribute of self</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">all_walk_data</span>
 
         <span class="k">return</span> <span class="n">all_walk_data</span></div></div>
 
 
-<div class="viewcode-block" id="gen_input_check"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.gen_input_check">[docs]</a><span class="k">def</span> <span class="nf">gen_input_check</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+<div class="viewcode-block" id="gen_input_check"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.gen_input_check">[docs]</a><span class="k">def</span> <span class="nf">gen_input_check</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">seed_time</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check the inputs provided to :obj:`generate_particles()`.</span>
 
 <span class="sd">    This function does input type checking and either succeeds or returns</span>
@@ -707,6 +754,9 @@
 <span class="sd">        seed_yloc : `list`</span>
 <span class="sd">            List of y-coordinates over which to initially distribute the</span>
 <span class="sd">            particles</span>
+
+<span class="sd">        seed_time : `int`, `float`</span>
+<span class="sd">            Value to set as initial travel time for newly seeded particles.</span>
 
 <span class="sd">        method : `str`, optional</span>
 <span class="sd">            Type of particle generation to use, either &#39;random&#39; or &#39;exact&#39;.</span>
@@ -745,13 +795,16 @@
         <span class="n">seed_yloc</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">seed_yloc</span><span class="p">)]</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;seed_yloc input type was not a list.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">seed_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> \
+      <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">seed_time</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;seed_time provided was not a float or int&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Method provided was not a string.&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="s1">&#39;exact&#39;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Method input is not a valid method, must be&#39;</span>
                          <span class="s1">&#39; &quot;random&quot; or &quot;exact&quot;.&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span></div>
+    <span class="k">return</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">seed_time</span></div>
 
 
 <div class="viewcode-block" id="coord2ind"><a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.coord2ind">[docs]</a><span class="k">def</span> <span class="nf">coord2ind</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">raster_origin</span><span class="p">,</span> <span class="n">raster_size</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">):</span>
@@ -894,6 +947,8 @@
     <span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">])</span>  <span class="c1"># Number of particles</span>
     <span class="c1"># Array to be populated</span>
     <span class="n">exposure_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">Np_tracer</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="c1"># list of particles that don&#39;t exit ROI</span>
+    <span class="n">_short_list</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Loop through particles to measure exposure time</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Np_tracer</span><span class="p">)),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -926,9 +981,13 @@
             <span class="c1"># (which can bias result)</span>
             <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">current_reg</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Warning: Particle &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is still within&#39;</span>
-                          <span class="s1">&#39; ROI at final timestep. </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                          <span class="s1">&#39;Run more iterations to get tail of ETD&#39;</span><span class="p">)</span>
+                    <span class="n">_short_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>  <span class="c1"># add particle number to list</span>
+
+    <span class="c1"># single print statement</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_short_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_short_list</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; Particles within ROI at final&#39;</span>
+              <span class="s1">&#39; timestep.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;Particles are: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">_short_list</span><span class="p">)</span> <span class="o">+</span>
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Run more iterations to get full tail of ETD.&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">exposure_times</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
 
@@ -960,7 +1019,7 @@
 
 <span class="sd">        clip : `float`, optional</span>
 <span class="sd">            Percentile at which to truncate the distribution. Particles which</span>
-<span class="sd">            get stuck can lead to errors at the high-extreme, so this </span>
+<span class="sd">            get stuck can lead to errors at the high-extreme, so this</span>
 <span class="sd">            parameter is used to normalize by a &quot;near-max&quot;. Default is the</span>
 <span class="sd">            99.5th percentile. To use true max, specify clip = 100</span>
 
@@ -974,7 +1033,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
-    
+
     <span class="c1"># Measure visit frequency</span>
     <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">raster_size</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]))):</span>
@@ -1026,21 +1085,21 @@
 
 <span class="sd">        clip : `float`, optional</span>
 <span class="sd">            Percentile at which to truncate the distribution. Particles which</span>
-<span class="sd">            get stuck can lead to errors at the high-extreme, so this </span>
+<span class="sd">            get stuck can lead to errors at the high-extreme, so this</span>
 <span class="sd">            parameter is used to normalize by a &quot;near-max&quot;. Default is the</span>
 <span class="sd">            99.5th percentile. To use true max, specify clip = 100</span>
 
 <span class="sd">    **Outputs** :</span>
 
 <span class="sd">        mean_time : `numpy.ndarray`</span>
-<span class="sd">            Array of mean occupation time, with cell values representing the </span>
+<span class="sd">            Array of mean occupation time, with cell values representing the</span>
 <span class="sd">            mean time particles spent in that cell. If sigma &gt; 0, the array</span>
 <span class="sd">            values include spatial filtering</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
-    
+
     <span class="c1"># Measure visit frequency</span>
     <span class="n">visit_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">raster_size</span><span class="p">)</span>
     <span class="n">time_total</span> <span class="o">=</span> <span class="n">visit_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1063,14 +1122,14 @@
     <span class="c1"># Prone to numerical outliers, so clip out extremes</span>
     <span class="n">vmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="n">clip</span><span class="p">))</span>
     <span class="n">mean_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
-    
+
     <span class="c1"># If applicable, do smoothing</span>
     <span class="k">if</span> <span class="n">sigma</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">mean_time</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
         <span class="n">mean_time</span><span class="p">[</span><span class="n">mean_time</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">mean_time</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">mean_time</span><span class="p">[</span><span class="n">mean_time</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    
+
     <span class="k">return</span> <span class="n">mean_time</span></div>
 
 
@@ -1157,7 +1216,7 @@
     <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridX</span><span class="p">),</span>
                              <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">gridY</span><span class="p">)])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
     <span class="n">gridXY_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">gridXY_array</span><span class="p">)</span>
-    
+
     <span class="c1"># If a boundary has been specified, create array to index outside it</span>
     <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>

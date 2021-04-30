@@ -3,11 +3,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <title>Background &#8212; dorado 2.4.1 documentation</title>
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Background &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
@@ -33,18 +35,18 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="background">
+  <section id="background">
 <span id="id1"></span><h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="motivation">
+<section id="motivation">
 <h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
 <p><cite>dorado</cite> was developed to provide an open-source and general method for routing passive tracer particles in a landscape scale flow field. Methods to simulate Lagrangian particle transport exist in adjacent fields and have been developed to solve problems at large scales <a class="footnote-reference brackets" href="#id9" id="id2">1</a> and at small scales <a class="footnote-reference brackets" href="#id10" id="id3">2</a>. The popular Delft3D suite of modules contains a method for Lagrangian particle tracking called Delft3D-PART <a class="footnote-reference brackets" href="#id11" id="id4">3</a>, however as part of the larger, complex Delft3D ecosystem, this code is harder to interrogate and understand directly.</p>
 <p>By developing <cite>dorado</cite> as a standalone python package, we hope to simplify the simulation of Lagrangian particle transport so that it may be applied to the results from any hydrodynamic simulation.</p>
-</div>
-<div class="section" id="name">
+</section>
+<section id="name">
 <h2>Name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h2>
 <p>The name <cite>dorado</cite> is inspired by the <a class="reference external" href="https://en.wikipedia.org/wiki/Salminus_brasiliensis">fish</a>.</p>
-</div>
-<div class="section" id="theory">
+</section>
+<section id="theory">
 <h2>Theory<a class="headerlink" href="#theory" title="Permalink to this headline">¶</a></h2>
 <p>Particle transport is simulated through the use of a weighted random walk framework <a class="footnote-reference brackets" href="#id12" id="id5">4</a>. In particular, we apply methods similar to those used in the numerical model DeltaRCM <a class="footnote-reference brackets" href="#id13" id="id6">5</a> <a class="footnote-reference brackets" href="#id14" id="id7">6</a>, to weight the random walk by the local water slopes and the water discharge components.</p>
 <p><cite>dorado</cite> assumes a rectangular grid and routes particles in a D-8 fashion assuming that the potential future location of a given particle is one of the surrounding 8 cells.</p>
@@ -68,8 +70,8 @@
 <div class="math">
 <p><img src="../_images/math/335614bd30bd93aa21dd6495a2dcc62fe6a423e4.png" alt="T_t = \frac{1}{2} \times d_{eq} \times \left(\frac{1}{v_o} + \frac{1}{v_i}\right) \times \left(1 + \left[dc \times U(-0.5,0.5)\right]\right)"/></p>
 </div><p>When <img class="math" src="../_images/math/2ac218300528332a8e9e62aff9126379238d521d.png" alt="{dc}"/> is 0, then the travel time calculation is based solely on the velocity field and deviation in particle path trajectory from the mean flow path. As the diffusivity coefficient is increased, the diffusivity present in travel time distributions will increase as well.</p>
-</div>
-<div class="section" id="references">
+</section>
+<section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <dl class="footnote brackets">
 <dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
@@ -91,8 +93,8 @@
 <dd><p>Liang, M., Geleynse, N., Edmonds, D. A., &amp; Passalacqua, P. (2015). A reduced-complexity model for river delta formation-Part 2: Assessment of the flow routing scheme. Earth Surface Dynamics, 3(1), 87.</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>

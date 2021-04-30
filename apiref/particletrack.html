@@ -3,11 +3,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <title>dorado.particle_track &#8212; dorado 2.4.1 documentation</title>
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dorado.particle_track &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
@@ -33,7 +35,7 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-dorado.particle_track">
+  <section id="module-dorado.particle_track">
 <span id="dorado-particle-track"></span><span id="particletrack"></span><h1>dorado.particle_track<a class="headerlink" href="#module-dorado.particle_track" title="Permalink to this headline">¶</a></h1>
 <p>Lower-level methods to manage parameters and particle movement.</p>
 <p>Particle class for managing the definition of particle attributes and
@@ -70,7 +72,7 @@ possible/sensible</p>
 
 <dl class="method">
 <dt id="dorado.particle_track.Particles.generate_particles">
-<code class="descname">generate_particles</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>method='random'</em>, <em>previous_walk_data=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.generate_particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.generate_particles" title="Permalink to this definition">¶</a></dt>
+<code class="descname">generate_particles</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>seed_time=0</em>, <em>method='random'</em>, <em>previous_walk_data=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.generate_particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.generate_particles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a set of particles in defined locations.</p>
 <p>After a <a class="reference internal" href="#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class has been
 initialized, this function can be called to create some particles
@@ -93,6 +95,13 @@ particles.</p>
 </dd>
 <dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
 particles.</p>
+</dd>
+<dt>seed_time<span class="classifier"><cite>float</cite>, <cite>int</cite>, optional</span></dt><dd><p>Seed time to apply to all newly seeded particles. This can be
+useful if you are generating new particles and adding them to
+a pre-existing set of particles and you want to run them in
+a group to a “target-time”. The default value is 0, as new
+particles have not traveled for any time, but a savy user
+might have need to seed this value with something else.</p>
 </dd>
 <dt>method<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Specify the type of particle generation you wish to use.
 Current options are ‘random’ and ‘exact’ for seeding particles
@@ -207,7 +216,7 @@ in order of particle ID.</p>
 
 <dl class="function">
 <dt id="dorado.particle_track.gen_input_check">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">gen_input_check</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>method</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#gen_input_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.gen_input_check" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dorado.particle_track.</code><code class="descname">gen_input_check</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>seed_time</em>, <em>method</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#gen_input_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.gen_input_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the inputs provided to <code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_particles()</span></code>.</p>
 <p>This function does input type checking and either succeeds or returns
 an error if the types provided cannot be converted to those that we
@@ -222,6 +231,8 @@ particles</p>
 </dd>
 <dt>seed_yloc<span class="classifier"><cite>list</cite></span></dt><dd><p>List of y-coordinates over which to initially distribute the
 particles</p>
+</dd>
+<dt>seed_time<span class="classifier"><cite>int</cite>, <cite>float</cite></span></dt><dd><p>Value to set as initial travel time for newly seeded particles.</p>
 </dd>
 <dt>method<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Type of particle generation to use, either ‘random’ or ‘exact’.</p>
 </dd>
@@ -343,6 +354,10 @@ defined dry_depth</p>
 <dt>steepest_descent<span class="classifier"><cite>bool</cite></span></dt><dd><p>Toggle for routing based on a steepest descent rather than the
 weighted random walk. If True, then the highest weighted cells are
 used to route the particles. Default value is False.</p>
+</dd>
+<dt>verbose<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Toggles whether or not warnings and print output are output to the
+console. If False, nothing is output, if True, messages are output.
+Default value is True. Errors are always raised.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -500,7 +515,7 @@ assumes data have the same coordinates. It is used as follows:
 </div></blockquote>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>

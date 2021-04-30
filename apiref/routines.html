@@ -3,11 +3,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <title>dorado.routines &#8212; dorado 2.4.1 documentation</title>
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dorado.routines &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
@@ -33,7 +35,7 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-dorado.routines">
+  <section id="module-dorado.routines">
 <span id="dorado-routines"></span><span id="routines"></span><h1>dorado.routines<a class="headerlink" href="#module-dorado.routines" title="Permalink to this headline">¶</a></h1>
 <p>Higher level methods for routing and visualizing tracer particles.</p>
 <p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
@@ -235,7 +237,7 @@ figure, default is ‘b’ for blue</p>
 <dl class="function">
 <dt id="dorado.routines.show_nourishment_area">
 <code class="descclassname">dorado.routines.</code><code class="descname">show_nourishment_area</code><span class="sig-paren">(</span><em>visit_freq</em>, <em>grid=None</em>, <em>walk_data=None</em>, <em>cmap='Reds'</em>, <em>sigma=0.7</em>, <em>min_alpha=0</em>, <em>show_seed=True</em>, <em>seed_color='dodgerblue'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.show_nourishment_area" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot a smoothed, normalized heatmap of particle visit frequency</p>
+<dd><p>Plot a smoothed, normalized heatmap of particle visit frequency.</p>
 <p>Function will plot the history of particle travel locations in walk_data
 as a heatmap overtop the specified grid, using the output of
 <a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_area" title="dorado.particle_track.nourishment_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.nourishment_area()</span></code></a>. Colors indicate number
@@ -272,8 +274,8 @@ frequented cell locations, default is full transparency</p>
 (first) seed location. Uses indices of walk_data[:][0][0]. Default
 is True, but only if ‘walk_data’ is also provided.</p>
 </dd>
-<dt>seed_color<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of matplotlib color used for the marker seed, if shown. Default
-is a light blue to contrast with the ‘Reds’ heatmap.</p>
+<dt>seed_color<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of matplotlib color used for the marker seed, if shown.
+Default is a light blue to contrast with the ‘Reds’ heatmap.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -289,7 +291,7 @@ is a light blue to contrast with the ‘Reds’ heatmap.</p>
 <dl class="function">
 <dt id="dorado.routines.show_nourishment_time">
 <code class="descclassname">dorado.routines.</code><code class="descname">show_nourishment_time</code><span class="sig-paren">(</span><em>mean_times</em>, <em>grid=None</em>, <em>walk_data=None</em>, <em>cmap='magma'</em>, <em>show_colorbar=True</em>, <em>min_alpha=0.3</em>, <em>show_seed=True</em>, <em>seed_color='dodgerblue'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.show_nourishment_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot a smoothed heatmap of mean particle visit time</p>
+<dd><p>Plot a smoothed heatmap of mean particle visit time.</p>
 <p>Function will plot the history of mean particle travel times in walk_data
 as a heatmap overtop the specified grid, using the output of
 <a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_time" title="dorado.particle_track.nourishment_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.nourishment_time()</span></code></a>. Colors indicate the mean
@@ -311,7 +313,8 @@ routines or the
 <dt>cmap<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of Matplotlib colormap used for the foreground (heatmap).
 Default is ‘magma’</p>
 </dd>
-<dt>show_colorbar<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Controls whether to plot a colorbar for mean_times, default is False</p>
+<dt>show_colorbar<span class="classifier"><cite>bool</cite>, optional</span></dt><dd><p>Controls whether to plot a colorbar for mean_times,
+default is False</p>
 </dd>
 <dt>min_alpha<span class="classifier"><cite>float</cite>, optional</span></dt><dd><p>Minimum alpha value of the heatmap, representing the cells which
 spent the least amount of time occupied, default is 0.3</p>
@@ -320,8 +323,8 @@ spent the least amount of time occupied, default is 0.3</p>
 (first) seed location. Uses indices of walk_data[:][0][0]. Default
 is True, but only if ‘walk_data’ is also provided.</p>
 </dd>
-<dt>seed_color<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of matplotlib color used for the marker seed, if shown. Default
-is a light blue.</p>
+<dt>seed_color<span class="classifier"><cite>str</cite>, optional</span></dt><dd><p>Name of matplotlib color used for the marker seed, if shown.
+Default is a light blue.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -337,7 +340,7 @@ is a light blue.</p>
 <dl class="function">
 <dt id="dorado.routines.snake_plots">
 <code class="descclassname">dorado.routines.</code><code class="descname">snake_plots</code><span class="sig-paren">(</span><em>grid, walk_data, num_steps, folder_name=None, interval=4, tail_length=12, rgba_start=[1, 0.4, 0.2, 1], rgba_end=[1, 0.3, 0.1, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#snake_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.snake_plots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot particle positions with a trailing tail</p>
+<dd><p>Plot particle positions with a trailing tail.</p>
 <p>Loops through existing walk_data history and creates a series of
 plots of the particle locations, with recent locations shown as a
 trailing tail. Default is for the tails to fade away, but they
@@ -498,7 +501,7 @@ and travel times as a json text file.</p>
 </div></blockquote>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>

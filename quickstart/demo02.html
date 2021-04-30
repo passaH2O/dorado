@@ -3,11 +3,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <title>Demo 2 - Using Lower-Level Functionality &#8212; dorado 2.4.1 documentation</title>
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Demo 2 - Using Lower-Level Functionality &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
@@ -31,7 +33,7 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="demo-2-using-lower-level-functionality">
+  <section id="demo-2-using-lower-level-functionality">
 <h1>Demo 2 - Using Lower-Level Functionality<a class="headerlink" href="#demo-2-using-lower-level-functionality" title="Permalink to this headline">¶</a></h1>
 <p>In this demo, we show how particles can be placed on a gridded flow field generated using the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in <a class="reference download internal" download="" href="../_downloads/88740e1ea0aa18ed325a9e72627b7118/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>.</p>
 <p>First we load the grid parameters for this example. The longer <a class="reference internal" href="../examples/index.html#examples"><span class="std std-ref">Examples</span></a> provide guidance on how to define your own grid parameters.</p>
@@ -53,9 +55,9 @@
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../pyplots/quickstart/demo2_flow.png">png</a>, <a class="reference external" href="../pyplots/quickstart/demo2_flow.hires.png">hires.png</a>)</p>
-<div class="figure align-center">
-<img alt="../_images/demo2_flow.png" src="../_images/demo2_flow.png" />
-</div>
+<figure class="align-center">
+<img alt="../_images/demo2_flow.png" class="plot-directive" src="../_images/demo2_flow.png" />
+</figure>
 <p>Now let’s route 50 particles with a target travel time of 2100 seconds. To do this, we first will need to define an instance of the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class. Then we will generate a set of 50 particles to be routed. Finally we will actually move the particles
 until the target travel time of 2100 seconds is reached.</p>
 <p>We will then visualize the final positions of the particles and display the final travel times associated with each of the particles to see how close they are to the target of 2100 seconds.</p>
@@ -83,9 +85,9 @@ until the target travel time of 2100 seconds is reached.</p>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../pyplots/quickstart/demo2.png">png</a>, <a class="reference external" href="../pyplots/quickstart/demo2.hires.png">hires.png</a>)</p>
-<div class="figure align-center">
-<img alt="../_images/demo22.png" src="../_images/demo22.png" />
-</div>
+<figure class="align-center">
+<img alt="../_images/demo22.png" class="plot-directive" src="../_images/demo22.png" />
+</figure>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of particle travel times for final particle locations: &#39;</span> <span class="o">+</span>
 <span class="gp">&gt;&gt;&gt; </span>      <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">finaltimes</span><span class="p">)))</span>
@@ -98,7 +100,7 @@ until the target travel time of 2100 seconds is reached.</p>
 <span class="go">2086. 2036. 2109. 2078. 2047.]</span>
 </pre></div>
 </div>
-</div>
+</section>
 
 
           </div>

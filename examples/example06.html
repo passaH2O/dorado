@@ -3,11 +3,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <title>Example 6 - Set Travel Time Target &#8212; dorado 2.4.1 documentation</title>
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Example 6 - Set Travel Time Target &#8212; dorado 2.4.2 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
@@ -33,7 +35,7 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="example-6-set-travel-time-target">
+  <section id="example-6-set-travel-time-target">
 <span id="example06"></span><h1>Example 6 - Set Travel Time Target<a class="headerlink" href="#example-6-set-travel-time-target" title="Permalink to this headline">¶</a></h1>
 <p>In this example we will revisit the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> model output we looked at in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>. This time, however, we will set a particle travel time target as opposed to a number of iterations for the particles to move.</p>
 <p>In this method, we allow the particles to take as many iterations as they need (individually) to get as close as possible to the target travel time that we prescribe.</p>
@@ -58,9 +60,9 @@
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../pyplots/quickstart/demo2.png">png</a>, <a class="reference external" href="../pyplots/quickstart/demo2.hires.png">hires.png</a>)</p>
-<div class="figure align-center">
-<img alt="../_images/demo2.png" src="../_images/demo2.png" />
-</div>
+<figure class="align-center">
+<img alt="../_images/demo2.png" class="plot-directive" src="../_images/demo2.png" />
+</figure>
 <p>To see how close we are to the prescribed target travel time of 2100 seconds, we will get a list of the final travel times that we then print to the console. We can access the data from the most recent step using <cite>get_state</cite>.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of particle travel times for final particle locations: &#39;</span> <span class="o">+</span>
@@ -73,7 +75,7 @@
 <span class="go">2102. 2102. 2099. 2042. 2070. 2108. 2115. 2115. 2108. 2112. 2062. 2124.]</span>
 </pre></div>
 </div>
-</div>
+</section>
 
 
           </div>
