@@ -9,6 +9,7 @@ through the domain.
 Project Homepage: https://github.com/passaH2O/dorado
 """
 from __future__ import division, print_function, absolute_import
+import warnings
 from builtins import range
 from math import pi
 import numpy as np
@@ -92,6 +93,11 @@ class modelParams:
             weighted random walk. If True, then the highest weighted cells are
             used to route the particles. Default value is False.
 
+        verbose : `bool`, optional
+            Toggles whether or not warnings and print output are output to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     This list of expected parameter values can also be obtained by querying the
     class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
     `vars(modelParams)`.
@@ -114,6 +120,7 @@ class modelParams:
         self.qy = None
         self.u = None
         self.v = None
+        self.verbose = True  # print things by default
 
 
 class Particles():
@@ -131,6 +138,12 @@ class Particles():
         possible/sensible
 
         """
+        # pass verbose
+        if getattr(params, 'verbose', None) is None:
+            self.verbose = True  # set verbosity on if somehow missing
+        else:
+            self.verbose = params.verbose
+
         # REQUIRED PARAMETERS #
         # Define the length along one cell face (assuming square cells)
         if getattr(params, 'dx', None) is None:
@@ -251,7 +264,8 @@ class Particles():
         try:
             self.theta = float(params.theta)
         except Exception:
-            print("Theta parameter not specified - using 1.0")
+            if self.verbose:
+                print("Theta parameter not specified - using 1.0")
             self.theta = 1.0  # if unspecified use 1
 
         # Gamma parameter used to weight the random walk
@@ -261,38 +275,45 @@ class Particles():
         try:
             self.gamma = float(params.gamma)
         except Exception:
-            print("Gamma parameter not specified - using 0.05")
+            if self.verbose:
+                print("Gamma parameter not specified - using 0.05")
             self.gamma = 0.05
 
         try:
             if params.diff_coeff < 0:
-                print("Warning: Specified diffusion coefficient is negative."
-                      " Rounding up to zero")
+                if self.verbose:
+                    warnings.warn("Specified diffusion coefficient is negative"
+                                  ". Rounding up to zero")
                 params.diff_coeff = 0.0
             elif params.diff_coeff >= 2:
-                print("Warning: Diffusion behaves non-physically when"
-                      " coefficient >= 2")
+                if self.verbose:
+                    warnings.warn("Diffusion behaves non-physically when"
+                                  " coefficient >= 2")
             self.diff_coeff = float(params.diff_coeff)
         except Exception:
             if getattr(params, 'steepest_descent', False) is True:
-                print("Diffusion disabled for steepest descent")
+                if self.verbose:
+                    print("Diffusion disabled for steepest descent")
                 self.diff_coeff = 0.0
             else:
-                print("Diffusion coefficient not specified - using 0.2")
+                if self.verbose:
+                    print("Diffusion coefficient not specified - using 0.2")
                 self.diff_coeff = 0.2
 
         # Minimum depth for cell to be considered wet
         try:
             self.dry_depth = params.dry_depth
         except Exception:
-            print("minimum depth for wetness not defined - using 10 cm")
+            if self.verbose:
+                print("minimum depth for wetness not defined - using 10 cm")
             self.dry_depth = 0.1
 
         # Cell types: 2 = land, 1 = channel, 0 = ocean, -1 = edge
         try:
             self.cell_type = params.cell_type
         except Exception:
-            print("Cell Types not specified - Estimating from depth")
+            if self.verbose:
+                print("Cell Types not specified - Estimating from depth")
             self.cell_type = np.zeros_like(self.depth, dtype='int')
             self.cell_type[self.depth < self.dry_depth] = 2
             self.cell_type = np.pad(self.cell_type[1:-1, 1:-1], 1, 'constant',
@@ -303,13 +324,16 @@ class Particles():
         # note: chooses randomly in event of ties
         try:
             if params.steepest_descent is True:
-                print("Using steepest descent")
+                if self.verbose:
+                    print("Using steepest descent")
                 self.steepest_descent = True
             else:
-                print("Using weighted random walk")
+                if self.verbose:
+                    print("Using weighted random walk")
                 self.steepest_descent = False
         except Exception:
-            print("Using weighted random walk")
+            if self.verbose:
+                print("Using weighted random walk")
             self.steepest_descent = False
 
         # DEFAULT PARAMETERS (Can be defined otherwise) #
@@ -380,6 +404,7 @@ class Particles():
         # initialize routing weights array
         self.weight = np.zeros((self.stage.shape[0], self.stage.shape[1], 9))
 
+
     # function to clear walk data if you've made a mistake while generating it
     def clear_walk_data(self):
         """Manually reset self.walk_data back to None."""
@@ -390,6 +415,7 @@ class Particles():
                            Np_tracer,
                            seed_xloc,
                            seed_yloc,
+                           seed_time=0,
                            method='random',
                            previous_walk_data=None):
         """Generate a set of particles in defined locations.
@@ -420,6 +446,14 @@ class Particles():
                 List of y-coordinates over which to initially distribute the
                 particles.
 
+            seed_time : `float`, `int`, optional
+                Seed time to apply to all newly seeded particles. This can be
+                useful if you are generating new particles and adding them to
+                a pre-existing set of particles and you want to run them in
+                a group to a "target-time". The default value is 0, as new
+                particles have not traveled for any time, but a savy user
+                might have need to seed this value with something else.
+
             method : `str`, optional
                 Specify the type of particle generation you wish to use.
                 Current options are 'random' and 'exact' for seeding particles
@@ -439,15 +473,19 @@ class Particles():
         """
         # if the values in self are invalid the input checked will catch them
         # do input type checking
-        Np_tracer, seed_xloc, seed_yloc = gen_input_check(Np_tracer,
-                                                          seed_xloc,
-                                                          seed_yloc,
-                                                          method)
+        Np_tracer, seed_xloc, seed_yloc, seed_time = gen_input_check(Np_tracer,
+                                                                     seed_xloc,
+                                                                     seed_yloc,
+                                                                     seed_time,
+                                                                     method)
 
         init_walk_data = dict()  # create init_walk_data dictionary
 
         # initialize new travel times list
-        new_start_times = [0.]*Np_tracer
+        if (seed_time != 0) and (self.verbose is True):
+            warnings.warn("Particle seed time is nonzero,"
+                          " be aware when post-processing.")
+        new_start_times = [seed_time]*Np_tracer
 
         if method == 'random':
             # create random start indices based on x, y locations and np_tracer
@@ -607,6 +645,9 @@ class Particles():
                     est_next_dt = 0.1
                 count = 1
 
+                # init list for too many particle iterations
+                _iter_particles = []
+
                 # Only iterate if this particle isn't already at a boundary:
                 if -1 not in self.cell_type[all_xinds[ii][-1]-1:
                                             all_xinds[ii][-1]+2,
@@ -617,10 +658,9 @@ class Particles():
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times = lw.particle_stepper(self,
-                                                    [[all_xinds[ii][-1],
-                                                      all_yinds[ii][-1]]],
-                                                    [all_times[ii][-1]])
+                        new_inds, travel_times = lw.particle_stepper(
+                            self, [[all_xinds[ii][-1], all_yinds[ii][-1]]],
+                            [all_times[ii][-1]])
 
                         # Don't duplicate location
                         # if particle is standing still at a boundary
@@ -638,9 +678,7 @@ class Particles():
                                           all_times[ii][-2])
                         count += 1
                         if count > 1e4:
-                            print('Warning: Particle iterations exceeded limit'
-                                  ' before reaching target time. Try smaller'
-                                  ' time-step')
+                            _iter_particles.append(ii)
                             break
 
             # Store travel information in all_walk_data
@@ -648,13 +686,21 @@ class Particles():
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
 
+            # write out warning if particles exceed step limit
+            if (len(_iter_particles) > 0) and (self.verbose is True):
+                warnings.warn(str(len(_iter_particles)) + "Particles"
+                              " exceeded iteration limit before reaching the"
+                              " target time, consider using a smaller"
+                              " time-step. Particles are: " +
+                              str(_iter_particles))
+
             # re-write the walk_data attribute of self
             self.walk_data = all_walk_data
 
         return all_walk_data
 
 
-def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
+def gen_input_check(Np_tracer, seed_xloc, seed_yloc, seed_time, method):
     """Check the inputs provided to :obj:`generate_particles()`.
 
     This function does input type checking and either succeeds or returns
@@ -673,6 +719,9 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
         seed_yloc : `list`
             List of y-coordinates over which to initially distribute the
             particles
+
+        seed_time : `int`, `float`
+            Value to set as initial travel time for newly seeded particles.
 
         method : `str`, optional
             Type of particle generation to use, either 'random' or 'exact'.
@@ -711,13 +760,16 @@ def gen_input_check(Np_tracer, seed_xloc, seed_yloc, method):
         seed_yloc = [int(y) for y in list(seed_yloc)]
     except Exception:
         raise TypeError("seed_yloc input type was not a list.")
+    if (isinstance(seed_time, float) is False) and \
+      (isinstance(seed_time, int) is False):
+        raise TypeError('seed_time provided was not a float or int')
     if isinstance(method, str) is False:
         raise TypeError('Method provided was not a string.')
     elif method not in ['random', 'exact']:
         raise ValueError('Method input is not a valid method, must be'
                          ' "random" or "exact".')
 
-    return Np_tracer, seed_xloc, seed_yloc
+    return Np_tracer, seed_xloc, seed_yloc, seed_time
 
 
 def coord2ind(coordinates, raster_origin, raster_size, cellsize):
@@ -860,6 +912,8 @@ def exposure_time(walk_data,
     Np_tracer = len(walk_data['xinds'])  # Number of particles
     # Array to be populated
     exposure_times = np.zeros([Np_tracer], dtype='float')
+    # list of particles that don't exit ROI
+    _short_list = []
 
     # Loop through particles to measure exposure time
     for ii in tqdm(list(range(0, Np_tracer)), ascii=True):
@@ -892,9 +946,13 @@ def exposure_time(walk_data,
             # (which can bias result)
             if jj == len(walk_data['travel_times'][ii])-1:
                 if current_reg == 1:
-                    print('Warning: Particle ' + str(ii) + ' is still within'
-                          ' ROI at final timestep. \n' +
-                          'Run more iterations to get tail of ETD')
+                    _short_list.append(ii)  # add particle number to list
+
+    # single print statement
+    if len(_short_list) > 0:
+        print(str(len(_short_list)) + ' Particles within ROI at final'
+              ' timestep.\n' + 'Particles are: ' + str(_short_list) +
+              '\nRun more iterations to get full tail of ETD.')
 
     return exposure_times.tolist()
 
@@ -926,7 +984,7 @@ def nourishment_area(walk_data, raster_size, sigma=0.7, clip=99.5):
 
         clip : `float`, optional
             Percentile at which to truncate the distribution. Particles which
-            get stuck can lead to errors at the high-extreme, so this 
+            get stuck can lead to errors at the high-extreme, so this
             parameter is used to normalize by a "near-max". Default is the
             99.5th percentile. To use true max, specify clip = 100
 
@@ -940,7 +998,7 @@ def nourishment_area(walk_data, raster_size, sigma=0.7, clip=99.5):
     """
     if sigma > 0:
         from scipy.ndimage import gaussian_filter
-    
+
     # Measure visit frequency
     visit_freq = np.zeros(raster_size)
     for ii in list(range(len(walk_data['xinds']))):
@@ -992,21 +1050,21 @@ def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
 
         clip : `float`, optional
             Percentile at which to truncate the distribution. Particles which
-            get stuck can lead to errors at the high-extreme, so this 
+            get stuck can lead to errors at the high-extreme, so this
             parameter is used to normalize by a "near-max". Default is the
             99.5th percentile. To use true max, specify clip = 100
 
     **Outputs** :
 
         mean_time : `numpy.ndarray`
-            Array of mean occupation time, with cell values representing the 
+            Array of mean occupation time, with cell values representing the
             mean time particles spent in that cell. If sigma > 0, the array
             values include spatial filtering
 
     """
     if sigma > 0:
         from scipy.ndimage import gaussian_filter
-    
+
     # Measure visit frequency
     visit_freq = np.zeros(raster_size)
     time_total = visit_freq.copy()
@@ -1029,14 +1087,14 @@ def nourishment_time(walk_data, raster_size, sigma=0.7, clip=99.5):
     # Prone to numerical outliers, so clip out extremes
     vmax = float(np.nanpercentile(mean_time, clip))
     mean_time = np.clip(mean_time, 0, vmax)
-    
+
     # If applicable, do smoothing
     if sigma > 0:
         mean_time = gaussian_filter(mean_time, sigma=sigma)
         mean_time[mean_time==np.min(mean_time)] = np.nan
     else:
         mean_time[mean_time==0] = np.nan
-    
+
     return mean_time
 
 
@@ -1123,7 +1181,7 @@ def unstruct2grid(coordinates,
     gridXY_array = np.array([np.concatenate(gridX),
                              np.concatenate(gridY)]).transpose()
     gridXY_array = np.ascontiguousarray(gridXY_array)
-    
+
     # If a boundary has been specified, create array to index outside it
     if boundary is not None:
         path = matplotlib.path.Path(boundary)

@@ -232,7 +232,8 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
         if i == 0:
             particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
         else:
-            particle.generate_particles(0, [], [], 'random', walk_data)
+            particle.generate_particles(0, [], [], method='random',
+                                        previous_walk_data=walk_data)
 
         walk_data = particle.run_iteration(target_time=target_times[i])
 
@@ -397,7 +398,7 @@ def get_state(walk_data, iteration=-1):
             yinds.append(walk_data['yinds'][ii][-1])
             times.append(walk_data['travel_times'][ii][-1])
             iter_exceeds_warning += 1
-    
+
     if iter_exceeds_warning > 0:
         print('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
@@ -515,21 +516,22 @@ def plot_exposure_time(walk_data,
     else:
         timeunit = '[' + str(timedelta) + ' s]'
 
-    # Handle directories
-    if folder_name is None:
-        folder_name = os.getcwd()
-    if os.path.exists(folder_name):
-        print('Saving files in existing directory')
-    else:
-        os.makedirs(folder_name)
-    if not os.path.exists(folder_name+os.sep+'figs'):
-        os.makedirs(folder_name+os.sep+'figs')
-    if not os.path.exists(folder_name+os.sep+'data'):
-        os.makedirs(folder_name+os.sep+'data')
+    if save_output:
+        # Handle directories
+        if folder_name is None:
+            folder_name = os.getcwd()
+        if os.path.exists(folder_name):
+            print('Saving files in existing directory')
+        else:
+            os.makedirs(folder_name)
+        if not os.path.exists(folder_name+os.sep+'figs'):
+            os.makedirs(folder_name+os.sep+'figs')
+        if not os.path.exists(folder_name+os.sep+'data'):
+            os.makedirs(folder_name+os.sep+'data')
 
-    # Save exposure times by particle ID
-    fpath = folder_name+os.sep+'data'+os.sep+'exposure_times.txt'
-    json.dump(exposure_times, open(fpath, 'w'))
+        # Save exposure times by particle ID
+        fpath = folder_name+os.sep+'data'+os.sep+'exposure_times.txt'
+        json.dump(exposure_times, open(fpath, 'w'))
     exposure_times = np.array(exposure_times)
 
     # Set end of ETD as the minimum travel time of particles
@@ -555,15 +557,15 @@ def plot_exposure_time(walk_data,
     frac_exited = np.append(frac_exited,
                             [float(num_particles_included)/float(Np_tracer)])
 
+    # Plot the cumulative ETD in its exact form
+    plt.figure(figsize=(5, 3), dpi=150)
+    plt.step(full_time_vect/timedelta, frac_exited, where='post')
+    plt.title('Cumulative Exposure Time Distribution')
+    plt.xlabel('Time ' + timeunit)
+    plt.ylabel('F(t) [-]')
+    plt.xlim([0, end_time/timedelta])
+    plt.ylim([0, 1])
     if save_output:
-        # Plot the cumulative ETD in its exact form
-        plt.figure(figsize=(5, 3), dpi=150)
-        plt.step(full_time_vect/timedelta, frac_exited, where='post')
-        plt.title('Cumulative Exposure Time Distribution')
-        plt.xlabel('Time ' + timeunit)
-        plt.ylabel('F(t) [-]')
-        plt.xlim([0, end_time/timedelta])
-        plt.ylim([0, 1])
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'Exact_CETD.png',
                     bbox_inches='tight')
         plt.close()
@@ -714,7 +716,7 @@ def draw_travel_path(grid, walk_data,
             Default it to show every iteration
 
         plot_legend : `bool`, optional
-            Controls whether resulting plot includes a legend of particle IDs. 
+            Controls whether resulting plot includes a legend of particle IDs.
             Default is False
 
     **Outputs** :
@@ -734,25 +736,24 @@ def draw_travel_path(grid, walk_data,
     ax = plt.gca()
     im = ax.imshow(grid, cmap='bone', alpha=0.9)
     ax.set_title('Particle Paths')
-    
-    paths = [] # Place to store particle paths
-    colors = [] # Place to store colors
+
+    paths = []  # Place to store particle paths
+    colors = []  # Place to store colors
     for i in tqdm(particles_to_follow):
         # Set color for this particle
         c = np.random.rand(3,)
         colors.append([c[0], c[1], c[2], 0.9])
-        
+
         x = walk_data['xinds'][i][0::interval]
         y = walk_data['yinds'][i][0::interval]
         lineseg = list(zip(y, x))
         paths.append(lineseg)
 
     # Add new line collection to our figure, apply a background shadow
-    lc = LineCollection(paths, colors=colors, 
+    lc = LineCollection(paths, colors=colors,
                         linewidths=1.2, capstyle='round',
-                        path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
-                                                                    alpha=0.2,
-                                                                    linewidth=1.6),
+                        path_effects=[path_effects.SimpleLineShadow(
+                            offset=(0.5, -0.5), alpha=0.2, linewidth=1.6),
                                       path_effects.Normal()])
     ax.add_collection(lc)
     if plot_legend:
@@ -819,11 +820,11 @@ def snake_plots(grid,
                 tail_length=12,
                 rgba_start=[1, 0.4, 0.2, 1],
                 rgba_end=[1, 0.3, 0.1, 0]):
-    """Plot particle positions with a trailing tail
-    
+    """Plot particle positions with a trailing tail.
+
     Loops through existing walk_data history and creates a series of
     plots of the particle locations, with recent locations shown as a
-    trailing tail. Default is for the tails to fade away, but they 
+    trailing tail. Default is for the tails to fade away, but they
     can also change color. Currently this function can only sync up
     particles by iteration number, not travel_times.
 
@@ -848,7 +849,7 @@ def snake_plots(grid,
 
         interval : `int`, optional
             Interval of iterations to skip over between each plot. Also
-            determines how "smooth" each particle trajectory appears. 
+            determines how "smooth" each particle trajectory appears.
             Default is to show every 4th iteration
 
         tail_length : `int`, optional
@@ -888,12 +889,12 @@ def snake_plots(grid,
     # Color list repeats for each particle when plotted
     colors = np.zeros((tail_length, 4))
     for c in list(range(4)):
-        colors[:,c] = np.linspace(rgba_start[c], rgba_end[c],
-                                  tail_length).T
+        colors[:, c] = np.linspace(rgba_start[c], rgba_end[c],
+                                   tail_length).T
 
     # Loop through specified number of steps
     for ii in list(range(interval, num_steps*interval, interval)):
-        paths = [] # Initialize place to store paths
+        paths = []  # Initialize place to store paths
         # Recent chunk of the path we're going to plot
         chunks = list(range(ii, ii-tail_length*interval, -1*interval))
 
@@ -908,11 +909,11 @@ def snake_plots(grid,
             x = walk_data['xinds'][jj]
             y = walk_data['yinds'][jj]
             lineseg = list(zip(y, x))
-            newest_segment = lineseg[0:2] # Use first segment as backup
+            newest_segment = lineseg[0:2]  # Use first segment as backup
 
             # Check that this particle had enough iterations
             if ii > len(lineseg):
-                continue # If not, skip
+                continue  # If not, skip
 
             # Loop through history in reverse order and grab segments
             for c in chunks:
@@ -933,14 +934,12 @@ def snake_plots(grid,
         # Add new line collection to our figure, apply a background shadow
         lc = LineCollection(paths, colors=colors,
                             linewidths=1.2, capstyle='round',
-                            path_effects=[path_effects.SimpleLineShadow(offset=(0.5,-0.5),
-                                                                        alpha=0.1,
-                                                                        linewidth=1.6),
+                            path_effects=[path_effects.SimpleLineShadow(
+                                offset=(0.5, -0.5), alpha=0.1, linewidth=1.6),
                                           path_effects.Normal()])
         ax.add_collection(lc)
         ax.set_title('Iteration %s' % ii)
-        plt.savefig(folder_name+os.sep+'figs'
-                    +os.sep+'snakefig'+str(ii)+'.png',
+        plt.savefig(folder_name+os.sep+'figs'+os.sep+'snakefig'+str(ii)+'.png',
                     bbox_inches='tight')
         plt.close()
 
@@ -948,7 +947,7 @@ def snake_plots(grid,
 def show_nourishment_area(visit_freq, grid=None, walk_data=None,
                           cmap='Reds', sigma=0.7, min_alpha=0,
                           show_seed=True, seed_color='dodgerblue'):
-    """Plot a smoothed, normalized heatmap of particle visit frequency
+    """Plot a smoothed, normalized heatmap of particle visit frequency.
 
     Function will plot the history of particle travel locations in walk_data
     as a heatmap overtop the specified grid, using the output of
@@ -994,8 +993,8 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
             is True, but only if 'walk_data' is also provided.
 
         seed_color : `str`, optional
-            Name of matplotlib color used for the marker seed, if shown. Default
-            is a light blue to contrast with the 'Reds' heatmap.
+            Name of matplotlib color used for the marker seed, if shown.
+            Default is a light blue to contrast with the 'Reds' heatmap.
 
     **Outputs** :
 
@@ -1006,13 +1005,13 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     from matplotlib.colors import Normalize
 
     # Plot heatmap with alpha based on visit_freq
-    if sigma >= 0.125: # This is just a visual trial-and-error thing
+    if sigma >= 0.125:  # This is just a visual trial-and-error thing
         amax = np.nanpercentile(visit_freq, 60)
     else:
         amax = np.nanpercentile(visit_freq, 30)
-    alphas = Normalize(0, amax, clip=True)(visit_freq) # Normalize alphas
+    alphas = Normalize(0, amax, clip=True)(visit_freq)  # Normalize alphas
     alphas = np.clip(alphas, min_alpha, 1)
-    colors = Normalize(np.nanmin(visit_freq), 1)(visit_freq) # Normalize colors
+    colors = Normalize(np.nanmin(visit_freq), 1)(visit_freq)  # Normalize color
     cmap = plt.cm.get_cmap(cmap)
     colors = cmap(colors)
     colors[..., -1] = alphas
@@ -1020,10 +1019,10 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     # Plot figure
     if len(plt.get_fignums()) < 1:
         # Create new figure axes if none are open
-        fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=300)
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5), dpi=300)
     else:
-        ax = plt.gca() # Otherwise grab existing
-    ax.set_facecolor('k') # Set facecolor black
+        ax = plt.gca()  # Otherwise grab existing
+    ax.set_facecolor('k')  # Set facecolor black
     if grid is not None:
         # Grid background intentionally dark:
         im = ax.imshow(grid, cmap='gist_gray', vmax=np.max(grid)*3)
@@ -1033,14 +1032,14 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     if (show_seed) & (walk_data is not None):
         ax.scatter(walk_data['yinds'][0][0], walk_data['xinds'][0][0],
                    c=seed_color, edgecolors='black', s=10, linewidths=0.5)
-    
+
     return ax
 
 
 def show_nourishment_time(mean_times, grid=None, walk_data=None,
                           cmap='magma', show_colorbar=True, min_alpha=0.3,
                           show_seed=True, seed_color='dodgerblue'):
-    """Plot a smoothed heatmap of mean particle visit time
+    """Plot a smoothed heatmap of mean particle visit time.
 
     Function will plot the history of mean particle travel times in walk_data
     as a heatmap overtop the specified grid, using the output of
@@ -1068,7 +1067,8 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
             Default is 'magma'
 
         show_colorbar : `bool`, optional
-            Controls whether to plot a colorbar for mean_times, default is False
+            Controls whether to plot a colorbar for mean_times,
+            default is False
 
         min_alpha : `float`, optional
             Minimum alpha value of the heatmap, representing the cells which
@@ -1080,8 +1080,8 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
             is True, but only if 'walk_data' is also provided.
 
         seed_color : `str`, optional
-            Name of matplotlib color used for the marker seed, if shown. Default
-            is a light blue.
+            Name of matplotlib color used for the marker seed, if shown.
+            Default is a light blue.
 
     **Outputs** :
 
@@ -1094,10 +1094,10 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
 
     # Plot heatmap with alpha based on times
     amax = np.nanpercentile(mean_times, 20)
-    alphas = Normalize(0, amax, clip=True)(mean_times) # Normalize alphas
+    alphas = Normalize(0, amax, clip=True)(mean_times)  # Normalize alphas
     alphas = np.clip(alphas, min_alpha, 1)
     colors = Normalize(np.nanmin(mean_times),
-                       np.nanmax(mean_times))(mean_times) # Normalize colors
+                       np.nanmax(mean_times))(mean_times)  # Normalize colors
     cmap = plt.cm.get_cmap(cmap)
     colors = cmap(colors)
     colors[..., -1] = alphas
@@ -1105,10 +1105,10 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
     # Plot figure
     if len(plt.get_fignums()) < 1:
         # Create new figure axes if none are open
-        fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=300)
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5), dpi=300)
     else:
-        ax = plt.gca() # Otherwise grab existing
-    ax.set_facecolor('k') # Set facecolor black
+        ax = plt.gca()  # Otherwise grab existing
+    ax.set_facecolor('k')  # Set facecolor black
     if grid is not None:
         # Grid background intentionally dark:
         im = ax.imshow(grid, cmap='gist_gray', vmax=np.max(grid)*3)
@@ -1123,7 +1123,7 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
                                            vmax=np.nanmax(mean_times))
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         sm.set_array([])
-        divider = make_axes_locatable(ax) # Make the right size
+        divider = make_axes_locatable(ax)  # Make the right size
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(sm, cax=cax)
         cbar.set_label('Mean Nourishment Time [s]')
