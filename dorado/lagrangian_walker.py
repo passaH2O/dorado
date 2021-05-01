@@ -139,10 +139,10 @@ def clear_borders(tiled_array):
             in the first and second dimension set to 0.
 
     """
-    raster[0,:,:] = 0.
-    raster[:,0,:] = 0.
-    raster[-1,:,:] = 0.
-    raster[:,-1,:] = 0.
+    tiled_array[0,:,:] = 0.
+    tiled_array[:,0,:] = 0.
+    tiled_array[-1,:,:] = 0.
+    tiled_array[:,-1,:] = 0.
     return
 
 
