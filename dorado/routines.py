@@ -74,25 +74,30 @@ def steady_plots(particle, num_iter,
         # Do particle iterations
         walk_data = particle.run_iteration()
         if save_output:
-            x0, y0, t0 = get_state(walk_data, 0)
+            # Get current location
             xi, yi, ti = get_state(walk_data)
-
-            fig = plt.figure(dpi=200)
-            ax = fig.add_subplot(111)
-            im = ax.imshow(particle.depth)
-            plt.title('Depth - Particle Iteration ' + str(i))
-            cax = fig.add_axes([ax.get_position().x1+0.01,
-                                ax.get_position().y0,
-                                0.02,
-                                ax.get_position().height])
-            cbar = plt.colorbar(im, cax=cax)
-            cbar.set_label('Water Depth [m]')
-            ax.scatter(y0, x0, c='b', s=0.75)
-            ax.scatter(yi, xi, c='r', s=0.75)
+            if i == 0:
+                # Initialize figure
+                x0, y0, t0 = get_state(walk_data, 0)
+                fig = plt.figure(dpi=200)
+                ax = fig.add_subplot(111)
+                im = ax.imshow(particle.depth)
+                cax = fig.add_axes([ax.get_position().x1+0.01,
+                                    ax.get_position().y0,
+                                    0.02,
+                                    ax.get_position().height])
+                cbar = plt.colorbar(im, cax=cax)
+                cbar.set_label('Water Depth [m]')
+                orig = ax.scatter(y0, x0, c='b', s=0.75)
+                newloc = ax.scatter(yi, xi, c='r', s=0.75)
+            else:
+                # Update figure with new locations
+                newloc.remove()
+                newloc = ax.scatter(yi, xi, c='r', s=0.75)
+            ax.set_title('Depth - Particle Iteration ' + str(i))
             plt.savefig(folder_name+os.sep +
                         'figs'+os.sep+'output'+str(i)+'.png',
                         bbox_inches='tight')
-            plt.close()
 
     if save_output:
         # save data as json text file - technically human readable
@@ -165,6 +170,7 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     # init params
     params = modelParams()
     params.dx = dx
+    params.verbose = False
     # make directory to save the data
     if folder_name is None:
         folder_name = os.getcwd()
@@ -237,25 +243,33 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
 
         walk_data = particle.run_iteration(target_time=target_times[i])
 
-        x0, y0, t0 = get_state(walk_data, 0)
         xi, yi, ti = get_state(walk_data)
-
-        # make and save plots and data
-        fig = plt.figure(dpi=200)
-        ax = fig.add_subplot(111)
-        ax.scatter(y0, x0, c='b', s=0.75)
-        ax.scatter(yi, xi, c='r', s=0.75)
-        im = ax.imshow(params.depth)
-        plt.title('Depth at Time ' + str(target_times[i]))
-        cax = fig.add_axes([ax.get_position().x1+0.01,
-                            ax.get_position().y0,
-                            0.02,
-                            ax.get_position().height])
-        cbar = plt.colorbar(im, cax=cax)
-        cbar.set_label('Water Depth [m]')
+        if i == 0:
+            x0, y0, t0 = get_state(walk_data, 0)
+            # Initialize figure
+            fig = plt.figure(dpi=200)
+            ax = fig.add_subplot(111)
+            im = ax.imshow(params.depth)
+            cax = fig.add_axes([ax.get_position().x1+0.01,
+                                ax.get_position().y0,
+                                0.02,
+                                ax.get_position().height])
+            cbar = plt.colorbar(im, cax=cax)
+            cbar.set_label('Water Depth [m]')
+            orig = ax.scatter(y0, x0, c='b', s=0.75)
+            newloc = ax.scatter(yi, xi, c='r', s=0.75)
+        else:
+            # Update figure with new locations
+            im.remove()
+            cbar.remove()
+            newloc.remove()
+            im = ax.imshow(params.depth)
+            newloc = ax.scatter(yi, xi, c='r', s=0.75)
+            cbar = plt.colorbar(im, cax=cax)
+            cbar.set_label('Water Depth [m]')
+        ax.set_title('Depth at Time ' + str(target_times[i]))
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
                     bbox_inches='tight')
-        plt.close()
 
     # save data as a json text file - technically human readable
     fpath = folder_name+os.sep+'data'+os.sep+'data.txt'
@@ -312,30 +326,38 @@ def time_plots(particle, num_iter, folder_name=None):
         walk_data = particle.run_iteration()
 
         # collect latest travel times
-        x0, y0, t0 = get_state(walk_data, 0)
         xi, yi, temptimes = get_state(walk_data)
 
         # set colorbar using 10th and 90th percentile values
         cm = matplotlib.cm.colors.Normalize(vmax=np.percentile(temptimes, 90),
                                             vmin=np.percentile(temptimes, 10))
 
-        fig = plt.figure(dpi=200)
-        ax = plt.gca()
-        plt.title('Depth - Particle Iteration ' + str(i))
-        ax.scatter(y0, x0, c='b', s=0.75)
-        sc = ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="5%", pad=0.05)
-        cbar = plt.colorbar(sc, cax=cax)
-        cbar.set_label('Particle Travel Times [s]')
-        im = ax.imshow(particle.depth)
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("bottom", size="5%", pad=0.5)
-        cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
-        cbar2.set_label('Water Depth [m]')
+        if i == 0:
+            x0, y0, t0 = get_state(walk_data, 0)
+            # Initialize figure
+            fig = plt.figure(dpi=200)
+            ax = plt.gca()
+            im = ax.imshow(particle.depth)
+            orig = ax.scatter(y0, x0, c='b', s=0.75)
+            sc = ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            cbar = plt.colorbar(sc, cax=cax)
+            cbar.set_label('Particle Travel Times [s]')
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("bottom", size="5%", pad=0.5)
+            cbar2 = plt.colorbar(im, cax=cax, orientation='horizontal')
+            cbar2.set_label('Water Depth [m]')
+        else:
+            # Update figure with new locations
+            cbar.remove()
+            sc.remove()
+            sc = ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
+            cbar = plt.colorbar(sc, cax=cax)
+            cbar.set_label('Particle Travel Times [s]')
+        ax.set_title('Depth - Particle Iteration ' + str(i))
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
                     bbox_inches='tight')
-        plt.close()
 
     # save data as a json text file - technically human readable
     fpath = folder_name+os.sep+'data'+os.sep+'data.txt'
