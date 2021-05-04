@@ -164,7 +164,6 @@ def make_weight(Particles):
         :obj:`dorado.particle_track.Particles` object
 
     """
-    print('Calculating routing weights ...')
     L, W = Particles.stage.shape
     
     # calculate surface slope weights
@@ -217,11 +216,10 @@ def make_weight(Particles):
 
     # Final checks, eliminate invalid choices
     clear_borders(weight)
-    weight[:,:,4] = 0.
+    # weight[:,:,4] = 0. # Should particles be allowed to stand still?
 
     # set weight in the true weight array
     Particles.weight = weight
-    print('Done')
 
 
 def get_weight(Particles, ind):
