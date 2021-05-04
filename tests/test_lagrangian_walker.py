@@ -405,3 +405,63 @@ def test_wet_boundary_no_weight():
     assert np.all(np.sum(particles.weight[1:-1, 1:-1, 4]) != 0.0)
     # assert that depths everywhere are 10.0
     assert np.all(particles.depth == 10.0)
+
+
+def test_big_sliding_window():
+    '''
+    Test for weight helper function big_sliding_window
+    '''
+    raster = np.array([[0,0,0,0,0],
+                       [0,1,2,3,0],
+                       [0,4,5,6,0],
+                       [0,7,8,9,0],
+                       [0,0,0,0,0]])
+    big_ravel = lw.big_sliding_window(raster)
+    # Check a couple indices for correct neighbors
+    assert np.all(big_ravel[2,2,:] == np.array([1,2,3,4,5,6,7,8,9]))
+    assert np.all(big_ravel[2,2,:] == raster[1:-1,1:-1].ravel())
+    assert np.all(big_ravel[1,1,:] == np.array([0,0,0,0,1,2,0,4,5]))
+    # Check for original raster at neighbor index 4
+    assert np.all(big_ravel[:,:,4] == raster)
+
+
+def test_tile_local_array():
+    '''
+    Test for weight helper function tile_local_array
+    '''
+    # tile iwalk into (3,3,9) array
+    tiled_iwalk = lw.tile_local_array(iwalk, 3, 3)
+    # assert correct neighbor order
+    assert np.all(tiled_iwalk[1,1,:] == iwalk.ravel())
+    # check one of the levels for uniformity
+    assert np.all(tiled_iwalk[:,:,2] == np.ones((3,3)))
+
+
+def test_tile_domain_array():
+    '''
+    Test for weight helper function tile_domain_array
+    '''
+    raster = np.array([[0,0,0,0,0],
+                       [0,1,2,3,0],
+                       [0,4,5,6,0],
+                       [0,7,8,9,0],
+                       [0,0,0,0,0]])
+    tiled_array = lw.tile_domain_array(raster)
+    # Check that vertical dimension is homogeneous
+    assert np.all(tiled_array[:,:,0] == tiled_array[:,:,1])
+    assert np.all(tiled_array[1,1,:] == np.ones((1,9)))
+    assert np.all(tiled_array[:,:,0] == raster)
+
+
+def test_clear_borders():
+    '''
+    Test for weight helper function clear_borders
+    '''
+    raster = np.ones((5,5,2))
+    lw.clear_borders(raster)
+    # Check for consistency and empty borders
+    assert np.all(raster[:,:,0] == raster[:,:,1])
+    assert np.all(raster[0,:,:] == 0)
+    assert np.all(raster[-1,:,:] == 0)
+    assert np.all(raster[:,0,:] == 0)
+    assert np.all(raster[:,-1,:] == 0)
