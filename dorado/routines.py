@@ -263,8 +263,9 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
             im.set_data(params.depth)
             newloc.remove()
             newloc = ax.scatter(yi, xi, c='r', s=0.75)
-            cbar.set_clim(vmin=np.min(params.depth),vmax=np.max(params.depth))
-            # ^ updates scale but not ticks?
+            # cbar.remove()
+            # cbar = plt.colorbar(im, cax=cax)
+            # cbar.set_label('Water Depth [m]')
             plt.draw()
         ax.set_title('Depth at Time ' + str(target_times[i]))
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
