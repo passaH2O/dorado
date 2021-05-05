@@ -260,13 +260,12 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
             newloc = ax.scatter(yi, xi, c='r', s=0.75)
         else:
             # Update figure with new locations
-            im.remove()
-            cbar.remove()
+            im.set_data(params.depth)
             newloc.remove()
-            im = ax.imshow(params.depth)
             newloc = ax.scatter(yi, xi, c='r', s=0.75)
-            cbar = plt.colorbar(im, cax=cax)
-            cbar.set_label('Water Depth [m]')
+            cbar.set_clim(vmin=np.min(params.depth),vmax=np.max(params.depth))
+            # ^ updates scale but not ticks?
+            plt.draw()
         ax.set_title('Depth at Time ' + str(target_times[i]))
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
                     bbox_inches='tight')
@@ -350,11 +349,11 @@ def time_plots(particle, num_iter, folder_name=None):
             cbar2.set_label('Water Depth [m]')
         else:
             # Update figure with new locations
-            cbar.remove()
             sc.remove()
             sc = ax.scatter(yi, xi, c=temptimes, s=0.75, cmap='coolwarm', norm=cm)
-            cbar = plt.colorbar(sc, cax=cax)
-            cbar.set_label('Particle Travel Times [s]')
+            # cbar.remove()
+            # cbar = plt.colorbar(sc, cax=cax)
+            # cbar.set_label('Particle Travel Times [s]')
         ax.set_title('Depth - Particle Iteration ' + str(i))
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'output'+str(i)+'.png',
                     bbox_inches='tight')
