@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>dorado.lagrangian_walker &#8212; dorado 2.4.2 documentation</title>
+    <title>dorado.lagrangian_walker &#8212; dorado 2.5.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -39,6 +39,35 @@
 <span id="dorado-lagrangian-walker"></span><span id="lagrangianwalker"></span><h1>dorado.lagrangian_walker<a class="headerlink" href="#module-dorado.lagrangian_walker" title="Permalink to this headline">¶</a></h1>
 <p>Core functions to handle the Lagrangian random walk movement of the particles.</p>
 <p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
+<dl class="function">
+<dt id="dorado.lagrangian_walker.big_sliding_window">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">big_sliding_window</code><span class="sig-paren">(</span><em>raster</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#big_sliding_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.big_sliding_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates 3D array organizing local neighbors at every index</p>
+<p>Returns a raster of shape (L,W,9) which organizes (along the third
+dimension) all of the neighbors in the original raster at a given
+index, in the order [NW, N, NE, W, 0, E, SW, S, SE]. Outputs are
+ordered to match np.ravel(), so it functions similarly to a loop
+applying ravel to the elements around each index.
+For example, the neighboring values in raster indexed at (i,j) are
+raster(i-1:i+2, j-1:j+2).ravel(). These 9 values have been mapped to
+big_ravel(i,j,:) for ease of computations. Helper function for make_weight.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>raster<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>2D array of values (e.g. stage, qx)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>big_ravel<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>3D array which sorts the D8 neighbors at index (i,j) in
+raster into the 3rd dimension at (i,j,:)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
 <dl class="function">
 <dt id="dorado.lagrangian_walker.calc_travel_times">
 <code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">calc_travel_times</code><span class="sig-paren">(</span><em>Particles</em>, <em>new_cell</em>, <em>ind</em>, <em>new_ind</em>, <em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calc_travel_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.calc_travel_times" title="Permalink to this definition">¶</a></dt>
@@ -131,6 +160,29 @@ indices so those particles will not travel this iteration</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="dorado.lagrangian_walker.clear_borders">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">clear_borders</code><span class="sig-paren">(</span><em>tiled_array</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#clear_borders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.clear_borders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set to zero all the edge elements of a vertical stack
+of 2D arrays. Helper function for make_weight.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>tiled_array<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>3D array repeating raster (e.g. stage, qx) 9 times
+along the third axis</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>tiled_array<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>The same 3D array as the input, but with the borders
+in the first and second dimension set to 0.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
 <dt id="dorado.lagrangian_walker.get_weight">
 <code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">get_weight</code><span class="sig-paren">(</span><em>Particles</em>, <em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#get_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.get_weight" title="Permalink to this definition">¶</a></dt>
 <dd><p>Choose new cell location given an initial location.</p>
@@ -156,8 +208,23 @@ current index using the routing weights from make_weight.</p>
 
 <dl class="function">
 <dt id="dorado.lagrangian_walker.make_weight">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">make_weight</code><span class="sig-paren">(</span><em>Particles</em>, <em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#make_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.make_weight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update weighting array with weights at this index</p>
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">make_weight</code><span class="sig-paren">(</span><em>Particles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#make_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.make_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the weighting array for particle routing</p>
+<p>Function to compute the routing weights at each index, which gets
+stored inside the <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object
+for use when routing. Called when the object gets instantiated.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>Particles<span class="classifier"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a></span></dt><dd><p>A <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><p>Updates the weights array inside the
+<a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="function">
@@ -282,6 +349,55 @@ also provides way to track the travel distance of the particles</p>
 <blockquote>
 <div><dl>
 <dt>dist<span class="classifier"><cite>float</cite></span></dt><dd><p>Distance between current (old) and new particle location</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.tile_domain_array">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">tile_domain_array</code><span class="sig-paren">(</span><em>raster</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#tile_domain_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.tile_domain_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repeat a large 2D array 9 times along the third axis.
+Helper function for make_weight.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>raster<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>2D array of values (e.g. stage, qx)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>tiled_array<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>3D array repeating raster 9 times</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dorado.lagrangian_walker.tile_local_array">
+<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">tile_local_array</code><span class="sig-paren">(</span><em>local_array</em>, <em>L</em>, <em>W</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#tile_local_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.tile_local_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a local array [[NW, N, NE], [W, 0, E], [SW, S, SE]]
+and repeat it into an array of shape (L,W,9), where L, W are
+the shape of the domain, and the original elements are ordered
+along the third axis. Helper function for make_weight.</p>
+<p><strong>Inputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>local_array<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>2D array of represnting the D8 neighbors around
+some index (e.g. ivec, jvec)</p>
+</dd>
+<dt>L<span class="classifier"><cite>int</cite></span></dt><dd><p>Length of the domain</p>
+</dd>
+<dt>W<span class="classifier"><cite>int</cite></span></dt><dd><p>Width of the domain</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong> :</p>
+<blockquote>
+<div><dl>
+<dt>tiled_array<span class="classifier"><cite>ndarray</cite></span></dt><dd><p>3D array repeating local_array.ravel() LxW times</p>
 </dd>
 </dl>
 </div></blockquote>

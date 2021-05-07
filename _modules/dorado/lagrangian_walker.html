@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>dorado.lagrangian_walker &#8212; dorado 2.4.2 documentation</title>
+    <title>dorado.lagrangian_walker &#8212; dorado 2.5.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -74,56 +74,185 @@
     <span class="k">return</span> <span class="n">choices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="make_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.make_weight">[docs]</a><span class="k">def</span> <span class="nf">make_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Update weighting array with weights at this index&quot;&quot;&quot;</span>
-    <span class="c1"># get stage values for neighboring cells</span>
-    <span class="n">stage_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+<div class="viewcode-block" id="big_sliding_window"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.big_sliding_window">[docs]</a><span class="k">def</span> <span class="nf">big_sliding_window</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates 3D array organizing local neighbors at every index</span>
 
+<span class="sd">    Returns a raster of shape (L,W,9) which organizes (along the third</span>
+<span class="sd">    dimension) all of the neighbors in the original raster at a given</span>
+<span class="sd">    index, in the order [NW, N, NE, W, 0, E, SW, S, SE]. Outputs are</span>
+<span class="sd">    ordered to match np.ravel(), so it functions similarly to a loop</span>
+<span class="sd">    applying ravel to the elements around each index.</span>
+<span class="sd">    For example, the neighboring values in raster indexed at (i,j) are </span>
+<span class="sd">    raster(i-1:i+2, j-1:j+2).ravel(). These 9 values have been mapped to</span>
+<span class="sd">    big_ravel(i,j,:) for ease of computations. Helper function for make_weight.</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        raster : `ndarray`</span>
+<span class="sd">            2D array of values (e.g. stage, qx)</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        big_ravel : `ndarray`</span>
+<span class="sd">            3D array which sorts the D8 neighbors at index (i,j) in </span>
+<span class="sd">            raster into the 3rd dimension at (i,j,:)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">big_ravel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">raster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">raster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">9</span><span class="p">))</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">big_ravel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">raster</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span><span class="mi">2</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">big_ravel</span></div>
+
+
+<div class="viewcode-block" id="tile_local_array"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.tile_local_array">[docs]</a><span class="k">def</span> <span class="nf">tile_local_array</span><span class="p">(</span><span class="n">local_array</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take a local array [[NW, N, NE], [W, 0, E], [SW, S, SE]]</span>
+<span class="sd">    and repeat it into an array of shape (L,W,9), where L, W are</span>
+<span class="sd">    the shape of the domain, and the original elements are ordered</span>
+<span class="sd">    along the third axis. Helper function for make_weight.</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        local_array : `ndarray`</span>
+<span class="sd">            2D array of represnting the D8 neighbors around</span>
+<span class="sd">            some index (e.g. ivec, jvec)</span>
+
+<span class="sd">        L : `int`</span>
+<span class="sd">            Length of the domain</span>
+
+<span class="sd">        W : `int`</span>
+<span class="sd">            Width of the domain</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        tiled_array : `ndarray`</span>
+<span class="sd">            3D array repeating local_array.ravel() LxW times</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">local_array</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="tile_domain_array"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.tile_domain_array">[docs]</a><span class="k">def</span> <span class="nf">tile_domain_array</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Repeat a large 2D array 9 times along the third axis.</span>
+<span class="sd">    Helper function for make_weight.</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        raster : `ndarray`</span>
+<span class="sd">            2D array of values (e.g. stage, qx)</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        tiled_array : `ndarray`</span>
+<span class="sd">            3D array repeating raster 9 times</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">raster</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="mi">9</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="clear_borders"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.clear_borders">[docs]</a><span class="k">def</span> <span class="nf">clear_borders</span><span class="p">(</span><span class="n">tiled_array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set to zero all the edge elements of a vertical stack </span>
+<span class="sd">    of 2D arrays. Helper function for make_weight.</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        tiled_array : `ndarray`</span>
+<span class="sd">            3D array repeating raster (e.g. stage, qx) 9 times</span>
+<span class="sd">            along the third axis</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        tiled_array : `ndarray`</span>
+<span class="sd">            The same 3D array as the input, but with the borders</span>
+<span class="sd">            in the first and second dimension set to 0.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tiled_array</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">tiled_array</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">tiled_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">tiled_array</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="make_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.make_weight">[docs]</a><span class="k">def</span> <span class="nf">make_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the weighting array for particle routing</span>
+
+<span class="sd">    Function to compute the routing weights at each index, which gets</span>
+<span class="sd">    stored inside the :obj:`dorado.particle_track.Particles` object</span>
+<span class="sd">    for use when routing. Called when the object gets instantiated.</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        Particles : :obj:`dorado.particle_track.Particles`</span>
+<span class="sd">            A :obj:`dorado.particle_track.Particles` object</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        Updates the weights array inside the</span>
+<span class="sd">        :obj:`dorado.particle_track.Particles` object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">L</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">shape</span>
+    
     <span class="c1"># calculate surface slope weights</span>
-    <span class="n">weight_sfc</span> <span class="o">=</span> <span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>
-                         <span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">stage_ind</span><span class="p">)</span> <span class="o">/</span>
-                         <span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">)</span>
-
+    <span class="n">weight_sfc</span> <span class="o">=</span> <span class="p">(</span><span class="n">tile_domain_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span> \
+                  <span class="o">-</span> <span class="n">big_sliding_window</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">))</span>
+    <span class="n">weight_sfc</span> <span class="o">/=</span> <span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+    <span class="n">weight_sfc</span><span class="p">[</span><span class="n">weight_sfc</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">clear_borders</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span>
+    
     <span class="c1"># calculate inertial component weights</span>
-    <span class="n">weight_int</span> <span class="o">=</span> <span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">((</span><span class="n">Particles</span><span class="o">.</span><span class="n">qx</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">jvec</span> <span class="o">+</span>
-                              <span class="n">Particles</span><span class="o">.</span><span class="n">qy</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">Particles</span><span class="o">.</span><span class="n">ivec</span><span class="p">)</span> <span class="o">/</span>
-                         <span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">))</span>
-
+    <span class="n">weight_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">tile_domain_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">qx</span><span class="p">)</span><span class="o">*</span><span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">jvec</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span> \
+                 <span class="o">+</span> <span class="p">(</span><span class="n">tile_domain_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">qy</span><span class="p">)</span><span class="o">*</span><span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">ivec</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span>
+    <span class="n">weight_int</span> <span class="o">/=</span> <span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+    <span class="n">weight_int</span><span class="p">[</span><span class="n">weight_int</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">clear_borders</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span>
+    
     <span class="c1"># get depth and cell types for neighboring cells</span>
-    <span class="n">depth_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">depth</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">ct_ind</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">cell_type</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">depth_ind</span> <span class="o">=</span> <span class="n">big_sliding_window</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+    <span class="n">ct_ind</span> <span class="o">=</span> <span class="n">big_sliding_window</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">cell_type</span><span class="p">)</span>
 
     <span class="c1"># set weights for cells that are too shallow, or invalid 0</span>
     <span class="n">weight_sfc</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">weight_int</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-
+    
     <span class="c1"># if sum of weights is above 0 normalize by sum of weights</span>
-    <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">weight_sfc</span> <span class="o">=</span> <span class="n">weight_sfc</span> <span class="o">/</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span>
-
-    <span class="c1"># if sum of weight is above 0 normalize by sum of weights</span>
-    <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">weight_int</span> <span class="o">=</span> <span class="n">weight_int</span> <span class="o">/</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span>
+    <span class="n">norm_sfc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">idx_sfc</span> <span class="o">=</span> <span class="n">tile_domain_array</span><span class="p">((</span><span class="n">norm_sfc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">weight_sfc</span><span class="p">[</span><span class="n">idx_sfc</span><span class="p">]</span> <span class="o">/=</span> <span class="n">tile_domain_array</span><span class="p">(</span><span class="n">norm_sfc</span><span class="p">)[</span><span class="n">idx_sfc</span><span class="p">]</span>
+    
+    <span class="n">norm_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">idx_int</span> <span class="o">=</span> <span class="n">tile_domain_array</span><span class="p">((</span><span class="n">norm_int</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">weight_int</span><span class="p">[</span><span class="n">idx_int</span><span class="p">]</span> <span class="o">/=</span> <span class="n">tile_domain_array</span><span class="p">(</span><span class="n">norm_int</span><span class="p">)[</span><span class="n">idx_int</span><span class="p">]</span>
 
     <span class="c1"># define actual weight by using gamma, and weight components</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">weight_sfc</span> <span class="o">+</span> \
-        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_int</span>
-
+             <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_int</span>
+    
     <span class="c1"># modify the weight by the depth and theta weighting parameter</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">depth_ind</span> <span class="o">**</span> <span class="n">Particles</span><span class="o">.</span><span class="n">theta</span> <span class="o">*</span> <span class="n">weight</span>
-
-    <span class="c1"># if the depth is below the minimum depth then location is not</span>
-    <span class="c1"># considered therefore set the associated weight to nan</span>
-    <span class="n">weight</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> \
-        <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    
+    <span class="c1"># if the depth is below the minimum depth then set weight to 0</span>
+    <span class="n">weight</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># if it&#39;s a dead end with only nans and 0&#39;s, choose deepest cell</span>
-    <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
-        <span class="n">weight</span><span class="p">[</span><span class="n">depth_ind</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">depth_ind</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">zero_weights</span> <span class="o">=</span> <span class="n">tile_domain_array</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">deepest_cells</span> <span class="o">=</span> <span class="p">(</span><span class="n">depth_ind</span> <span class="o">==</span> <span class="n">tile_domain_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">depth_ind</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="n">choose_deep_cells</span> <span class="o">=</span> <span class="p">(</span><span class="n">zero_weights</span> <span class="o">&amp;</span> <span class="n">deepest_cells</span><span class="p">)</span>
+    <span class="n">weight</span><span class="p">[</span><span class="n">choose_deep_cells</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="c1"># Final checks, eliminate invalid choices</span>
+    <span class="n">clear_borders</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
 
     <span class="c1"># set weight in the true weight array</span>
-    <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">weight</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span></div>
+    <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span></div>
 
 
 <div class="viewcode-block" id="get_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.get_weight">[docs]</a><span class="k">def</span> <span class="nf">get_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
@@ -146,9 +275,6 @@
 <span class="sd">            New location given as a value between 1 and 8 (inclusive)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check if weights have been computed for this location:</span>
-    <span class="k">if</span> <span class="n">nansum</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">make_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
     <span class="c1"># randomly pick the new cell for the particle to move to using the</span>
     <span class="c1"># random_pick function and the set of weights</span>
     <span class="k">if</span> <span class="n">Particles</span><span class="o">.</span><span class="n">steepest_descent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
