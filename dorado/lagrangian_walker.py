@@ -39,56 +39,185 @@ def random_pick_seed(choices, probs=None):
     return choices[idx]
 
 
-def make_weight(Particles, ind):
-    """Update weighting array with weights at this index"""
-    # get stage values for neighboring cells
-    stage_ind = Particles.stage[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
+def big_sliding_window(raster):
+    """Creates 3D array organizing local neighbors at every index
 
+    Returns a raster of shape (L,W,9) which organizes (along the third
+    dimension) all of the neighbors in the original raster at a given
+    index, in the order [NW, N, NE, W, 0, E, SW, S, SE]. Outputs are
+    ordered to match np.ravel(), so it functions similarly to a loop
+    applying ravel to the elements around each index.
+    For example, the neighboring values in raster indexed at (i,j) are 
+    raster(i-1:i+2, j-1:j+2).ravel(). These 9 values have been mapped to
+    big_ravel(i,j,:) for ease of computations. Helper function for make_weight.
+
+    **Inputs** :
+
+        raster : `ndarray`
+            2D array of values (e.g. stage, qx)
+
+    **Outputs** :
+
+        big_ravel : `ndarray`
+            3D array which sorts the D8 neighbors at index (i,j) in 
+            raster into the 3rd dimension at (i,j,:)
+
+    """
+    big_ravel = np.zeros((raster.shape[0],raster.shape[1],9))
+    big_ravel[1:-1,1:-1,0] = raster[0:-2,0:-2]
+    big_ravel[1:-1,1:-1,1] = raster[0:-2,1:-1]
+    big_ravel[1:-1,1:-1,2] = raster[0:-2,2:]
+    big_ravel[1:-1,1:-1,3] = raster[1:-1,0:-2]
+    big_ravel[1:-1,1:-1,4] = raster[1:-1,1:-1]
+    big_ravel[1:-1,1:-1,5] = raster[1:-1,2:]
+    big_ravel[1:-1,1:-1,6] = raster[2:,0:-2]
+    big_ravel[1:-1,1:-1,7] = raster[2:,1:-1]
+    big_ravel[1:-1,1:-1,8] = raster[2:,2:]
+
+    return big_ravel
+
+
+def tile_local_array(local_array, L, W):
+    """Take a local array [[NW, N, NE], [W, 0, E], [SW, S, SE]]
+    and repeat it into an array of shape (L,W,9), where L, W are
+    the shape of the domain, and the original elements are ordered
+    along the third axis. Helper function for make_weight.
+
+    **Inputs** :
+
+        local_array : `ndarray`
+            2D array of represnting the D8 neighbors around
+            some index (e.g. ivec, jvec)
+
+        L : `int`
+            Length of the domain
+
+        W : `int`
+            Width of the domain
+
+    **Outputs** :
+
+        tiled_array : `ndarray`
+            3D array repeating local_array.ravel() LxW times
+
+    """
+    return np.tile(local_array.ravel(), (L, W, 1))
+
+
+def tile_domain_array(raster):
+    """Repeat a large 2D array 9 times along the third axis.
+    Helper function for make_weight.
+
+    **Inputs** :
+
+        raster : `ndarray`
+            2D array of values (e.g. stage, qx)
+
+    **Outputs** :
+
+        tiled_array : `ndarray`
+            3D array repeating raster 9 times
+
+    """
+    return np.repeat(raster[:, :, np.newaxis], 9, axis=2)
+
+
+def clear_borders(tiled_array):
+    """Set to zero all the edge elements of a vertical stack 
+    of 2D arrays. Helper function for make_weight.
+
+    **Inputs** :
+
+        tiled_array : `ndarray`
+            3D array repeating raster (e.g. stage, qx) 9 times
+            along the third axis
+
+    **Outputs** :
+
+        tiled_array : `ndarray`
+            The same 3D array as the input, but with the borders
+            in the first and second dimension set to 0.
+
+    """
+    tiled_array[0,:,:] = 0.
+    tiled_array[:,0,:] = 0.
+    tiled_array[-1,:,:] = 0.
+    tiled_array[:,-1,:] = 0.
+    return
+
+
+def make_weight(Particles):
+    """Create the weighting array for particle routing
+
+    Function to compute the routing weights at each index, which gets
+    stored inside the :obj:`dorado.particle_track.Particles` object
+    for use when routing. Called when the object gets instantiated.
+
+    **Inputs** :
+
+        Particles : :obj:`dorado.particle_track.Particles`
+            A :obj:`dorado.particle_track.Particles` object
+
+    **Outputs** :
+
+        Updates the weights array inside the
+        :obj:`dorado.particle_track.Particles` object
+
+    """
+    L, W = Particles.stage.shape
+    
     # calculate surface slope weights
-    weight_sfc = maximum(0,
-                         (Particles.stage[ind] - stage_ind) /
-                         Particles.distances)
-
+    weight_sfc = (tile_domain_array(Particles.stage) \
+                  - big_sliding_window(Particles.stage))
+    weight_sfc /= tile_local_array(Particles.distances, L, W)
+    weight_sfc[weight_sfc <= 0] = 0
+    clear_borders(weight_sfc)
+    
     # calculate inertial component weights
-    weight_int = maximum(0, ((Particles.qx[ind] * Particles.jvec +
-                              Particles.qy[ind] * Particles.ivec) /
-                         Particles.distances))
-
+    weight_int = (tile_domain_array(Particles.qx)*tile_local_array(Particles.jvec, L, W)) \
+                 + (tile_domain_array(Particles.qy)*tile_local_array(Particles.ivec, L, W))
+    weight_int /= tile_local_array(Particles.distances, L, W)
+    weight_int[weight_int <= 0] = 0
+    clear_borders(weight_int)
+    
     # get depth and cell types for neighboring cells
-    depth_ind = Particles.depth[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
-    ct_ind = Particles.cell_type[ind[0]-1:ind[0]+2, ind[1]-1:ind[1]+2]
+    depth_ind = big_sliding_window(Particles.depth)
+    ct_ind = big_sliding_window(Particles.cell_type)
 
     # set weights for cells that are too shallow, or invalid 0
     weight_sfc[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
     weight_int[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
-
+    
     # if sum of weights is above 0 normalize by sum of weights
-    if nansum(weight_sfc) > 0:
-        weight_sfc = weight_sfc / nansum(weight_sfc)
-
-    # if sum of weight is above 0 normalize by sum of weights
-    if nansum(weight_int) > 0:
-        weight_int = weight_int / nansum(weight_int)
+    norm_sfc = np.nansum(weight_sfc, axis=2)
+    idx_sfc = tile_domain_array((norm_sfc > 0))
+    weight_sfc[idx_sfc] /= tile_domain_array(norm_sfc)[idx_sfc]
+    
+    norm_int = np.nansum(weight_int, axis=2)
+    idx_int = tile_domain_array((norm_int > 0))
+    weight_int[idx_int] /= tile_domain_array(norm_int)[idx_int]
 
     # define actual weight by using gamma, and weight components
     weight = Particles.gamma * weight_sfc + \
-        (1 - Particles.gamma) * weight_int
-
+             (1 - Particles.gamma) * weight_int
+    
     # modify the weight by the depth and theta weighting parameter
     weight = depth_ind ** Particles.theta * weight
-
-    # if the depth is below the minimum depth then location is not
-    # considered therefore set the associated weight to nan
-    weight[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] \
-        = np.nan
+    
+    # if the depth is below the minimum depth then set weight to 0
+    weight[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
 
     # if it's a dead end with only nans and 0's, choose deepest cell
-    if nansum(weight) <= 0:
-        weight = np.zeros_like(weight)
-        weight[depth_ind == np.max(depth_ind)] = 1.0
+    zero_weights = tile_domain_array((np.nansum(weight, axis=2) <= 0))
+    deepest_cells = (depth_ind == tile_domain_array(np.max(depth_ind,axis=2)))
+    choose_deep_cells = (zero_weights & deepest_cells)
+    weight[choose_deep_cells] = 1.0
+
+    # Final checks, eliminate invalid choices
+    clear_borders(weight)
 
     # set weight in the true weight array
-    Particles.weight[ind[0], ind[1], :] = weight.ravel()
+    Particles.weight = weight
 
 
 def get_weight(Particles, ind):
@@ -111,9 +240,6 @@ def get_weight(Particles, ind):
             New location given as a value between 1 and 8 (inclusive)
 
     """
-    # Check if weights have been computed for this location:
-    if nansum(Particles.weight[ind[0], ind[1], :]) <= 0:
-        make_weight(Particles, ind)
     # randomly pick the new cell for the particle to move to using the
     # random_pick function and the set of weights
     if Particles.steepest_descent is not True:
