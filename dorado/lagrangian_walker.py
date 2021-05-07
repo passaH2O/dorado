@@ -204,19 +204,17 @@ def make_weight(Particles):
     # modify the weight by the depth and theta weighting parameter
     weight = depth_ind ** Particles.theta * weight
     
-    # if the depth is below the minimum depth then location is not
-    # considered therefore set the associated weight to nan
+    # if the depth is below the minimum depth then set weight to 0
     weight[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
 
     # if it's a dead end with only nans and 0's, choose deepest cell
     zero_weights = tile_domain_array((np.nansum(weight, axis=2) <= 0))
-    deepest_cells = (depth_ind == tile_domain_array(np.max(depth_ind, axis=2)))
+    deepest_cells = (depth_ind == tile_domain_array(np.max(depth_ind,axis=2)))
     choose_deep_cells = (zero_weights & deepest_cells)
     weight[choose_deep_cells] = 1.0
 
     # Final checks, eliminate invalid choices
     clear_borders(weight)
-    # weight[:,:,4] = 0. # Should particles be allowed to stand still?
 
     # set weight in the true weight array
     Particles.weight = weight
