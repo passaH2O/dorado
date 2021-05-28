@@ -64,10 +64,10 @@ class modelParams:
 
         gamma  : `float`
             Second of two weighting parameters for the weighted random walk.
-            Default value is 0.05. Gamma must be in the range [0,1]. Gamma == 0
+            Default value is 0.05. Gamma must be in the range [0,1]. Gamma == 1
             means that the random walk weights are independent of the discharge
             values, and instead are based on the water surface gradient (the
-            stage). Gamma == 1 means that the random walk weights are not
+            stage). Gamma == 0 means that the random walk weights are not
             dependent on the surface gradient, and instead are based on the
             inertial forces (the flow discharge).
 
