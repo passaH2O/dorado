@@ -127,7 +127,7 @@ jobs:
         pip install -r requirements.txt
         pip install sphinx
         sudo apt update -y && sudo apt install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended dvipng
-        pip install m2r
+        pip install m2r2
         pip install ipython
         pip install ipykernel
     - name: Install dorado
