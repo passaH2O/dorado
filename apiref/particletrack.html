@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>dorado.particle_track &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dorado.lagrangian_walker" href="lagrangianwalker.html" />
@@ -42,13 +42,13 @@
 parameters of the domain as well as iterative movement of the particles
 through the domain.</p>
 <p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
-<dl class="class">
-<dt id="dorado.particle_track.Particles">
-<em class="property">class </em><code class="descclassname">dorado.particle_track.</code><code class="descname">Particles</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="dorado.particle_track.Particles">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">Particles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.Particles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for the particle(s) that is(are) going to be routed.</p>
-<dl class="method">
-<dt id="dorado.particle_track.Particles.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.__init__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="dorado.particle_track.Particles.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.Particles.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check input parameters and assign default values where/if needed.</p>
 <p>Methods require a class of parameters
 (<a class="reference internal" href="#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>) to be passed
@@ -58,21 +58,21 @@ otherwise an error is raised or default values are assigned when
 possible/sensible</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="dorado.particle_track.Particles.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#dorado.particle_track.Particles.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dorado.particle_track.Particles.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#dorado.particle_track.Particles.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="dorado.particle_track.Particles.clear_walk_data">
-<code class="descname">clear_walk_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.clear_walk_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.clear_walk_data" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="dorado.particle_track.Particles.clear_walk_data">
+<span class="sig-name descname"><span class="pre">clear_walk_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.clear_walk_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.Particles.clear_walk_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manually reset self.walk_data back to None.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="dorado.particle_track.Particles.generate_particles">
-<code class="descname">generate_particles</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>seed_time=0</em>, <em>method='random'</em>, <em>previous_walk_data=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.generate_particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.generate_particles" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="dorado.particle_track.Particles.generate_particles">
+<span class="sig-name descname"><span class="pre">generate_particles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Np_tracer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_xloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_yloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_walk_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.generate_particles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.Particles.generate_particles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a set of particles in defined locations.</p>
 <p>After a <a class="reference internal" href="#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class has been
 initialized, this function can be called to create some particles
@@ -121,9 +121,9 @@ at the 10th iteration.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="method">
-<dt id="dorado.particle_track.Particles.run_iteration">
-<code class="descname">run_iteration</code><span class="sig-paren">(</span><em>target_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.run_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.Particles.run_iteration" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="dorado.particle_track.Particles.run_iteration">
+<span class="sig-name descname"><span class="pre">run_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#Particles.run_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.Particles.run_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run an iteration of the particle routing.</p>
 <p>Runs an iteration of the particle routing.
 Returns at each step the particle’s locations and travel times.</p>
@@ -152,9 +152,9 @@ particle at the 10th iteration</p>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.coord2ind">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">coord2ind</code><span class="sig-paren">(</span><em>coordinates</em>, <em>raster_origin</em>, <em>raster_size</em>, <em>cellsize</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#coord2ind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.coord2ind" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.coord2ind">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">coord2ind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster_origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellsize</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#coord2ind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.coord2ind" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert geographical coordinates into raster index coordinates.</p>
 <p>Assumes geographic coordinates are projected onto a Cartesian grid.
 Accepts coordinates in meters or decimal degrees.</p>
@@ -185,9 +185,9 @@ numpy.shape(raster).</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.exposure_time">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">exposure_time</code><span class="sig-paren">(</span><em>walk_data</em>, <em>region_of_interest</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#exposure_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.exposure_time" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.exposure_time">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">exposure_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_of_interest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#exposure_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.exposure_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measure exposure time distribution of particles in a specified region.</p>
 <p>Function to measure the exposure time distribution (ETD) of particles to
 the specified region. For steady flows, the ETD is exactly equivalent to
@@ -214,9 +214,9 @@ in order of particle ID.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.gen_input_check">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">gen_input_check</code><span class="sig-paren">(</span><em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>seed_time</em>, <em>method</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#gen_input_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.gen_input_check" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.gen_input_check">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">gen_input_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Np_tracer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_xloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_yloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#gen_input_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.gen_input_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the inputs provided to <code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_particles()</span></code>.</p>
 <p>This function does input type checking and either succeeds or returns
 an error if the types provided cannot be converted to those that we
@@ -253,9 +253,9 @@ particles</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.ind2coord">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">ind2coord</code><span class="sig-paren">(</span><em>walk_data</em>, <em>raster_origin</em>, <em>raster_size</em>, <em>cellsize</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#ind2coord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.ind2coord" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.ind2coord">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">ind2coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster_origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellsize</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#ind2coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.ind2coord" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert raster index coordinates into geographical coordinates.</p>
 <p>Appends the walk_data dictionary from the output of run_iteration
 with additional fields ‘xcoord’ and ‘ycoord’ in projected geographic
@@ -290,9 +290,9 @@ geographic position at each iteration.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="class">
-<dt id="dorado.particle_track.modelParams">
-<em class="property">class </em><code class="descclassname">dorado.particle_track.</code><code class="descname">modelParams</code><a class="reference internal" href="../_modules/dorado/particle_track.html#modelParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.modelParams" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="dorado.particle_track.modelParams">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">modelParams</span></span><a class="reference internal" href="../_modules/dorado/particle_track.html#modelParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.modelParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter class with attributes and grid particles will be routed on.</p>
 <p>The parameters class, <a class="reference internal" href="#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>,
 must be populated with user-defined
@@ -364,9 +364,9 @@ Default value is True. Errors are always raised.</p>
 <p>This list of expected parameter values can also be obtained by querying the
 class attributes with <cite>dir(modelParams)</cite>, <cite>modelParams.__dict__</cite>, or
 <cite>vars(modelParams)</cite>.</p>
-<dl class="method">
-<dt id="dorado.particle_track.modelParams.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#modelParams.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.modelParams.__init__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="dorado.particle_track.modelParams.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#modelParams.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.modelParams.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the expected variables for the modelParams class.</p>
 <p>Variables are initialized as NoneType they need to be assigned by the
 user. Due to the wide variety of data formats produced by differeny
@@ -374,17 +374,17 @@ hydrodynamic models, this is process is not automated and must be
 handled on a case-by-case basis.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="dorado.particle_track.modelParams.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#dorado.particle_track.modelParams.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dorado.particle_track.modelParams.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#dorado.particle_track.modelParams.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.nourishment_area">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">nourishment_area</code><span class="sig-paren">(</span><em>walk_data</em>, <em>raster_size</em>, <em>sigma=0.7</em>, <em>clip=99.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#nourishment_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.nourishment_area" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.nourishment_area">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">nourishment_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#nourishment_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.nourishment_area" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the nourishment area of a particle injection</p>
 <p>Function will measure the regions of the domain ‘fed’ by a seed location,
 as indicated by the history of particle travel locations in walk_data.
@@ -423,9 +423,9 @@ that cell. If sigma &gt; 0, the array values include spatial filtering</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.nourishment_time">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">nourishment_time</code><span class="sig-paren">(</span><em>walk_data</em>, <em>raster_size</em>, <em>sigma=0.7</em>, <em>clip=99.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#nourishment_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.nourishment_time" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.nourishment_time">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">nourishment_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#nourishment_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.nourishment_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the nourishment time of a particle injection</p>
 <p>Function will measure the average length of time particles spend in each
 area of the domain for a given seed location, as indicated by the history
@@ -464,9 +464,9 @@ values include spatial filtering</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.particle_track.unstruct2grid">
-<code class="descclassname">dorado.particle_track.</code><code class="descname">unstruct2grid</code><span class="sig-paren">(</span><em>coordinates</em>, <em>quantity</em>, <em>cellsize</em>, <em>k_nearest_neighbors=3</em>, <em>boundary=None</em>, <em>crop=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#unstruct2grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.particle_track.unstruct2grid" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.unstruct2grid">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">unstruct2grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_nearest_neighbors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#unstruct2grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.unstruct2grid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert unstructured model outputs into gridded arrays.</p>
 <p>Interpolates model variables (e.g. depth, velocity) from an
 unstructured grid onto a Cartesian grid using inverse-distance-weighted
@@ -569,15 +569,15 @@ assumes data have the same coordinates. It is used as follows:
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -594,7 +594,7 @@ assumes data have the same coordinates. It is used as follows:
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

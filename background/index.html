@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Background &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Paper" href="../paper/index.html" />
@@ -50,26 +50,26 @@
 <h2>Theory<a class="headerlink" href="#theory" title="Permalink to this headline">¶</a></h2>
 <p>Particle transport is simulated through the use of a weighted random walk framework <a class="footnote-reference brackets" href="#id12" id="id5">4</a>. In particular, we apply methods similar to those used in the numerical model DeltaRCM <a class="footnote-reference brackets" href="#id13" id="id6">5</a> <a class="footnote-reference brackets" href="#id14" id="id7">6</a>, to weight the random walk by the local water slopes and the water discharge components.</p>
 <p><cite>dorado</cite> assumes a rectangular grid and routes particles in a D-8 fashion assuming that the potential future location of a given particle is one of the surrounding 8 cells.</p>
-<p>The weights for the random walk are sensitive to 2 parameters, <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> and <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/>.</p>
-<p>The routing direction (F*) is the estimate of the local downstream of the flow <a class="footnote-reference brackets" href="#id13" id="id8">5</a>. This direction F* is comprised of <img class="math" src="../_images/math/1471f491199a55e64d1ea5a287b0636187b9f836.png" alt="{F_{sfc}}"/>, and <img class="math" src="../_images/math/0c34159fa1ba4a2e3efde659bfbe3199096bdfe0.png" alt="{F_{int}}"/>, calculated based on the water surface gradient and the discharge respectively. The proportional combination of these directional components is dictated by the parameter <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/>:</p>
+<p>The weights for the random walk are sensitive to 2 parameters, <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> and <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/>.</p>
+<p>The routing direction (F*) is the estimate of the local downstream of the flow <a class="footnote-reference brackets" href="#id13" id="id8">5</a>. This direction F* is comprised of <img class="math" src="../_images/math/b0d217d5047cc28d4466313f694710f81cc7e5aa.png" alt="{F_{sfc}}"/>, and <img class="math" src="../_images/math/b6653402239f6e4117110f6ea175232eaef35da1.png" alt="{F_{int}}"/>, calculated based on the water surface gradient and the discharge respectively. The proportional combination of these directional components is dictated by the parameter <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/>:</p>
 <div class="math">
-<p><img src="../_images/math/3d5139112c5c8f36e2601103063fc3934ed0cdc1.png" alt="F^{*} = \gamma F_{sfc} + (1-\gamma) F_{int}"/></p>
-</div><p>In this way, the <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> parameter controls the proportional dependence of water surface slope and water discharge on the downstream direction. A <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> of 0 means that the water slope is ignored when determining the downstream flow direction, and a <img class="math" src="../_images/math/95be00cce3c6b8b321b80e96c64eb633e3d26fd9.png" alt="{\gamma}"/> of 1 means that the discharge values (the flow field) is ignored.</p>
-<p>The second weighting parameter, <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/> modifies the routing weight for the random walk based on the local water depth value. The routing weights for each neighboring cell are calculated per [5], using the following equation:</p>
+<p><img src="../_images/math/971e88747be9a814c11c7212701f6f1809813a2d.png" alt="F^{*} = \gamma F_{sfc} + (1-\gamma) F_{int}"/></p>
+</div><p>In this way, the <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> parameter controls the proportional dependence of water surface slope and water discharge on the downstream direction. A <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> of 0 means that the water slope is ignored when determining the downstream flow direction, and a <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> of 1 means that the discharge values (the flow field) is ignored.</p>
+<p>The second weighting parameter, <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/> modifies the routing weight for the random walk based on the local water depth value. The routing weights for each neighboring cell are calculated per [5], using the following equation:</p>
 <div class="math">
-<p><img src="../_images/math/4b3fdf1059ccf10148f9360117fa10fca0c931be.png" alt="w_i = \frac{ \text{max} \left(0, F \cdot d_i \right)}{R_i \Delta_i}"/></p>
-</div><p>The resistance value (<img class="math" src="../_images/math/19a651980028fb9460bbe1b0ba7e01c4694f815b.png" alt="{R_i}"/>) is computed using the local water depth (<img class="math" src="../_images/math/a64bda3b3b9aa304ba2c049b8a63965e7e9a76da.png" alt="{h_i}"/>) and the parameter <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/>:</p>
+<p><img src="../_images/math/5c307dbefa056e3275c6f1bf0527fed786ec184e.png" alt="w_i = \frac{ \text{max} \left(0, F \cdot d_i \right)}{R_i \Delta_i}"/></p>
+</div><p>The resistance value (<img class="math" src="../_images/math/2abe5ec7117dc91438280030a844ae73fd9812be.png" alt="{R_i}"/>) is computed using the local water depth (<img class="math" src="../_images/math/7354f5f66edee28933ce7d1e20ca495abc9629e7.png" alt="{h_i}"/>) and the parameter <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/>:</p>
 <div class="math">
-<p><img src="../_images/math/b5bae4314e3619c121032021a36475304f4e9f06.png" alt="R_i = \frac{1}{h_i^\theta}"/></p>
-</div><p>When <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/> is 0, then the local depth values are not impacting the weighting factor associated with each cell. As <img class="math" src="../_images/math/17c7a09ec75298bcf7a107a481f3882a3bb52709.png" alt="{\theta}"/> gets larger, the local routing weights have an increasingly large dependence on the water depth of the neighboring cells.</p>
-<p>To measure the travel times associated with the particles as they move through the flow field, both the flow velocity and the direction of the flow are taken into account. As the particles are routed on a grid, there is a loss of accuracy due to the assumption that particles are located in the center of grid cells. To account for this ‘lost time’, a diffusive coefficient (<img class="math" src="../_images/math/2ac218300528332a8e9e62aff9126379238d521d.png" alt="{dc}"/>) is applied to introduce some diffusivity to the travel time values.</p>
-<p>The travel time calculation is based on the effective distance the particle travels in the orientation of the mean flow at the particle’s location. This effective or projected distance (<img class="math" src="../_images/math/0267dd9e5172e7badc1d0283a63603693cc1e952.png" alt="{d_{eq}}"/>) is computed using the definition of a vector projection based on the actual distance being traveled (<img class="math" src="../_images/math/b9e5f5d30057e1576db24204dc17221c03d5096a.png" alt="{\Delta}"/>) and the orientation of travel relative to the mean flow vector (<img class="math" src="../_images/math/96eca08709df37527a08c6aed78f438b5e2f1223.png" alt="{\phi}"/>):</p>
+<p><img src="../_images/math/7310f79e0d552679514101c0ae937277f8f91fde.png" alt="R_i = \frac{1}{h_i^\theta}"/></p>
+</div><p>When <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/> is 0, then the local depth values are not impacting the weighting factor associated with each cell. As <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/> gets larger, the local routing weights have an increasingly large dependence on the water depth of the neighboring cells.</p>
+<p>To measure the travel times associated with the particles as they move through the flow field, both the flow velocity and the direction of the flow are taken into account. As the particles are routed on a grid, there is a loss of accuracy due to the assumption that particles are located in the center of grid cells. To account for this ‘lost time’, a diffusive coefficient (<img class="math" src="../_images/math/6d0ed532f0bd7a766d30706acbd8bc2c34348891.png" alt="{dc}"/>) is applied to introduce some diffusivity to the travel time values.</p>
+<p>The travel time calculation is based on the effective distance the particle travels in the orientation of the mean flow at the particle’s location. This effective or projected distance (<img class="math" src="../_images/math/ad7eea8357c2d9dfbd4455a236a9f3d9d100832d.png" alt="{d_{eq}}"/>) is computed using the definition of a vector projection based on the actual distance being traveled (<img class="math" src="../_images/math/1083aa102b0b06bc00595a865a1de30c58583abb.png" alt="{\Delta}"/>) and the orientation of travel relative to the mean flow vector (<img class="math" src="../_images/math/4fdfee929b38755b9d0f5eece9936ece392420ea.png" alt="{\phi}"/>):</p>
 <div class="math">
-<p><img src="../_images/math/6e530d29d6810e182e2a7b7fba4f8f33eab27349.png" alt="d_{eq} = \Delta \times \cos{\phi}"/></p>
-</div><p>The travel time (<img class="math" src="../_images/math/0dad02b6e155a1df921372a520a57835d9d8e789.png" alt="{T_t}"/>) is then calculated based on this effective distance (<img class="math" src="../_images/math/0267dd9e5172e7badc1d0283a63603693cc1e952.png" alt="{d_{eq}}"/>) and the average of the inverted velocity values at the origin cell location (<img class="math" src="../_images/math/409e1c210f96b67bf40600ea1d4d816f09d0176a.png" alt="{o}"/>) and the new cell location (<img class="math" src="../_images/math/57d48cb55a63d2bc92c717caa6e57cfd25f945d0.png" alt="{i}"/>) for the particle. To re-introduce diffusivity lost due to the gridded scheme used in <cite>dorado</cite>, the travel time is also modulated by a user-specified diffusivity coefficient (<img class="math" src="../_images/math/2ac218300528332a8e9e62aff9126379238d521d.png" alt="{dc}"/>) which is multiplied by a sample from a uniform distribution centered at 0:</p>
+<p><img src="../_images/math/912c2698710d7bcb408b7dba0f5e0da5da66e1af.png" alt="d_{eq} = \Delta \times \cos{\phi}"/></p>
+</div><p>The travel time (<img class="math" src="../_images/math/388a552f6edb826449627e6a948749e1aa5bdb16.png" alt="{T_t}"/>) is then calculated based on this effective distance (<img class="math" src="../_images/math/ad7eea8357c2d9dfbd4455a236a9f3d9d100832d.png" alt="{d_{eq}}"/>) and the average of the inverted velocity values at the origin cell location (<img class="math" src="../_images/math/97ac7194f8afcce09dd1aec29fbc8d7704c739c0.png" alt="{o}"/>) and the new cell location (<img class="math" src="../_images/math/c6a389cf2069dc4e82958af1b8fb2ee43231774a.png" alt="{i}"/>) for the particle. To re-introduce diffusivity lost due to the gridded scheme used in <cite>dorado</cite>, the travel time is also modulated by a user-specified diffusivity coefficient (<img class="math" src="../_images/math/6d0ed532f0bd7a766d30706acbd8bc2c34348891.png" alt="{dc}"/>) which is multiplied by a sample from a uniform distribution centered at 0:</p>
 <div class="math">
-<p><img src="../_images/math/335614bd30bd93aa21dd6495a2dcc62fe6a423e4.png" alt="T_t = \frac{1}{2} \times d_{eq} \times \left(\frac{1}{v_o} + \frac{1}{v_i}\right) \times \left(1 + \left[dc \times U(-0.5,0.5)\right]\right)"/></p>
-</div><p>When <img class="math" src="../_images/math/2ac218300528332a8e9e62aff9126379238d521d.png" alt="{dc}"/> is 0, then the travel time calculation is based solely on the velocity field and deviation in particle path trajectory from the mean flow path. As the diffusivity coefficient is increased, the diffusivity present in travel time distributions will increase as well.</p>
+<p><img src="../_images/math/116ecb328fcd7d9dad62bc20e660629dadf61084.png" alt="T_t = \frac{1}{2} \times d_{eq} \times \left(\frac{1}{v_o} + \frac{1}{v_i}\right) \times \left(1 + \left[dc \times U(-0.5,0.5)\right]\right)"/></p>
+</div><p>When <img class="math" src="../_images/math/6d0ed532f0bd7a766d30706acbd8bc2c34348891.png" alt="{dc}"/> is 0, then the travel time calculation is based solely on the velocity field and deviation in particle path trajectory from the mean flow path. As the diffusivity coefficient is increased, the diffusivity present in travel time distributions will increase as well.</p>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
@@ -146,15 +146,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -171,7 +171,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

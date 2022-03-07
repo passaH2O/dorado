@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>User Guide &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Examples" href="../examples/index.html" />
@@ -43,7 +43,7 @@
 <ol class="arabic simple">
 <li><p>Initialize the parameters class (<a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>) for parameters related to the grid (model domain). This includes information about flow fields, grid cell size, and tuning parameters for the random walk.</p></li>
 <li><p>Initialize a <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class and generate a set of particles to be routed. A built in <cite>particle_generator()</cite> function is available to help with particle generation.</p></li>
-<li><p>Either use one of the high-level API procedures defined in <a class="reference download internal" download="" href="../_downloads/c64c267b8ed7f241b80fee2a01fd3c5f/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>, or simulation particle evolution using the <cite>run_iteration</cite> method.</p></li>
+<li><p>Either use one of the high-level API procedures defined in <a class="reference download internal" download="" href="../_downloads/79b83c161465f6a40f8f6b68becb9356/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>, or simulation particle evolution using the <cite>run_iteration</cite> method.</p></li>
 </ol>
 <p>Here we will describe some of the functionality built into the high-level API as well as the options available at the lower-level.</p>
 </section>
@@ -90,7 +90,7 @@
 </section>
 <section id="the-high-level-api">
 <h2>The High-Level API<a class="headerlink" href="#the-high-level-api" title="Permalink to this headline">¶</a></h2>
-<p>High-level functionality is provided in the <a class="reference download internal" download="" href="../_downloads/c64c267b8ed7f241b80fee2a01fd3c5f/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a> script. Many of the example scripts take advantage of these methods and functions to route particles and make plots with minimal lines of code. A non-exhaustive list of the provided functionality is below.</p>
+<p>High-level functionality is provided in the <a class="reference download internal" download="" href="../_downloads/79b83c161465f6a40f8f6b68becb9356/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a> script. Many of the example scripts take advantage of these methods and functions to route particles and make plots with minimal lines of code. A non-exhaustive list of the provided functionality is below.</p>
 <section id="functions-to-route-particles">
 <h3>Functions to route particles<a class="headerlink" href="#functions-to-route-particles" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -109,12 +109,12 @@
 <li><p>Plot the travel paths specified particles have taken</p></li>
 <li><p>Plot the particle positions for a specified iteration or travel time</p></li>
 </ul>
-<p>For additional detail, either view the script itself <a class="reference download internal" download="" href="../_downloads/c64c267b8ed7f241b80fee2a01fd3c5f/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>, or refer to the API documentation: <a class="reference internal" href="../apiref/routines.html#routines"><span class="std std-ref">dorado.routines</span></a>.</p>
+<p>For additional detail, either view the script itself <a class="reference download internal" download="" href="../_downloads/79b83c161465f6a40f8f6b68becb9356/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>, or refer to the API documentation: <a class="reference internal" href="../apiref/routines.html#routines"><span class="std std-ref">dorado.routines</span></a>.</p>
 </section>
 </section>
 <section id="the-lower-level-api">
 <h2>The Lower-Level API<a class="headerlink" href="#the-lower-level-api" title="Permalink to this headline">¶</a></h2>
-<p>Lower-level functionality is provided in the <a class="reference download internal" download="" href="../_downloads/88740e1ea0aa18ed325a9e72627b7118/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a> script. At this level particle/domain parameters are assigned and more direct iterations with the particle routing functions are possible. A short list of the functionality present in this module is below.</p>
+<p>Lower-level functionality is provided in the <a class="reference download internal" download="" href="../_downloads/c39b58a931465f459ba4c1514f43c368/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a> script. At this level particle/domain parameters are assigned and more direct iterations with the particle routing functions are possible. A short list of the functionality present in this module is below.</p>
 <ul class="simple">
 <li><p>Parameter and domain information definition in the <cite>params</cite> class</p></li>
 <li><p>Particle initialization and generation of particles</p></li>
@@ -122,7 +122,7 @@
 <li><p>Function for calculating exposure time (and residence time) of particles in a defined region of interest</p></li>
 <li><p>Assorted functions for transforming from real coordinate systems to the raster domain used for the particle routing</p></li>
 </ul>
-<p>For additional detail, either view the script itself <a class="reference download internal" download="" href="../_downloads/88740e1ea0aa18ed325a9e72627b7118/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>, or refer to the API documentation: <a class="reference internal" href="../apiref/particletrack.html#particletrack"><span class="std std-ref">dorado.particle_track</span></a>.</p>
+<p>For additional detail, either view the script itself <a class="reference download internal" download="" href="../_downloads/c39b58a931465f459ba4c1514f43c368/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>, or refer to the API documentation: <a class="reference internal" href="../apiref/particletrack.html#particletrack"><span class="std std-ref">dorado.particle_track</span></a>.</p>
 </section>
 </section>
 
@@ -183,15 +183,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -208,7 +208,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

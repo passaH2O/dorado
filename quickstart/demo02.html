@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Demo 2 - Using Lower-Level Functionality &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -35,7 +35,7 @@
             
   <section id="demo-2-using-lower-level-functionality">
 <h1>Demo 2 - Using Lower-Level Functionality<a class="headerlink" href="#demo-2-using-lower-level-functionality" title="Permalink to this headline">¶</a></h1>
-<p>In this demo, we show how particles can be placed on a gridded flow field generated using the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in <a class="reference download internal" download="" href="../_downloads/88740e1ea0aa18ed325a9e72627b7118/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>.</p>
+<p>In this demo, we show how particles can be placed on a gridded flow field generated using the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in <a class="reference download internal" download="" href="../_downloads/c39b58a931465f459ba4c1514f43c368/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>.</p>
 <p>First we load the grid parameters for this example. The longer <a class="reference internal" href="../examples/index.html#examples"><span class="std std-ref">Examples</span></a> provide guidance on how to define your own grid parameters.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado.particle_track</span> <span class="k">as</span> <span class="nn">pt</span>
@@ -43,7 +43,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">anugaparams</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_anuga_params</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>We can visualize the flow discharge components for this scenario from the loaded parameters. The full script used to produce the below figures is available <a class="reference download internal" download="" href="../_downloads/671fc917e367bc589c5fc3e92df76a6f/demo2_flow.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<p>We can visualize the flow discharge components for this scenario from the loaded parameters. The full script used to produce the below figures is available <a class="reference download internal" download="" href="../_downloads/b49a2b8d2c7497882bfac3b3dcf1a031/demo2_flow.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">anugaparams</span><span class="o">.</span><span class="n">qx</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;x-component of water discharge&#39;</span><span class="p">)</span>
@@ -55,7 +55,7 @@
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../pyplots/quickstart/demo2_flow.png">png</a>, <a class="reference external" href="../pyplots/quickstart/demo2_flow.hires.png">hires.png</a>)</p>
-<figure class="align-center">
+<figure class="align-default">
 <img alt="../_images/demo2_flow.png" class="plot-directive" src="../_images/demo2_flow.png" />
 </figure>
 <p>Now let’s route 50 particles with a target travel time of 2100 seconds. To do this, we first will need to define an instance of the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class. Then we will generate a set of 50 particles to be routed. Finally we will actually move the particles
@@ -65,7 +65,7 @@ until the target travel time of 2100 seconds is reached.</p>
 <p class="admonition-title">Note</p>
 <p>The <cite>dorado</cite> method of routing particles in discrete grid cells limits the precision which can be achieved in travel time values as the particles can only be located at the center of grid cells.</p>
 </div>
-<p>The full script to produce the below figure and output is available <a class="reference download internal" download="" href="../_downloads/4bde4793bf1acee8f2dd3e884e13206a/demo2.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<p>The full script to produce the below figure and output is available <a class="reference download internal" download="" href="../_downloads/1aa47095608dfe0c7158725349a5adcf/demo2.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="go"># initialize the particles class</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">Particles</span><span class="p">(</span><span class="n">anugaparams</span><span class="p">)</span>
 
@@ -85,8 +85,8 @@ until the target travel time of 2100 seconds is reached.</p>
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../pyplots/quickstart/demo2.png">png</a>, <a class="reference external" href="../pyplots/quickstart/demo2.hires.png">hires.png</a>)</p>
-<figure class="align-center">
-<img alt="../_images/demo22.png" class="plot-directive" src="../_images/demo22.png" />
+<figure class="align-default">
+<img alt="../_images/demo2.png" class="plot-directive" src="../_images/demo2.png" />
 </figure>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of particle travel times for final particle locations: &#39;</span> <span class="o">+</span>
@@ -150,15 +150,15 @@ until the target travel time of 2100 seconds is reached.</p>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -175,7 +175,7 @@ until the target travel time of 2100 seconds is reached.</p>
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

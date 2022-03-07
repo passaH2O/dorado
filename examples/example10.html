@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Example 10 - Routing Particles in Parallel &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 11 - The Travel Time Diffusion Coefficient" href="example11.html" />
@@ -42,7 +42,7 @@
 <p>This functionality has only been tested on UNIX-based systems.</p>
 </div>
 <p>In this example, we will use the parallel routing functionality to distribute the particle routing procedure across multiple CPU cores. Then we will compare the time it takes to route particles in serial against the time it takes to route an equivalent number of particles on 2 CPU cores. To do this, we use the native <cite>multiprocessing</cite> library that is provided with Python.</p>
-<p>Full example script available <a class="reference download internal" download="" href="../_downloads/bb0c7a9406e4ee140f502caaf57eb667/parallel_comparison.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<p>Full example script available <a class="reference download internal" download="" href="../_downloads/0d04a4ff63f390977962fbcb3c290d04/parallel_comparison.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>We will be running the parallel comparison on the ANUGA example domain used in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>. The only difference is that we will use a larger number of particles so that the impact of the parallelization can be measured even on this relatively small and simple domain.</p>
 <p>So after initializing the parameters as we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will define the number of particles and where they should be seeded.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">200</span>
@@ -141,15 +141,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -166,7 +166,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

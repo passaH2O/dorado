@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Example 13 - Using Unstructured Grids &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 14 - Nourishment Area and Time Functions" href="example14.html" />
@@ -46,7 +46,7 @@ out of) the array coordinates used in routing the particles, as well as
 how to compute exposure times to a region of interest. Hopefully this
 example in conjunction with other examples can provide information on
 how users can adapt these codes to their use-case.</p>
-<p>Full example workbook available <a class="reference download internal" download="" href="../_downloads/540650a058baed2c28facdae43c7dbf2/unstructured_grid_anuga.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<p>Full example workbook available <a class="reference download internal" download="" href="../_downloads/2df7ed9c20ab3fe218cacb38686d16da/unstructured_grid_anuga.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>To demonstrate this functionality, we make use of outputs from the
 hydrodynamic model <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a>,
 which solves the 2D shallow-water equations on a triangular mesh. We’ve
@@ -125,7 +125,7 @@ of the water column, and the two components of inertia.</p>
 needed by <code class="docutils literal notranslate"><span class="pre">dorado</span></code>. This will include gridding the
 hydrodynamic outputs and transforming our geospatial coordinates into
 “array index” coordinates.</p>
-<p>First, let’s combine our <img class="math" src="../_images/math/497184a5e83d0159a4bf15b0bb89dc5aa40cce7d.png" alt="(x,y)"/> coordinates into a list of
+<p>First, let’s combine our <img class="math" src="../_images/math/349c0e2dbdade2e90e54c3fdf0342401c320c56e.png" alt="(x,y)"/> coordinates into a list of
 tuples. This is the expected format for coordinates in the following
 functions.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use list comprehension to convert into tuples</span>
@@ -148,11 +148,11 @@ inverse-distance-weighted interpolation to create a Cartesian grid the
 same size as our model’s extent. To use this function, we need to
 provide: - Our list of <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> (as tuples). - The unstructured
 data we want to be gridded (here we start with <code class="docutils literal notranslate"><span class="pre">depth</span></code>). - The desired
-grid size of the resulting rasters (here we’re using <img class="math" src="../_images/math/96fc100bed84677eaee925344911851cce8cdb01.png" alt="1 m"/>,
+grid size of the resulting rasters (here we’re using <img class="math" src="../_images/math/c08fb88342de6a308cce1ed37d750636a50738e1.png" alt="1 m"/>,
 because the test model was on high-resolution lidar data). - The
-number of <img class="math" src="../_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> nearest neighbors to use in the interpolation. If
-<img class="math" src="../_images/math/e0c697f0cf4a4c09fb151f725bdc6e65c3be447c.png" alt="k=1"/>, we use only the nearest datapoint, whereas higher values
-(default is <img class="math" src="../_images/math/a60f3b4a3531f65bb5a1b11f886d291ff8ccaef5.png" alt="k=3"/>) interpolate the data into a smoother result.</p>
+number of <img class="math" src="../_images/math/9630132210b904754c9ab272b61cb527d12263ca.png" alt="k"/> nearest neighbors to use in the interpolation. If
+<img class="math" src="../_images/math/9d2c68066f95fb228e58b8a39d03aa8474728022.png" alt="k=1"/>, we use only the nearest datapoint, whereas higher values
+(default is <img class="math" src="../_images/math/58cf4c471f9c85b17a67672f932094cf15e19648.png" alt="k=3"/>) interpolate the data into a smoother result.</p>
 <p>The underlying code relies on <code class="docutils literal notranslate"><span class="pre">scipy</span></code> to build a <code class="docutils literal notranslate"><span class="pre">cKDTree</span></code> of our
 unstructured data, which maps the datapoints onto a uniform array.
 <code class="docutils literal notranslate"><span class="pre">cKDTree</span></code> is much faster than other gridding functions
@@ -163,7 +163,7 @@ very small.</p>
 function <code class="docutils literal notranslate"><span class="pre">myInterp</span></code> (after building the nearest-distance tree), which
 will be considerably faster than calling <code class="docutils literal notranslate"><span class="pre">unstruct2grid</span></code> again if we
 are gridding additional datasets. This function assumes data have the
-same coordinates, grid size, and <img class="math" src="../_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/>. - A gridded array of our
+same coordinates, grid size, and <img class="math" src="../_images/math/9630132210b904754c9ab272b61cb527d12263ca.png" alt="k"/>. - A gridded array of our
 data.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use IDW interpolation interpolate unstructured data into uniform grid</span>
 <span class="n">myInterp</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">unstruct2grid</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">unstructured</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -208,16 +208,16 @@ location by opening some GIS software and finding the coordinates of
 that location. Here, we will use the function
 <code class="docutils literal notranslate"><span class="pre">particle_track.coord2ind()</span></code> to convert your coordinates into array
 indices. This function requires: - Coordinates to be converted, as a
-list [] of <img class="math" src="../_images/math/497184a5e83d0159a4bf15b0bb89dc5aa40cce7d.png" alt="(x,y)"/> tuples - The location of the lower left corner
+list [] of <img class="math" src="../_images/math/349c0e2dbdade2e90e54c3fdf0342401c320c56e.png" alt="(x,y)"/> tuples - The location of the lower left corner
 of your rasters (i.e. the origin). If you used <code class="docutils literal notranslate"><span class="pre">unstruct2grid</span></code> to
 generate rasters, this location will be <code class="docutils literal notranslate"><span class="pre">[(min(x),</span> <span class="pre">min(y))]</span></code>.
 Otherwise, if you’re loading data from e.g. a GeoTIFF, the lower left
 corner will be stored in the .tif metadata and can be accessed by GIS
 software or gdalinfo (if the user has GDAL) - The dimensions of the
 raster, accessible via <code class="docutils literal notranslate"><span class="pre">np.shape(raster)</span></code> - The grid size of the
-raster (here <img class="math" src="../_images/math/3250cb5323c088f155c19d90b245821b2207b186.png" alt="1m"/>).</p>
+raster (here <img class="math" src="../_images/math/c2cdf175bad4d3d97e4897ce9fbf9a8cd2fedbd3.png" alt="1m"/>).</p>
 <p><strong>Note:</strong> this coordinate transform flips the orientation of the unit
-vectors (i.e. <img class="math" src="../_images/math/da85f3cdb6e4f6d76e24acd89b0830548fa2b3cb.png" alt="y_{index} = x"/> and <img class="math" src="../_images/math/58f66904f1de73ad72ba528a6646c9bc09459aed.png" alt="x_{index} = -y"/>) and
+vectors (i.e. <img class="math" src="../_images/math/4322cd7b562e5d084805852fc36d39c3a604d27f.png" alt="y_{index} = x"/> and <img class="math" src="../_images/math/4602454dadffac985ed073248d82b46069e1b7d0.png" alt="x_{index} = -y"/>) and
 returns raster indices. This is convenient for the internal
 functions of <code class="docutils literal notranslate"><span class="pre">particle_tools.py</span></code>, but may cause confusion with
 plotting or interpreting later if locations are not translated back into
@@ -466,7 +466,7 @@ ROI, all those times are counted.</p>
 <p><strong>Note:</strong> For a representative ETD, it is important to run a <em>lot</em> of
 particles. A large sample size is needed to obtain a realistic
 distribution (and smooth plots). Depending on the domain, we recommend at
-least <img class="math" src="../_images/math/e728045d42b977ff8bad7b2582b5ede1dd0b76bd.png" alt="O(10^3)"/>.</p>
+least <img class="math" src="../_images/math/a99e28025689dd857368d152d0ffaf72cb02490b.png" alt="O(10^3)"/>.</p>
 <p>First, let’s generate and visualize the ROI:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the array</span>
 <span class="n">regions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
@@ -577,15 +577,15 @@ capture the tail of the distribution.</p>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -602,7 +602,7 @@ capture the tail of the distribution.</p>
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

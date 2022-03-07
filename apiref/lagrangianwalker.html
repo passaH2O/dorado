@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>dorado.lagrangian_walker &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dorado.routines" href="routines.html" />
@@ -39,9 +39,9 @@
 <span id="dorado-lagrangian-walker"></span><span id="lagrangianwalker"></span><h1>dorado.lagrangian_walker<a class="headerlink" href="#module-dorado.lagrangian_walker" title="Permalink to this headline">¶</a></h1>
 <p>Core functions to handle the Lagrangian random walk movement of the particles.</p>
 <p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
-<dl class="function">
-<dt id="dorado.lagrangian_walker.big_sliding_window">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">big_sliding_window</code><span class="sig-paren">(</span><em>raster</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#big_sliding_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.big_sliding_window" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.big_sliding_window">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">big_sliding_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raster</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#big_sliding_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.big_sliding_window" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates 3D array organizing local neighbors at every index</p>
 <p>Returns a raster of shape (L,W,9) which organizes (along the third
 dimension) all of the neighbors in the original raster at a given
@@ -68,9 +68,9 @@ raster into the 3rd dimension at (i,j,:)</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.calc_travel_times">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">calc_travel_times</code><span class="sig-paren">(</span><em>Particles</em>, <em>new_cell</em>, <em>ind</em>, <em>new_ind</em>, <em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calc_travel_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.calc_travel_times" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.calc_travel_times">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">calc_travel_times</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calc_travel_times"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.calc_travel_times" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate travel time for particle to get to the new location.</p>
 <p>Function to calculate the travel time for the particle to get from the
 current location to the new location. Calculated by taking the inverse
@@ -101,9 +101,9 @@ average velocity</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.calculate_new_ind">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">calculate_new_ind</code><span class="sig-paren">(</span><em>ind</em>, <em>new_cell</em>, <em>iwalk</em>, <em>jwalk</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calculate_new_ind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.calculate_new_ind" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.calculate_new_ind">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">calculate_new_ind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iwalk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jwalk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#calculate_new_ind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.calculate_new_ind" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new cell location (1-8 value) to the previous index.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
@@ -128,9 +128,9 @@ one in a D-8 sense</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.check_for_boundary">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">check_for_boundary</code><span class="sig-paren">(</span><em>new_inds</em>, <em>current_inds</em>, <em>cell_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#check_for_boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.check_for_boundary" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.check_for_boundary">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">check_for_boundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#check_for_boundary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.check_for_boundary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure new location is not a boundary cell.</p>
 <p>Function to make sure particle is not exiting the boundary with the
 proposed new location.</p>
@@ -159,9 +159,9 @@ indices so those particles will not travel this iteration</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.clear_borders">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">clear_borders</code><span class="sig-paren">(</span><em>tiled_array</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#clear_borders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.clear_borders" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.clear_borders">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">clear_borders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiled_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#clear_borders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.clear_borders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set to zero all the edge elements of a vertical stack
 of 2D arrays. Helper function for make_weight.</p>
 <p><strong>Inputs</strong> :</p>
@@ -182,9 +182,9 @@ in the first and second dimension set to 0.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.get_weight">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">get_weight</code><span class="sig-paren">(</span><em>Particles</em>, <em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#get_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.get_weight" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.get_weight">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">get_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#get_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.get_weight" title="Permalink to this definition">¶</a></dt>
 <dd><p>Choose new cell location given an initial location.</p>
 <p>Function to randomly choose 1 of the surrounding 8 cells around the
 current index using the routing weights from make_weight.</p>
@@ -206,9 +206,9 @@ current index using the routing weights from make_weight.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.make_weight">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">make_weight</code><span class="sig-paren">(</span><em>Particles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#make_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.make_weight" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.make_weight">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">make_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Particles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#make_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.make_weight" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the weighting array for particle routing</p>
 <p>Function to compute the routing weights at each index, which gets
 stored inside the <a class="reference internal" href="particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> object
@@ -227,9 +227,9 @@ for use when routing. Called when the object gets instantiated.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.particle_stepper">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">particle_stepper</code><span class="sig-paren">(</span><em>Particles</em>, <em>current_inds</em>, <em>travel_times</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#particle_stepper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.particle_stepper" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.particle_stepper">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">particle_stepper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#particle_stepper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.particle_stepper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Step particles a single iteration.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
@@ -253,16 +253,16 @@ for use when routing. Called when the object gets instantiated.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.random">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">random</code><span class="sig-paren">(</span><em>size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#dorado.lagrangian_walker.random" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.random">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dorado.lagrangian_walker.random" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return random floats in the half-open interval [0.0, 1.0). Alias for
 <cite>random_sample</cite> to ease forward-porting to the new random API.</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.random_pick">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">random_pick</code><span class="sig-paren">(</span><em>probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#random_pick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.random_pick" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.random_pick">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">random_pick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#random_pick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.random_pick" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pick value from weighted probability array.</p>
 <p>Randomly pick a number weighted by array probs (len 8)
 Return the index of the selected weight in array probs</p>
@@ -283,9 +283,9 @@ the surrounding cells for the random walk</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.random_pick_seed">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">random_pick_seed</code><span class="sig-paren">(</span><em>choices</em>, <em>probs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#random_pick_seed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.random_pick_seed" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.random_pick_seed">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">random_pick_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#random_pick_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.random_pick_seed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly pick a number from array of choices.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
@@ -305,9 +305,9 @@ the surrounding cells for the random walk</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.steep_descent">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">steep_descent</code><span class="sig-paren">(</span><em>probs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#steep_descent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.steep_descent" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.steep_descent">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">steep_descent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#steep_descent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.steep_descent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Choose value with greatest probability, no longer random.</p>
 <p>Pick the array value with the greatest probability, no longer a
 stochastic process, instead just choosing the steepest descent</p>
@@ -328,9 +328,9 @@ surrounding cells</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.step_update">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">step_update</code><span class="sig-paren">(</span><em>new_cell</em>, <em>distances</em>, <em>dx</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#step_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.step_update" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.step_update">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">step_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#step_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.step_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get distance to new particle location.</p>
 <p>Function to check new location is some distance away from old one,
 also provides way to track the travel distance of the particles</p>
@@ -354,9 +354,9 @@ also provides way to track the travel distance of the particles</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.tile_domain_array">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">tile_domain_array</code><span class="sig-paren">(</span><em>raster</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#tile_domain_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.tile_domain_array" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.tile_domain_array">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">tile_domain_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raster</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#tile_domain_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.tile_domain_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Repeat a large 2D array 9 times along the third axis.
 Helper function for make_weight.</p>
 <p><strong>Inputs</strong> :</p>
@@ -375,9 +375,9 @@ Helper function for make_weight.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.lagrangian_walker.tile_local_array">
-<code class="descclassname">dorado.lagrangian_walker.</code><code class="descname">tile_local_array</code><span class="sig-paren">(</span><em>local_array</em>, <em>L</em>, <em>W</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#tile_local_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.lagrangian_walker.tile_local_array" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.lagrangian_walker.tile_local_array">
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">tile_local_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#tile_local_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.tile_local_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a local array [[NW, N, NE], [W, 0, E], [SW, S, SE]]
 and repeat it into an array of shape (L,W,9), where L, W are
 the shape of the domain, and the original elements are ordered
@@ -457,15 +457,15 @@ some index (e.g. ivec, jvec)</p>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -482,7 +482,7 @@ some index (e.g. ivec, jvec)</p>
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

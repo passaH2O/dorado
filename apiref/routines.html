@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>dorado.routines &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dorado.parallel_routing" href="parallelrouting.html" />
@@ -39,9 +39,9 @@
 <span id="dorado-routines"></span><span id="routines"></span><h1>dorado.routines<a class="headerlink" href="#module-dorado.routines" title="Permalink to this headline">¶</a></h1>
 <p>Higher level methods for routing and visualizing tracer particles.</p>
 <p>Project Homepage: <a class="reference external" href="https://github.com/passaH2O/dorado">https://github.com/passaH2O/dorado</a></p>
-<dl class="function">
-<dt id="dorado.routines.animate_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">animate_plots</code><span class="sig-paren">(</span><em>start_val</em>, <em>end_val</em>, <em>folder_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#animate_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.animate_plots" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.animate_plots">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">animate_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#animate_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.animate_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Animation routine, requires an optional animation writer.</p>
 <p>Routine to make mp4 animation of the particle routing from png outputs
 of the previous plotting routines.</p>
@@ -62,9 +62,9 @@ of the previous plotting routines.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.draw_travel_path">
-<code class="descclassname">dorado.routines.</code><code class="descname">draw_travel_path</code><span class="sig-paren">(</span><em>grid</em>, <em>walk_data</em>, <em>particles_to_follow='all'</em>, <em>output_file='travel_paths.png'</em>, <em>interval=1</em>, <em>plot_legend=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#draw_travel_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.draw_travel_path" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.draw_travel_path">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">draw_travel_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles_to_follow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'travel_paths.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#draw_travel_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.draw_travel_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a plot with the travel path of specified particles drawn out.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
@@ -98,9 +98,9 @@ Default is False</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.get_state">
-<code class="descclassname">dorado.routines.</code><code class="descname">get_state</code><span class="sig-paren">(</span><em>walk_data</em>, <em>iteration=-1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#get_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.get_state" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.get_state">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">get_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#get_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.get_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pull walk_data values from a specific iteration.</p>
 <p>Routine to return slices of the walk_data dict at a given iteration #.
 This function provides a shortcut to ‘smart’ indexing of the dict.
@@ -129,9 +129,9 @@ walk_data[‘travel_times’][:][iteration]</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.get_time_state">
-<code class="descclassname">dorado.routines.</code><code class="descname">get_time_state</code><span class="sig-paren">(</span><em>walk_data</em>, <em>target_time</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#get_time_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.get_time_state" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.get_time_state">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">get_time_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#get_time_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.get_time_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pull walk_data values nearest to a specific time.</p>
 <p>Routine to return slices of the walk_data dict at a given travel time.
 This function provides a shortcut to ‘smart’ indexing of the dict.</p>
@@ -162,9 +162,9 @@ the nature of the method.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.plot_exposure_time">
-<code class="descclassname">dorado.routines.</code><code class="descname">plot_exposure_time</code><span class="sig-paren">(</span><em>walk_data</em>, <em>exposure_times</em>, <em>folder_name=None</em>, <em>timedelta=1</em>, <em>nbins=100</em>, <em>save_output=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#plot_exposure_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.plot_exposure_time" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.plot_exposure_time">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">plot_exposure_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exposure_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timedelta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#plot_exposure_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.plot_exposure_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot exposure time distribution of particles in a specified region.</p>
 <p>Function to plot the exposure time distribution (ETD) of particles to
 the specified region. Relies on the output of particle_track.exposure_time</p>
@@ -197,9 +197,9 @@ times as a json (‘human-readable’) text file.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.plot_state">
-<code class="descclassname">dorado.routines.</code><code class="descname">plot_state</code><span class="sig-paren">(</span><em>grid</em>, <em>walk_data</em>, <em>iteration=-1</em>, <em>target_time=None</em>, <em>c='b'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#plot_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.plot_state" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.plot_state">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">plot_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#plot_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.plot_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot particle positions on an array.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
@@ -234,9 +234,9 @@ figure, default is ‘b’ for blue</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.show_nourishment_area">
-<code class="descclassname">dorado.routines.</code><code class="descname">show_nourishment_area</code><span class="sig-paren">(</span><em>visit_freq</em>, <em>grid=None</em>, <em>walk_data=None</em>, <em>cmap='Reds'</em>, <em>sigma=0.7</em>, <em>min_alpha=0</em>, <em>show_seed=True</em>, <em>seed_color='dodgerblue'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.show_nourishment_area" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.show_nourishment_area">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">show_nourishment_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">visit_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walk_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Reds'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dodgerblue'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.show_nourishment_area" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a smoothed, normalized heatmap of particle visit frequency.</p>
 <p>Function will plot the history of particle travel locations in walk_data
 as a heatmap overtop the specified grid, using the output of
@@ -288,9 +288,9 @@ Default is a light blue to contrast with the ‘Reds’ heatmap.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.show_nourishment_time">
-<code class="descclassname">dorado.routines.</code><code class="descname">show_nourishment_time</code><span class="sig-paren">(</span><em>mean_times</em>, <em>grid=None</em>, <em>walk_data=None</em>, <em>cmap='magma'</em>, <em>show_colorbar=True</em>, <em>min_alpha=0.3</em>, <em>show_seed=True</em>, <em>seed_color='dodgerblue'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.show_nourishment_time" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.show_nourishment_time">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">show_nourishment_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walk_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'magma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dodgerblue'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#show_nourishment_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.show_nourishment_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a smoothed heatmap of mean particle visit time.</p>
 <p>Function will plot the history of mean particle travel times in walk_data
 as a heatmap overtop the specified grid, using the output of
@@ -337,9 +337,9 @@ Default is a light blue.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.snake_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">snake_plots</code><span class="sig-paren">(</span><em>grid, walk_data, num_steps, folder_name=None, interval=4, tail_length=12, rgba_start=[1, 0.4, 0.2, 1], rgba_end=[1, 0.3, 0.1, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#snake_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.snake_plots" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.snake_plots">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">snake_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">walk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tail_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgba_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0.4,</span> <span class="pre">0.2,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgba_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0.3,</span> <span class="pre">0.1,</span> <span class="pre">0]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#snake_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.snake_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot particle positions with a trailing tail.</p>
 <p>Loops through existing walk_data history and creates a series of
 plots of the particle locations, with recent locations shown as a
@@ -386,9 +386,9 @@ Default slowly fades to red-ish with an alpha of zero</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.steady_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">steady_plots</code><span class="sig-paren">(</span><em>particle</em>, <em>num_iter</em>, <em>folder_name=None</em>, <em>save_output=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#steady_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.steady_plots" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.steady_plots">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">steady_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#steady_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.steady_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Automated particle movement in steady flow field.</p>
 <p>Function to automate plotting of particle movement over a steady flow
 fields. Particles all have same number of iterations and are allowed to
@@ -421,9 +421,9 @@ with the particle locations and travel times as a json
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.time_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">time_plots</code><span class="sig-paren">(</span><em>particle</em>, <em>num_iter</em>, <em>folder_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#time_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.time_plots" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.time_plots">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">time_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#time_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.time_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Steady flow plots with particle travel times visualized.</p>
 <p>Make plots with each particle’s travel time visualized.
 Routine assumes a steady flow field, but could be expanded to an unsteady
@@ -450,9 +450,9 @@ generated particles.</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
-<dt id="dorado.routines.unsteady_plots">
-<code class="descclassname">dorado.routines.</code><code class="descname">unsteady_plots</code><span class="sig-paren">(</span><em>dx</em>, <em>Np_tracer</em>, <em>seed_xloc</em>, <em>seed_yloc</em>, <em>num_steps</em>, <em>timestep</em>, <em>output_base</em>, <em>output_type</em>, <em>folder_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#unsteady_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dorado.routines.unsteady_plots" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="dorado.routines.unsteady_plots">
+<span class="sig-prename descclassname"><span class="pre">dorado.routines.</span></span><span class="sig-name descname"><span class="pre">unsteady_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Np_tracer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_xloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_yloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/routines.html#unsteady_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.routines.unsteady_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Automated particle movement in unsteady flow.</p>
 <p>Function to automate plotting of particle movement in an unsteady flow
 field (time-varying). Particles all have the same travel time at the end
@@ -555,15 +555,15 @@ and travel times as a json text file.</p>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -580,7 +580,7 @@ and travel times as a json text file.</p>
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

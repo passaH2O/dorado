@@ -1,20 +1,20 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Example 11 - The Travel Time Diffusion Coefficient &#8212; dorado 2.5.0 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 12 - Unsteady Flow Fields" href="example12.html" />
@@ -38,7 +38,7 @@
   <section id="example-11-the-travel-time-diffusion-coefficient">
 <span id="example11"></span><h1>Example 11 - The Travel Time Diffusion Coefficient<a class="headerlink" href="#example-11-the-travel-time-diffusion-coefficient" title="Permalink to this headline">¶</a></h1>
 <p>In this example, we will develop a simple straight channel with steady, uniform flow. Then we will use two different travel time diffusion coefficient values (<cite>diff_coeff</cite>) and look at the impact on the particle travel time distributions at a specific location.</p>
-<p>Shortened code for the synthetic channel creation will be provided, for the full code refer to the <a class="reference download internal" download="" href="../_downloads/af9b0ed9931f5ea2cea202e2e3f0eecb/traveltime_straight_channel.py"><code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">script</span></code></a>.</p>
+<p>Shortened code for the synthetic channel creation will be provided, for the full code refer to the <a class="reference download internal" download="" href="../_downloads/a3814eee3ab4138780a8374bcb7ae1d7/traveltime_straight_channel.py"><code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">script</span></code></a>.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado.particle_track</span> <span class="k">as</span> <span class="nn">pt</span>
@@ -52,7 +52,7 @@
 </div>
 <p>In the 100 x 50 cell domain, we have a straight channel with flow from the top of the domain to the bottom at -10 m/s. Our cell size is 50m, and the particles will be seeded at row 10. We will define a region of interest that extends to row 70, and apply the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.exposure_time" title="dorado.particle_track.exposure_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.exposure_time</span></code></a> function to calculate the travel times of the particles. The region will end at the boundary of row 70. Since the flow velocity is both steady and uniform in this channel, our expected travel time is simply:</p>
 <div class="math">
-<p><img src="../_images/math/376f1322126363d8ea62f9420bee4823922ddee3.png" alt="\begin{eqnarray}
+<p><img src="../_images/math/0fc6735852312d3f77a8dc30ba3633a13855e8bd.png" alt="\begin{eqnarray}
 {\text{Exp. Time} = 59.5 \text{ cells} \times 50 \text{ m/cell} \div 10 \text{ m/s} = 297.5 \text{ seconds}}.
 \end{eqnarray}"/></p>
 </div><p>With this in mind we will conduct two simulations, both using 500 tracer particles. In the first, we will set the travel time diffusion coefficient (<cite>diff_coeff</cite>) to 0, and in the second we will set it to 1.0 (a significant amount of added diffusivity).</p>
@@ -155,15 +155,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -180,7 +180,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
