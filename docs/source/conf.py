@@ -43,7 +43,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.githubpages',
               'matplotlib.sphinxext.plot_directive',
               'sphinx.ext.viewcode',
-              'm2r',
+              'm2r2',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive']
 

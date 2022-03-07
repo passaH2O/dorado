@@ -521,7 +521,7 @@ def test_nourishment_area_sigma():
     vf = particle_track.nourishment_area(walk_data, (3,3),
                                          sigma=0.5, clip=100)
     vf[np.isnan(vf)] = 0
-    assert pytest.approx(vf == answer, 0.001)
+    assert vf == pytest.approx(answer, rel=1e-2)
 
 def test_nourishment_time():
     walk_data = dict()
@@ -548,7 +548,7 @@ def test_nourishment_time_sigma():
     nt = particle_track.nourishment_time(walk_data, (6, 6),
                                          sigma=0.5, clip=100)
     nt[np.isnan(nt)] = 0
-    assert pytest.approx(nt == answer, 0.001)
+    assert nt == pytest.approx(answer, abs=1e-2)
 
 def test_unstruct2grid_k1():
     coords = [(10.5, 10.1),
@@ -581,11 +581,11 @@ def test_unstruct2grid_k3():
     interp_func, gridd = particle_track.unstruct2grid(coords, quantity,
                                                       cellsize,
                                                       k_nearest_neighbors=3)
-    assert pytest.approx(gridd == np.array([[2.13911589, 2.26676874,
+    assert pytest.approx(gridd) == np.array([[2.13911589, 2.26676874,
                                              2.1792037],
                                             [2., 2.68254467, 2.10026059],
                                             [1.96968263, 1.6122416,
-                                             1.65818041]]))
+                                             1.65818041]])
 
 def test_unstruct2grid_bounds():
     coords = [(10.5, 10.1),
