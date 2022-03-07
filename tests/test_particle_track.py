@@ -581,11 +581,11 @@ def test_unstruct2grid_k3():
     interp_func, gridd = particle_track.unstruct2grid(coords, quantity,
                                                       cellsize,
                                                       k_nearest_neighbors=3)
-    assert pytest.approx(gridd == np.array([[2.13911589, 2.26676874,
+    assert pytest.approx(gridd) == np.array([[2.13911589, 2.26676874,
                                              2.1792037],
                                             [2., 2.68254467, 2.10026059],
                                             [1.96968263, 1.6122416,
-                                             1.65818041]]))
+                                             1.65818041]])
 
 def test_unstruct2grid_bounds():
     coords = [(10.5, 10.1),
