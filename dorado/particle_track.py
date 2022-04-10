@@ -888,7 +888,8 @@ def ind2coord(walk_data, raster_origin, raster_size, cellsize):
 
 
 def exposure_time(walk_data,
-                  region_of_interest):
+                  region_of_interest,
+                  verbose=True):
     """Measure exposure time distribution of particles in a specified region.
 
     Function to measure the exposure time distribution (ETD) of particles to
@@ -905,6 +906,11 @@ def exposure_time(walk_data,
             Binary array the same size as input arrays in modelParams class
             with 1's everywhere inside the region in which we want to
             measure exposure time, and 0's everywhere else.
+
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
 
     **Outputs** :
 
@@ -955,9 +961,10 @@ def exposure_time(walk_data,
 
     # single print statement
     if len(_short_list) > 0:
-        print(str(len(_short_list)) + ' Particles within ROI at final'
-              ' timestep.\n' + 'Particles are: ' + str(_short_list) +
-              '\nRun more iterations to get full tail of ETD.')
+        if verbose:
+            print(str(len(_short_list)) + ' Particles within ROI at final'
+                  ' timestep.\n' + 'Particles are: ' + str(_short_list) +
+                  '\nRun more iterations to get full tail of ETD.')
 
     return exposure_times.tolist()
 
