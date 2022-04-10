@@ -47,7 +47,7 @@ def big_sliding_window(raster):
     index, in the order [NW, N, NE, W, 0, E, SW, S, SE]. Outputs are
     ordered to match np.ravel(), so it functions similarly to a loop
     applying ravel to the elements around each index.
-    For example, the neighboring values in raster indexed at (i,j) are 
+    For example, the neighboring values in raster indexed at (i,j) are
     raster(i-1:i+2, j-1:j+2).ravel(). These 9 values have been mapped to
     big_ravel(i,j,:) for ease of computations. Helper function for make_weight.
 
@@ -59,7 +59,7 @@ def big_sliding_window(raster):
     **Outputs** :
 
         big_ravel : `ndarray`
-            3D array which sorts the D8 neighbors at index (i,j) in 
+            3D array which sorts the D8 neighbors at index (i,j) in
             raster into the 3rd dimension at (i,j,:)
 
     """
@@ -123,7 +123,7 @@ def tile_domain_array(raster):
 
 
 def clear_borders(tiled_array):
-    """Set to zero all the edge elements of a vertical stack 
+    """Set to zero all the edge elements of a vertical stack
     of 2D arrays. Helper function for make_weight.
 
     **Inputs** :
@@ -165,21 +165,21 @@ def make_weight(Particles):
 
     """
     L, W = Particles.stage.shape
-    
+
     # calculate surface slope weights
     weight_sfc = (tile_domain_array(Particles.stage) \
                   - big_sliding_window(Particles.stage))
     weight_sfc /= tile_local_array(Particles.distances, L, W)
     weight_sfc[weight_sfc <= 0] = 0
     clear_borders(weight_sfc)
-    
+
     # calculate inertial component weights
     weight_int = (tile_domain_array(Particles.qx)*tile_local_array(Particles.jvec, L, W)) \
                  + (tile_domain_array(Particles.qy)*tile_local_array(Particles.ivec, L, W))
     weight_int /= tile_local_array(Particles.distances, L, W)
     weight_int[weight_int <= 0] = 0
     clear_borders(weight_int)
-    
+
     # get depth and cell types for neighboring cells
     depth_ind = big_sliding_window(Particles.depth)
     ct_ind = big_sliding_window(Particles.cell_type)
@@ -187,12 +187,12 @@ def make_weight(Particles):
     # set weights for cells that are too shallow, or invalid 0
     weight_sfc[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
     weight_int[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
-    
+
     # if sum of weights is above 0 normalize by sum of weights
     norm_sfc = np.nansum(weight_sfc, axis=2)
     idx_sfc = tile_domain_array((norm_sfc > 0))
     weight_sfc[idx_sfc] /= tile_domain_array(norm_sfc)[idx_sfc]
-    
+
     norm_int = np.nansum(weight_int, axis=2)
     idx_int = tile_domain_array((norm_int > 0))
     weight_int[idx_int] /= tile_domain_array(norm_int)[idx_int]
@@ -200,10 +200,10 @@ def make_weight(Particles):
     # define actual weight by using gamma, and weight components
     weight = Particles.gamma * weight_sfc + \
              (1 - Particles.gamma) * weight_int
-    
+
     # modify the weight by the depth and theta weighting parameter
     weight = depth_ind ** Particles.theta * weight
-    
+
     # if the depth is below the minimum depth then set weight to 0
     weight[(depth_ind <= Particles.dry_depth) | (ct_ind == 2)] = 0
 
@@ -506,7 +506,7 @@ def particle_stepper(Particles, current_inds, travel_times):
                                           Particles.dx),
                     new_cells))
     # put new indices into array
-    new_inds = np.array(new_inds, dtype=np.int)
+    new_inds = np.array(new_inds, dtype=np.int32)
     new_inds[np.array(dist) == 0] = 0
     # see if the indices are at boundaries
     new_inds = check_for_boundary(new_inds, inds, Particles.cell_type)
