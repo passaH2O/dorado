@@ -22,7 +22,8 @@ import json
 # Functions for running random walk model
 # --------------------------------------------------------
 def steady_plots(particle, num_iter,
-                 folder_name=None, save_output=True):
+                 folder_name=None, save_output=True,
+                 verbose=True):
     """Automated particle movement in steady flow field.
 
     Function to automate plotting of particle movement over a steady flow
@@ -45,6 +46,11 @@ def steady_plots(particle, num_iter,
             Controls whether or not the output images/data are saved to disk.
             Default value is True.
 
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     **Outputs** :
 
         walk_data : `dict`
@@ -61,7 +67,8 @@ def steady_plots(particle, num_iter,
         if folder_name is None:
             folder_name = os.getcwd()
         if os.path.exists(folder_name):
-            print('Saving files in existing directory')
+            if verbose:
+                print('Saving files in existing directory')
         else:
             os.makedirs(folder_name)
         if not os.path.exists(folder_name+os.sep+'figs'):
@@ -111,7 +118,7 @@ def steady_plots(particle, num_iter,
 
 def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
                    output_base, output_type,
-                   folder_name=None):
+                   folder_name=None, verbose=True):
     """Automated particle movement in unsteady flow.
 
     Function to automate plotting of particle movement in an unsteady flow
@@ -156,6 +163,11 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
         folder_name : `str`, optional
             Path to folder in which to save output plots.
 
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     **Outputs** :
 
         walk_data : `dict`
@@ -174,7 +186,8 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     if folder_name is None:
         folder_name = os.getcwd()
     if os.path.exists(folder_name):
-        print('Saving files in existing directory')
+        if verbose:
+            print('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
     if not os.path.exists(folder_name+os.sep+'figs'):
@@ -195,9 +208,10 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     qylist = sorted(qylist)
     datalist = sorted(datalist)
     if num_steps > max(len(depthlist), len(datalist)):
-        print('Warning: num_steps exceeds number of model outputs in'
-              ' output_base')
-        print('Setting num_steps to equal number of model outputs')
+        if verbose:
+            print('Warning: num_steps exceeds number of model outputs in'
+                  ' output_base')
+            print('Setting num_steps to equal number of model outputs')
         num_steps = max(len(depthlist), len(datalist))
 
     # Create vector of target times
@@ -277,7 +291,7 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     return walk_data
 
 
-def time_plots(particle, num_iter, folder_name=None):
+def time_plots(particle, num_iter, folder_name=None, verbose=True):
     """Steady flow plots with particle travel times visualized.
 
     Make plots with each particle's travel time visualized.
@@ -296,6 +310,11 @@ def time_plots(particle, num_iter, folder_name=None):
         folder_name : `str`, optional
             Path to folder in which to save output plots.
 
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     **Outputs** :
 
         walk_data : `dict`
@@ -308,7 +327,8 @@ def time_plots(particle, num_iter, folder_name=None):
     if folder_name is None:
         folder_name = os.getcwd()
     if os.path.exists(folder_name):
-        print('Saving files in existing directory')
+        if verbose:
+            print('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
     if not os.path.exists(folder_name+os.sep+'figs'):
@@ -366,7 +386,7 @@ def time_plots(particle, num_iter, folder_name=None):
 # --------------------------------------------------------
 # Functions for plotting/interpreting outputs
 # --------------------------------------------------------
-def get_state(walk_data, iteration=-1):
+def get_state(walk_data, iteration=-1, verbose=True):
     """Pull walk_data values from a specific iteration.
 
     Routine to return slices of the walk_data dict at a given iteration #.
@@ -381,6 +401,11 @@ def get_state(walk_data, iteration=-1):
         iteration : `int`, optional
             Iteration number at which to slice the dictionary. Defaults
             to -1, i.e. the most recent step
+
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
 
     **Outputs** :
 
@@ -416,13 +441,14 @@ def get_state(walk_data, iteration=-1):
             iter_exceeds_warning += 1
 
     if iter_exceeds_warning > 0:
-        print('Note: %s particles have not reached %s iterations' % \
-              (iter_exceeds_warning, iteration))
+        if verbose:
+            print('Note: %s particles have not reached %s iterations' % \
+                  (iter_exceeds_warning, iteration))
 
     return xinds, yinds, times
 
 
-def get_time_state(walk_data, target_time):
+def get_time_state(walk_data, target_time, verbose=True):
     """Pull walk_data values nearest to a specific time.
 
     Routine to return slices of the walk_data dict at a given travel time.
@@ -435,6 +461,11 @@ def get_time_state(walk_data, target_time):
 
         target_time : `float`
             Travel time at which to slice the dictionary.
+
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
 
     **Outputs** :
 
@@ -469,7 +500,8 @@ def get_time_state(walk_data, target_time):
         times.append(walk_data['travel_times'][ii][tt])
 
         if times_ii[-1] < target_time:
-            print('Note: Particle '+str(ii)+' never reached target_time')
+            if verbose:
+                print('Note: Particle '+str(ii)+' never reached target_time')
 
     return xinds, yinds, times
 
@@ -479,7 +511,8 @@ def plot_exposure_time(walk_data,
                        folder_name=None,
                        timedelta=1,
                        nbins=100,
-                       save_output=True):
+                       save_output=True,
+                       verbose=True):
     """Plot exposure time distribution of particles in a specified region.
 
     Function to plot the exposure time distribution (ETD) of particles to
@@ -509,6 +542,11 @@ def plot_exposure_time(walk_data,
             Controls whether or not the output images/data are saved to disk.
             Default value is True.
 
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     **Outputs** :
 
         If `save_output` is set to True, script saves plots of the cumulative
@@ -537,7 +575,8 @@ def plot_exposure_time(walk_data,
         if folder_name is None:
             folder_name = os.getcwd()
         if os.path.exists(folder_name):
-            print('Saving files in existing directory')
+            if verbose:
+                print('Saving files in existing directory')
         else:
             os.makedirs(folder_name)
         if not os.path.exists(folder_name+os.sep+'figs'):
@@ -835,7 +874,8 @@ def snake_plots(grid,
                 interval=4,
                 tail_length=12,
                 rgba_start=[1, 0.4, 0.2, 1],
-                rgba_end=[1, 0.3, 0.1, 0]):
+                rgba_end=[1, 0.3, 0.1, 0],
+                verbose=True):
     """Plot particle positions with a trailing tail.
 
     Loops through existing walk_data history and creates a series of
@@ -883,6 +923,11 @@ def snake_plots(grid,
             path, specified as [red, green, blue, alpha] in the range 0-1.
             Default slowly fades to red-ish with an alpha of zero
 
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
+
     **Outputs** :
 
         Saves a plot of the particle travel history at each step as a png
@@ -895,7 +940,8 @@ def snake_plots(grid,
     if folder_name is None:
         folder_name = os.getcwd()
     if os.path.exists(folder_name):
-        print('Saving files in existing directory')
+        if verbose:
+            print('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
     if not os.path.exists(folder_name+os.sep+'figs'):

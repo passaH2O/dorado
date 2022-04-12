@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dorado.lagrangian_walker &#8212; dorado 2.5.0 documentation</title>
+    <title>dorado.lagrangian_walker &#8212; dorado 2.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -82,7 +82,7 @@
 <span class="sd">    index, in the order [NW, N, NE, W, 0, E, SW, S, SE]. Outputs are</span>
 <span class="sd">    ordered to match np.ravel(), so it functions similarly to a loop</span>
 <span class="sd">    applying ravel to the elements around each index.</span>
-<span class="sd">    For example, the neighboring values in raster indexed at (i,j) are </span>
+<span class="sd">    For example, the neighboring values in raster indexed at (i,j) are</span>
 <span class="sd">    raster(i-1:i+2, j-1:j+2).ravel(). These 9 values have been mapped to</span>
 <span class="sd">    big_ravel(i,j,:) for ease of computations. Helper function for make_weight.</span>
 
@@ -94,7 +94,7 @@
 <span class="sd">    **Outputs** :</span>
 
 <span class="sd">        big_ravel : `ndarray`</span>
-<span class="sd">            3D array which sorts the D8 neighbors at index (i,j) in </span>
+<span class="sd">            3D array which sorts the D8 neighbors at index (i,j) in</span>
 <span class="sd">            raster into the 3rd dimension at (i,j,:)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -158,7 +158,7 @@
 
 
 <div class="viewcode-block" id="clear_borders"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.clear_borders">[docs]</a><span class="k">def</span> <span class="nf">clear_borders</span><span class="p">(</span><span class="n">tiled_array</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Set to zero all the edge elements of a vertical stack </span>
+    <span class="sd">&quot;&quot;&quot;Set to zero all the edge elements of a vertical stack</span>
 <span class="sd">    of 2D arrays. Helper function for make_weight.</span>
 
 <span class="sd">    **Inputs** :</span>
@@ -200,21 +200,21 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">L</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">shape</span>
-    
+
     <span class="c1"># calculate surface slope weights</span>
     <span class="n">weight_sfc</span> <span class="o">=</span> <span class="p">(</span><span class="n">tile_domain_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span> \
                   <span class="o">-</span> <span class="n">big_sliding_window</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">stage</span><span class="p">))</span>
     <span class="n">weight_sfc</span> <span class="o">/=</span> <span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
     <span class="n">weight_sfc</span><span class="p">[</span><span class="n">weight_sfc</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">clear_borders</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">)</span>
-    
+
     <span class="c1"># calculate inertial component weights</span>
     <span class="n">weight_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">tile_domain_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">qx</span><span class="p">)</span><span class="o">*</span><span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">jvec</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span> \
                  <span class="o">+</span> <span class="p">(</span><span class="n">tile_domain_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">qy</span><span class="p">)</span><span class="o">*</span><span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">ivec</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span>
     <span class="n">weight_int</span> <span class="o">/=</span> <span class="n">tile_local_array</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">distances</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
     <span class="n">weight_int</span><span class="p">[</span><span class="n">weight_int</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">clear_borders</span><span class="p">(</span><span class="n">weight_int</span><span class="p">)</span>
-    
+
     <span class="c1"># get depth and cell types for neighboring cells</span>
     <span class="n">depth_ind</span> <span class="o">=</span> <span class="n">big_sliding_window</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
     <span class="n">ct_ind</span> <span class="o">=</span> <span class="n">big_sliding_window</span><span class="p">(</span><span class="n">Particles</span><span class="o">.</span><span class="n">cell_type</span><span class="p">)</span>
@@ -222,12 +222,12 @@
     <span class="c1"># set weights for cells that are too shallow, or invalid 0</span>
     <span class="n">weight_sfc</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">weight_int</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-    
+
     <span class="c1"># if sum of weights is above 0 normalize by sum of weights</span>
     <span class="n">norm_sfc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_sfc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">idx_sfc</span> <span class="o">=</span> <span class="n">tile_domain_array</span><span class="p">((</span><span class="n">norm_sfc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">weight_sfc</span><span class="p">[</span><span class="n">idx_sfc</span><span class="p">]</span> <span class="o">/=</span> <span class="n">tile_domain_array</span><span class="p">(</span><span class="n">norm_sfc</span><span class="p">)[</span><span class="n">idx_sfc</span><span class="p">]</span>
-    
+
     <span class="n">norm_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weight_int</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">idx_int</span> <span class="o">=</span> <span class="n">tile_domain_array</span><span class="p">((</span><span class="n">norm_int</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">weight_int</span><span class="p">[</span><span class="n">idx_int</span><span class="p">]</span> <span class="o">/=</span> <span class="n">tile_domain_array</span><span class="p">(</span><span class="n">norm_int</span><span class="p">)[</span><span class="n">idx_int</span><span class="p">]</span>
@@ -235,10 +235,10 @@
     <span class="c1"># define actual weight by using gamma, and weight components</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">weight_sfc</span> <span class="o">+</span> \
              <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Particles</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_int</span>
-    
+
     <span class="c1"># modify the weight by the depth and theta weighting parameter</span>
     <span class="n">weight</span> <span class="o">=</span> <span class="n">depth_ind</span> <span class="o">**</span> <span class="n">Particles</span><span class="o">.</span><span class="n">theta</span> <span class="o">*</span> <span class="n">weight</span>
-    
+
     <span class="c1"># if the depth is below the minimum depth then set weight to 0</span>
     <span class="n">weight</span><span class="p">[(</span><span class="n">depth_ind</span> <span class="o">&lt;=</span> <span class="n">Particles</span><span class="o">.</span><span class="n">dry_depth</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ct_ind</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -541,7 +541,7 @@
                                           <span class="n">Particles</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span>
                     <span class="n">new_cells</span><span class="p">))</span>
     <span class="c1"># put new indices into array</span>
-    <span class="n">new_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_inds</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">new_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_inds</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
     <span class="n">new_inds</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># see if the indices are at boundaries</span>
     <span class="n">new_inds</span> <span class="o">=</span> <span class="n">check_for_boundary</span><span class="p">(</span><span class="n">new_inds</span><span class="p">,</span> <span class="n">inds</span><span class="p">,</span> <span class="n">Particles</span><span class="o">.</span><span class="n">cell_type</span><span class="p">)</span>
@@ -634,7 +634,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
