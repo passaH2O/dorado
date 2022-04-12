@@ -559,8 +559,7 @@ class Particles():
     # run an iteration where particles are moved
     # have option of specifying the particle start locations
     # otherwise they are randomly placed within x and y seed locations
-    def run_iteration(self,
-                      target_time=None):
+    def run_iteration(self, target_time=None, max_iter=1e4):
         """Run an iteration of the particle routing.
 
         Runs an iteration of the particle routing.
@@ -573,7 +572,13 @@ class Particles():
                 end of this iteration. If left undefined, then just one
                 iteration is run and the particles will be out of sync in time.
                 Note that this loop will terminate before the target_time if
-                the particle exceeds the hard-coded limit of 1e4 steps
+                the particle exceeds the maximum number of permitted
+                iterations (max_iter)
+
+            max_iter : `int`, optional
+                The maximum number of iterations a particle is allowed to
+                take in order to try to reach a specified target_time.
+                This is an optional parameter with a default value of 10,000.
 
         **Outputs** :
 
@@ -677,7 +682,7 @@ class Particles():
                         est_next_dt = max(0.1, all_times[ii][-1] -
                                           all_times[ii][-2])
                         count += 1
-                        if count > 1e4:
+                        if count > max_iter:
                             _iter_particles.append(ii)
                             break
 
@@ -883,7 +888,8 @@ def ind2coord(walk_data, raster_origin, raster_size, cellsize):
 
 
 def exposure_time(walk_data,
-                  region_of_interest):
+                  region_of_interest,
+                  verbose=True):
     """Measure exposure time distribution of particles in a specified region.
 
     Function to measure the exposure time distribution (ETD) of particles to
@@ -900,6 +906,11 @@ def exposure_time(walk_data,
             Binary array the same size as input arrays in modelParams class
             with 1's everywhere inside the region in which we want to
             measure exposure time, and 0's everywhere else.
+
+        verbose : `bool`, optional
+            Toggles whether or not messages print to the
+            console. If False, nothing is output, if True, messages are output.
+            Default value is True. Errors are always raised.
 
     **Outputs** :
 
@@ -950,9 +961,10 @@ def exposure_time(walk_data,
 
     # single print statement
     if len(_short_list) > 0:
-        print(str(len(_short_list)) + ' Particles within ROI at final'
-              ' timestep.\n' + 'Particles are: ' + str(_short_list) +
-              '\nRun more iterations to get full tail of ETD.')
+        if verbose:
+            print(str(len(_short_list)) + ' Particles within ROI at final'
+                  ' timestep.\n' + 'Particles are: ' + str(_short_list) +
+                  '\nRun more iterations to get full tail of ETD.')
 
     return exposure_times.tolist()
 
