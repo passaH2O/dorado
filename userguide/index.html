@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>User Guide &#8212; dorado 2.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -14,6 +14,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,9 +37,9 @@
           <div class="body" role="main">
             
   <section id="user-guide">
-<span id="userguide"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<span id="userguide"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading">¶</a></h1>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>The basic workflow when using <cite>dorado</cite> can be summarized in three steps:</p>
 <ol class="arabic simple">
 <li><p>Initialize the parameters class (<a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>) for parameters related to the grid (model domain). This includes information about flow fields, grid cell size, and tuning parameters for the random walk.</p></li>
@@ -48,7 +49,7 @@
 <p>Here we will describe some of the functionality built into the high-level API as well as the options available at the lower-level.</p>
 </section>
 <section id="defining-the-params">
-<h2>Defining the <cite>params</cite><a class="headerlink" href="#defining-the-params" title="Permalink to this headline">¶</a></h2>
+<h2>Defining the <cite>params</cite><a class="headerlink" href="#defining-the-params" title="Permalink to this heading">¶</a></h2>
 <p>Defining the parameters is required prior to doing any particle routing. Initiation of the parameter class (<a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.modelParams" title="dorado.particle_track.modelParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.modelParams</span></code></a>) can be achieved by typing the following:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado.particle_track</span> <span class="k">as</span> <span class="nn">pt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
@@ -56,7 +57,7 @@
 </div>
 <p>After establishing the parameter class, information about the domain must be provided. As <cite>dorado</cite> is a generic package designed to be used with a variety of input datasets or model outputs, we have tried to make the required input parameters as flexible as possible, however some values <strong>must</strong> be provided.</p>
 <section id="required-parameters">
-<h3>Required Parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Required Parameters<a class="headerlink" href="#required-parameters" title="Permalink to this heading">¶</a></h3>
 <p>A brief description of the required parameters is listed below, for a comprehensive list, please refer to the API documentation: <a class="reference internal" href="../apiref/particletrack.html#particletrack"><span class="std std-ref">dorado.particle_track</span></a>.</p>
 <ul>
 <li><p>the length along a square cell face (<cite>dx</cite>)</p></li>
@@ -73,15 +74,15 @@
 </ul>
 </section>
 <section id="optional-parameters">
-<h3>Optional Parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Optional Parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this heading">¶</a></h3>
 <p>For a list of the optional parameters, please see <a class="reference internal" href="../apiref/particletrack.html#particletrack"><span class="std std-ref">dorado.particle_track</span></a>, these parameters include values related to the random walk weighting scheme, travel time calculations, and even the distance and direction assumptions related to the grid.</p>
 </section>
 </section>
 <section id="defining-the-particles">
-<h2>Defining the <cite>Particles</cite><a class="headerlink" href="#defining-the-particles" title="Permalink to this headline">¶</a></h2>
+<h2>Defining the <cite>Particles</cite><a class="headerlink" href="#defining-the-particles" title="Permalink to this heading">¶</a></h2>
 <p>Defining a <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class is a key step in using <cite>dorado</cite> to perform particle routing. To define a set of particles, the model parameters must first be defined as described above. The <cite>Particles</cite> class is initialized using an instance of the model parameters. From there, particles can be generated and routed.</p>
 <section id="particle-generation-and-routing">
-<h3>Particle Generation and Routing<a class="headerlink" href="#particle-generation-and-routing" title="Permalink to this headline">¶</a></h3>
+<h3>Particle Generation and Routing<a class="headerlink" href="#particle-generation-and-routing" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Particles can be generated using the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles.generate_particles" title="dorado.particle_track.Particles.generate_particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles.generate_particles</span></code></a> function, this allows for random and exact placement of particles</p></li>
 <li><p>Particles can be routed using either the High-Level or Low-Level API functionalities described below</p></li>
@@ -89,10 +90,10 @@
 </section>
 </section>
 <section id="the-high-level-api">
-<h2>The High-Level API<a class="headerlink" href="#the-high-level-api" title="Permalink to this headline">¶</a></h2>
+<h2>The High-Level API<a class="headerlink" href="#the-high-level-api" title="Permalink to this heading">¶</a></h2>
 <p>High-level functionality is provided in the <a class="reference download internal" download="" href="../_downloads/79b83c161465f6a40f8f6b68becb9356/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a> script. Many of the example scripts take advantage of these methods and functions to route particles and make plots with minimal lines of code. A non-exhaustive list of the provided functionality is below.</p>
 <section id="functions-to-route-particles">
-<h3>Functions to route particles<a class="headerlink" href="#functions-to-route-particles" title="Permalink to this headline">¶</a></h3>
+<h3>Functions to route particles<a class="headerlink" href="#functions-to-route-particles" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Particle movement given a steady flow field with saving of the data and images after each particle iteration</p></li>
 <li><p>Particle movement in an unsteady flow field with automated data and plot saving</p></li>
@@ -100,7 +101,7 @@
 </ul>
 </section>
 <section id="functions-to-plot-interpret-output">
-<h3>Functions to plot/interpret output<a class="headerlink" href="#functions-to-plot-interpret-output" title="Permalink to this headline">¶</a></h3>
+<h3>Functions to plot/interpret output<a class="headerlink" href="#functions-to-plot-interpret-output" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Query particle locations and travel times at a given iteration</p></li>
 <li><p>Query particle locations at a given travel time</p></li>
@@ -113,7 +114,7 @@
 </section>
 </section>
 <section id="the-lower-level-api">
-<h2>The Lower-Level API<a class="headerlink" href="#the-lower-level-api" title="Permalink to this headline">¶</a></h2>
+<h2>The Lower-Level API<a class="headerlink" href="#the-lower-level-api" title="Permalink to this heading">¶</a></h2>
 <p>Lower-level functionality is provided in the <a class="reference download internal" download="" href="../_downloads/c39b58a931465f459ba4c1514f43c368/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a> script. At this level particle/domain parameters are assigned and more direct iterations with the particle routing functions are possible. A short list of the functionality present in this module is below.</p>
 <ul class="simple">
 <li><p>Parameter and domain information definition in the <cite>params</cite> class</p></li>
@@ -191,7 +192,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -208,7 +209,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

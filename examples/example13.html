@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Example 13 - Using Unstructured Grids &#8212; dorado 2.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -14,6 +14,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
           <div class="body" role="main">
             
   <section id="example-13-using-unstructured-grids">
-<span id="example13"></span><h1>Example 13 - Using Unstructured Grids<a class="headerlink" href="#example-13-using-unstructured-grids" title="Permalink to this headline">¶</a></h1>
+<span id="example13"></span><h1>Example 13 - Using Unstructured Grids<a class="headerlink" href="#example-13-using-unstructured-grids" title="Permalink to this heading">¶</a></h1>
 <p>This workbook provides an example workflow for running particles on an
 unstructured model output (i.e. flow variables are from a non-Cartesian
 grid). We make use of several of the geospatial functions in
@@ -56,7 +57,7 @@ dependencies not required by this distribution. If the user is also
 using ANUGA flow-fields, there is a a commented-out block of code below
 demonstrating how we extracted the input files for use in this workbook.</p>
 <section id="import-necessary-dependencies">
-<h2>Import necessary dependencies<a class="headerlink" href="#import-necessary-dependencies" title="Permalink to this headline">¶</a></h2>
+<h2>Import necessary dependencies<a class="headerlink" href="#import-necessary-dependencies" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
@@ -69,7 +70,7 @@ demonstrating how we extracted the input files for use in this workbook.</p>
 </div>
 </section>
 <section id="load-in-model-outputs">
-<h2>Load in model outputs<a class="headerlink" href="#load-in-model-outputs" title="Permalink to this headline">¶</a></h2>
+<h2>Load in model outputs<a class="headerlink" href="#load-in-model-outputs" title="Permalink to this heading">¶</a></h2>
 <p>If we were starting directly from an ANUGA output file, this is where we
 would import the outputs from the model run. We have included these
 files directly with the distribution, but for anyone interested in
@@ -120,7 +121,7 @@ of the water column, and the two components of inertia.</p>
 </div>
 </section>
 <section id="convert-data-and-coordinates-for-particle-routing">
-<h2>Convert data and coordinates for particle routing<a class="headerlink" href="#convert-data-and-coordinates-for-particle-routing" title="Permalink to this headline">¶</a></h2>
+<h2>Convert data and coordinates for particle routing<a class="headerlink" href="#convert-data-and-coordinates-for-particle-routing" title="Permalink to this heading">¶</a></h2>
 <p>Now that we have the data we need, we can convert it into the format
 needed by <code class="docutils literal notranslate"><span class="pre">dorado</span></code>. This will include gridding the
 hydrodynamic outputs and transforming our geospatial coordinates into
@@ -254,7 +255,7 @@ of either meters or decimal degrees.</p>
 <img alt="../_images/unstructured_grid_anuga_15_2.png" src="../_images/unstructured_grid_anuga_15_2.png" />
 </section>
 <section id="set-up-particle-routing-parameters">
-<h2>Set up particle routing parameters<a class="headerlink" href="#set-up-particle-routing-parameters" title="Permalink to this headline">¶</a></h2>
+<h2>Set up particle routing parameters<a class="headerlink" href="#set-up-particle-routing-parameters" title="Permalink to this heading">¶</a></h2>
 <p>Now that we have pre-converted the input data we need, let’s set up the
 particle routing to be run. We do this using the
 <code class="docutils literal notranslate"><span class="pre">particle_track.modelParams</span></code> class, in which we populate the attributes to
@@ -281,7 +282,7 @@ of the random walk (<code class="docutils literal notranslate"><span class="pre"
 you to play with these weights and see how your solution is affected.</p>
 </section>
 <section id="generate-particles">
-<h2>Generate particles<a class="headerlink" href="#generate-particles" title="Permalink to this headline">¶</a></h2>
+<h2>Generate particles<a class="headerlink" href="#generate-particles" title="Permalink to this heading">¶</a></h2>
 <p>Now we instantiate the <code class="docutils literal notranslate"><span class="pre">particle_track.Particles</span></code> class, and generate
 some particles to be routed. Here we are using the <code class="docutils literal notranslate"><span class="pre">'random'</span></code> method
 to generate particles, which seeds them randomly within a specified region.
@@ -309,7 +310,7 @@ If we knew exactly where we wanted particles, we could call the
 </div>
 </section>
 <section id="run-the-particle-routing">
-<h2>Run the particle routing<a class="headerlink" href="#run-the-particle-routing" title="Permalink to this headline">¶</a></h2>
+<h2>Run the particle routing<a class="headerlink" href="#run-the-particle-routing" title="Permalink to this heading">¶</a></h2>
 <p>Now we call on one of the routines, <code class="docutils literal notranslate"><span class="pre">routines.steady_plots()</span></code>, to run
 the model. The core of the particle routing occurs in the
 <code class="docutils literal notranslate"><span class="pre">particle_track.run_iteration()</span></code> function, but for ease of use, we
@@ -428,7 +429,7 @@ model output.</p>
 </div>
 </section>
 <section id="analyze-the-outputs">
-<h2>Analyze the outputs<a class="headerlink" href="#analyze-the-outputs" title="Permalink to this headline">¶</a></h2>
+<h2>Analyze the outputs<a class="headerlink" href="#analyze-the-outputs" title="Permalink to this heading">¶</a></h2>
 <p>Now that we have the walk history stored in <code class="docutils literal notranslate"><span class="pre">walk_data</span></code>, we can query
 this dictionary for features of interest. For starters, we can convert
 the location indices back into geospatial coordinates using the function
@@ -585,7 +586,7 @@ capture the tail of the distribution.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -602,7 +603,7 @@ capture the tail of the distribution.</p>
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Quickstart &#8212; dorado 2.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -14,6 +14,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,10 +37,10 @@
           <div class="body" role="main">
             
   <section id="quickstart">
-<span id="id1"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h1>
 <p>Quick guide to using the <cite>dorado</cite> package using the 2 built-in sample datasets. The first demo provides an example of how to use the high-level API, while the second shows how functions can be accessed at a lower-level.</p>
 <section id="demo-1-using-the-high-level-api">
-<h2>Demo 1- Using the High-Level API<a class="headerlink" href="#demo-1-using-the-high-level-api" title="Permalink to this headline">¶</a></h2>
+<h2>Demo 1- Using the High-Level API<a class="headerlink" href="#demo-1-using-the-high-level-api" title="Permalink to this heading">¶</a></h2>
 <p>In this demo, we show how particles can be routed along a simulated river delta, example output is from the delta simulation model, <a class="reference external" href="https://github.com/DeltaRCM/pyDeltaRCM">DeltaRCM</a>.
 To do this, we will be using one of the high-level API functions provided in <a class="reference download internal" download="" href="../_downloads/79b83c161465f6a40f8f6b68becb9356/routines.py"><code class="xref download docutils literal notranslate"><span class="pre">routines.py</span></code></a>.
 A set of 50 particles will be seeded in the main channel of the synthetic delta.
@@ -75,7 +76,7 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 </figure>
 </section>
 <section id="demo-2-using-lower-level-functionality">
-<h2>Demo 2 - Using Lower-Level Functionality<a class="headerlink" href="#demo-2-using-lower-level-functionality" title="Permalink to this headline">¶</a></h2>
+<h2>Demo 2 - Using Lower-Level Functionality<a class="headerlink" href="#demo-2-using-lower-level-functionality" title="Permalink to this heading">¶</a></h2>
 <p>In this demo, we show how particles can be placed on a gridded flow field generated using the <a class="reference external" href="https://github.com/GeoscienceAustralia/anuga_core">ANUGA</a> software package. Instead of specifying the number of iterations for the particles to walk, we will be specifying a target travel time for the particles to travel in this demo. To do this, we will use some of the lower-level functionality accessible in <a class="reference download internal" download="" href="../_downloads/c39b58a931465f459ba4c1514f43c368/particle_track.py"><code class="xref download docutils literal notranslate"><span class="pre">particle_track.py</span></code></a>.</p>
 <p>First we load the grid parameters for this example. The longer <a class="reference internal" href="../examples/index.html#examples"><span class="std std-ref">Examples</span></a> provide guidance on how to define your own grid parameters.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
@@ -206,7 +207,7 @@ until the target travel time of 2100 seconds is reached.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -223,7 +224,7 @@ until the target travel time of 2100 seconds is reached.</p>
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

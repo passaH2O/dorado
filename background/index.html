@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Background &#8212; dorado 2.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -14,6 +14,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,24 +37,24 @@
           <div class="body" role="main">
             
   <section id="background">
-<span id="id1"></span><h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Background<a class="headerlink" href="#background" title="Permalink to this heading">¶</a></h1>
 <section id="motivation">
-<h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
-<p><cite>dorado</cite> was developed to provide an open-source and general method for routing passive tracer particles in a landscape scale flow field. Methods to simulate Lagrangian particle transport exist in adjacent fields and have been developed to solve problems at large scales <a class="footnote-reference brackets" href="#id9" id="id2">1</a> and at small scales <a class="footnote-reference brackets" href="#id10" id="id3">2</a>. The popular Delft3D suite of modules contains a method for Lagrangian particle tracking called Delft3D-PART <a class="footnote-reference brackets" href="#id11" id="id4">3</a>, however as part of the larger, complex Delft3D ecosystem, this code is harder to interrogate and understand directly.</p>
+<h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this heading">¶</a></h2>
+<p><cite>dorado</cite> was developed to provide an open-source and general method for routing passive tracer particles in a landscape scale flow field. Methods to simulate Lagrangian particle transport exist in adjacent fields and have been developed to solve problems at large scales <a class="footnote-reference brackets" href="#id9" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and at small scales <a class="footnote-reference brackets" href="#id10" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. The popular Delft3D suite of modules contains a method for Lagrangian particle tracking called Delft3D-PART <a class="footnote-reference brackets" href="#id11" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, however as part of the larger, complex Delft3D ecosystem, this code is harder to interrogate and understand directly.</p>
 <p>By developing <cite>dorado</cite> as a standalone python package, we hope to simplify the simulation of Lagrangian particle transport so that it may be applied to the results from any hydrodynamic simulation.</p>
 </section>
 <section id="name">
-<h2>Name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h2>
+<h2>Name<a class="headerlink" href="#name" title="Permalink to this heading">¶</a></h2>
 <p>The name <cite>dorado</cite> is inspired by the <a class="reference external" href="https://en.wikipedia.org/wiki/Salminus_brasiliensis">fish</a>.</p>
 </section>
 <section id="theory">
-<h2>Theory<a class="headerlink" href="#theory" title="Permalink to this headline">¶</a></h2>
-<p>Particle transport is simulated through the use of a weighted random walk framework <a class="footnote-reference brackets" href="#id12" id="id5">4</a>. In particular, we apply methods similar to those used in the numerical model DeltaRCM <a class="footnote-reference brackets" href="#id13" id="id6">5</a> <a class="footnote-reference brackets" href="#id14" id="id7">6</a>, to weight the random walk by the local water slopes and the water discharge components.</p>
+<h2>Theory<a class="headerlink" href="#theory" title="Permalink to this heading">¶</a></h2>
+<p>Particle transport is simulated through the use of a weighted random walk framework <a class="footnote-reference brackets" href="#id12" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>. In particular, we apply methods similar to those used in the numerical model DeltaRCM <a class="footnote-reference brackets" href="#id13" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id14" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>, to weight the random walk by the local water slopes and the water discharge components.</p>
 <p><cite>dorado</cite> assumes a rectangular grid and routes particles in a D-8 fashion assuming that the potential future location of a given particle is one of the surrounding 8 cells.</p>
 <p>The weights for the random walk are sensitive to 2 parameters, <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> and <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/>.</p>
-<p>The routing direction (F*) is the estimate of the local downstream of the flow <a class="footnote-reference brackets" href="#id13" id="id8">5</a>. This direction F* is comprised of <img class="math" src="../_images/math/b0d217d5047cc28d4466313f694710f81cc7e5aa.png" alt="{F_{sfc}}"/>, and <img class="math" src="../_images/math/b6653402239f6e4117110f6ea175232eaef35da1.png" alt="{F_{int}}"/>, calculated based on the water surface gradient and the discharge respectively. The proportional combination of these directional components is dictated by the parameter <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/>:</p>
+<p>The routing direction (F) is the estimate of the local downstream of the flow <a class="footnote-reference brackets" href="#id13" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>. This direction F is comprised of <img class="math" src="../_images/math/b0d217d5047cc28d4466313f694710f81cc7e5aa.png" alt="{F_{sfc}}"/>, and <img class="math" src="../_images/math/b6653402239f6e4117110f6ea175232eaef35da1.png" alt="{F_{int}}"/>, calculated based on the water surface gradient and the discharge respectively. The proportional combination of these directional components is dictated by the parameter <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/>:</p>
 <div class="math">
-<p><img src="../_images/math/971e88747be9a814c11c7212701f6f1809813a2d.png" alt="F^{*} = \gamma F_{sfc} + (1-\gamma) F_{int}"/></p>
+<p><img src="../_images/math/1e5e329944ae5abecc634f7e9b70e77bf425e97a.png" alt="F = \gamma F_{sfc} + (1-\gamma) F_{int}"/></p>
 </div><p>In this way, the <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> parameter controls the proportional dependence of water surface slope and water discharge on the downstream direction. A <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> of 0 means that the water slope is ignored when determining the downstream flow direction, and a <img class="math" src="../_images/math/c2a44b40f0aac3b2d275b26de9753464ca075e98.png" alt="{\gamma}"/> of 1 means that the discharge values (the flow field) is ignored.</p>
 <p>The second weighting parameter, <img class="math" src="../_images/math/99dc5faa048afe77c592f876f9a1a85cb502b48c.png" alt="{\theta}"/> modifies the routing weight for the random walk based on the local water depth value. The routing weights for each neighboring cell are calculated per [5], using the following equation:</p>
 <div class="math">
@@ -72,27 +73,32 @@
 </div><p>When <img class="math" src="../_images/math/6d0ed532f0bd7a766d30706acbd8bc2c34348891.png" alt="{dc}"/> is 0, then the travel time calculation is based solely on the velocity field and deviation in particle path trajectory from the mean flow path. As the diffusivity coefficient is increased, the diffusivity present in travel time distributions will increase as well.</p>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
-<dd><p>Dagestad, K.-F., Röhrs, J., Breivik, Ø., and Ådlandsvik, B.: OpenDrift v1.0: a generic framework for trajectory modelling, Geosci. Model Dev., 11, 1405-1420, <a class="reference external" href="https://doi.org/10.5194/gmd-11-1405-2018">https://doi.org/10.5194/gmd-11-1405-2018</a>, 2018.</p>
-</dd>
-<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
-<dd><p>ANGE Team, Freshkiss3D home page. Available at: <a class="reference external" href="https://freshkiss3d.gitlabpages.inria.fr/freshkiss3d/">https://freshkiss3d.gitlabpages.inria.fr/freshkiss3d/</a></p>
-</dd>
-<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
-<dd><p>Hydraulics, D. (2007). Delft3D-PART user manual version 2.13. WL| Delft Hydraulics, Delft.</p>
-</dd>
-<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id5">4</a></span></dt>
-<dd><p>Pearson, K. (1905). The problem of the random walk. Nature, 72(1867), 342-342.</p>
-</dd>
-<dt class="label" id="id13"><span class="brackets">5</span><span class="fn-backref">(<a href="#id6">1</a>,<a href="#id8">2</a>)</span></dt>
-<dd><p>Liang, M., Voller, V. R., &amp; Paola, C. (2015). A reduced-complexity model for river delta formation-Part 1: Modeling deltas with channel dynamics. Earth Surface Dynamics, 3(1).</p>
-</dd>
-<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id7">6</a></span></dt>
-<dd><p>Liang, M., Geleynse, N., Edmonds, D. A., &amp; Passalacqua, P. (2015). A reduced-complexity model for river delta formation-Part 2: Assessment of the flow routing scheme. Earth Surface Dynamics, 3(1), 87.</p>
-</dd>
-</dl>
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
+<aside class="footnote brackets" id="id9" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Dagestad, K.-F., Röhrs, J., Breivik, Ø., and Ådlandsvik, B.: OpenDrift v1.0: a generic framework for trajectory modelling, Geosci. Model Dev., 11, 1405-1420, <a class="reference external" href="https://doi.org/10.5194/gmd-11-1405-2018">https://doi.org/10.5194/gmd-11-1405-2018</a>, 2018.</p>
+</aside>
+<aside class="footnote brackets" id="id10" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>ANGE Team, Freshkiss3D home page. Available at: <a class="reference external" href="https://freshkiss3d.gitlabpages.inria.fr/freshkiss3d/">https://freshkiss3d.gitlabpages.inria.fr/freshkiss3d/</a></p>
+</aside>
+<aside class="footnote brackets" id="id11" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<p>Hydraulics, D. (2007). Delft3D-PART user manual version 2.13. WL| Delft Hydraulics, Delft.</p>
+</aside>
+<aside class="footnote brackets" id="id12" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">4</a><span class="fn-bracket">]</span></span>
+<p>Pearson, K. (1905). The problem of the random walk. Nature, 72(1867), 342-342.</p>
+</aside>
+<aside class="footnote brackets" id="id13" role="note">
+<span class="label"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id6">1</a>,<a role="doc-backlink" href="#id8">2</a>)</span>
+<p>Liang, M., Voller, V. R., &amp; Paola, C. (2015). A reduced-complexity model for river delta formation-Part 1: Modeling deltas with channel dynamics. Earth Surface Dynamics, 3(1).</p>
+</aside>
+<aside class="footnote brackets" id="id14" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">6</a><span class="fn-bracket">]</span></span>
+<p>Liang, M., Geleynse, N., Edmonds, D. A., &amp; Passalacqua, P. (2015). A reduced-complexity model for river delta formation-Part 2: Assessment of the flow routing scheme. Earth Surface Dynamics, 3(1), 87.</p>
+</aside>
 </section>
 </section>
 
@@ -154,7 +160,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -171,7 +177,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
