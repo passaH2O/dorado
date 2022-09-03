@@ -14,7 +14,6 @@ setup(
     package_data = {'' : ['*.txt', '*.npz']},
     long_description = 'See project webpage for details: https://github.com/passaH2O/dorado',
     classifiers = ['Programming Language :: Python :: 2.7',
-                   'Programming Language :: Python :: 3.6',
                    'Programming Language :: Python :: 3.7',
                    'Programming Language :: Python :: 3.8',
 		   'Programming Language :: Python :: 3.9'],
