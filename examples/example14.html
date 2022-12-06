@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="License" href="../misc/license.html" />
@@ -41,13 +42,13 @@
 <p>In this example, we analyze the travel history of a particle injection by computing the “nourishment area” and “nourishment time” for a given seed location.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/3f26f22f95a982e856b1b53c4691022f/nourishment_example.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>We will again make use of the DeltaRCM example data used in <a class="reference internal" href="example02.html#example02"><span class="std std-ref">Example 2 - Particles in Steady Flow (DeltaRCM)</span></a>, but in this case we will slightly change the settings used in the random walk. In particular, this time we will include discharge fields, in order to obtain more useful travel time information.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;ex_deltarcm_data.npz&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now we will create the parameter class and assign attributes to it.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;qx&#39;</span><span class="p">]</span>
@@ -58,7 +59,7 @@
 </pre></div>
 </div>
 <p>Now that the parameters have all been defined, we will define the particles class and generate a set of particles.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">137</span><span class="p">,</span> <span class="mi">140</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">300</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">particles</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">Particles</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -66,11 +67,11 @@
 </pre></div>
 </div>
 <p>Now, we will route the particles for 120 iterations. Notice that we have used more particles and iterations than in <a class="reference internal" href="example02.html#example02"><span class="std std-ref">Example 2 - Particles in Steady Flow (DeltaRCM)</span></a> – this helps us obtain more statistically representative results later on.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="s1">&#39;nourishment_example&#39;</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="s1">&#39;nourishment_example&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now that we have an existing <cite>walk_data</cite> dictionary, let’s visualize some bulk information about the travel history. First, we can compute which regions of the domain were most visited by particles. This metric is often referred to as the <cite>Nourishment Area</cite> (e.g. Liang et al., 2016, doi.org/10.1002/2015JF003653) of a sample location, as it represents regions which are “nourished” by material from that location. We can compute how frequently cells were visited by particles using the <cite>nourishment_area</cite> function, and visualize the results using the <cite>show_nourishment_area</cite> routine.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">visit_freq</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">nourishment_area</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">visit_freq</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">nourishment_area</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">show_nourishment_area</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -78,7 +79,7 @@
 <p>The result is visualized in the figure above. Flow depth serves as the background in this figure, on top of which the Nourishment Area is shown, with regions colored by how frequently each cell was occupied by particles. Because we are often interested in where particles can go in general, rather than exactly where they have gone, by default this function will perform a small amount of Gaussian filtering, to smooth out some of the stochasticity in the travel paths. This smoothing can be turned off or ramped up depending on the application. Additionally, the plotting routine comes with many optional settings which can be used to change the aesthetics of the resulting figure.</p>
 <p>Because the Nourishment Area is a time-integrated measure of where particles are going, we may also want to know how long particles tend to stay there once they get there. For this question, we have provided a second function, which we are calling the Nourishment Time, which computes how long on average particles spend in each cell they travel through. In steady model runs (such as this one), the result is trivially related to the flow velocity of each cell – however, for unsteady runs, in which the underlying flow field might be changing in between particle iterations, the results of this function can be more interesting.</p>
 <p>Similar to before, we compute this by calling on the <cite>nourishment_time</cite> function, and visualize the results using the <cite>show_nourishment_time</cite> routine.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean_times</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">nourishment_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="mi">95</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean_times</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">particle_track</span><span class="o">.</span><span class="n">nourishment_time</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="mi">95</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span> <span class="o">=</span> <span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">show_nourishment_time</span><span class="p">(</span><span class="n">mean_times</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -180,7 +181,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -43,14 +44,14 @@ Then using information about the water depths and flow rates in the delta, the p
 River deltas are distributary networks, and so the particles will not all travel along the same channels.
 By using a tool like <cite>dorado</cite>, simulated particles can help us answer questions related to hydrological connectivity and nutrient residence times in deltaic systems.</p>
 <p>First we load and create the sample particles object.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.example_data</span> <span class="kn">import</span> <span class="n">define_params</span> <span class="k">as</span> <span class="n">dp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rcmparticles</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">make_rcm_particles</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>We can visualize the water depth for this scenario from the <cite>rcmparticles</cite> object. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/72066b4afc85e809f36daaa658d27ece/demo1_depth.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rcmparticles</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rcmparticles</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Water Depth&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -61,7 +62,7 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
 <img alt="../_images/demo1_depth.png" class="plot-directive" src="../_images/demo1_depth.png" />
 </figure>
 <p>Now let’s route 50 particles for 50 iterations.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">rcmparticles</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;demo-1&#39;</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dorado</span><span class="o">.</span><span class="n">routines</span><span class="o">.</span><span class="n">steady_plots</span><span class="p">(</span><span class="n">rcmparticles</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;demo-1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <cite>steady_plots()</cite> function saves plots of each iteration of the particle movement to the subfolder ‘demo-1/figs’. The final plot is shown below; the initial particle locations are shown as blue dots, and the final particle locations are red dots. If you’d like to download this portion of the demo as a standalone script, it is available <a class="reference download internal" download="" href="../_downloads/504cb022b93d57a45120d56399f684ce/demo1.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
@@ -144,7 +145,7 @@ By using a tool like <cite>dorado</cite>, simulated particles can help us answer
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

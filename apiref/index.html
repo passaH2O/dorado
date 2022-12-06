@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dorado.particle_track" href="particletrack.html" />
@@ -41,10 +42,58 @@
 <p>Below are links to the API reference for each component of the <cite>dorado</cite> software.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="particletrack.html">dorado.particle_track</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lagrangianwalker.html">dorado.lagrangian_walker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routines.html">dorado.routines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parallelrouting.html">dorado.parallel_routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="particletrack.html">dorado.particle_track</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.Particles"><code class="docutils literal notranslate"><span class="pre">Particles</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.coord2ind"><code class="docutils literal notranslate"><span class="pre">coord2ind()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.exposure_time"><code class="docutils literal notranslate"><span class="pre">exposure_time()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.gen_input_check"><code class="docutils literal notranslate"><span class="pre">gen_input_check()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.ind2coord"><code class="docutils literal notranslate"><span class="pre">ind2coord()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.modelParams"><code class="docutils literal notranslate"><span class="pre">modelParams</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_area"><code class="docutils literal notranslate"><span class="pre">nourishment_area()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.nourishment_time"><code class="docutils literal notranslate"><span class="pre">nourishment_time()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="particletrack.html#dorado.particle_track.unstruct2grid"><code class="docutils literal notranslate"><span class="pre">unstruct2grid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lagrangianwalker.html">dorado.lagrangian_walker</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.big_sliding_window"><code class="docutils literal notranslate"><span class="pre">big_sliding_window()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.calc_travel_times"><code class="docutils literal notranslate"><span class="pre">calc_travel_times()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.calculate_new_ind"><code class="docutils literal notranslate"><span class="pre">calculate_new_ind()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.check_for_boundary"><code class="docutils literal notranslate"><span class="pre">check_for_boundary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.clear_borders"><code class="docutils literal notranslate"><span class="pre">clear_borders()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.get_weight"><code class="docutils literal notranslate"><span class="pre">get_weight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.make_weight"><code class="docutils literal notranslate"><span class="pre">make_weight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.particle_stepper"><code class="docutils literal notranslate"><span class="pre">particle_stepper()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.random"><code class="docutils literal notranslate"><span class="pre">random()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.random_pick"><code class="docutils literal notranslate"><span class="pre">random_pick()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.random_pick_seed"><code class="docutils literal notranslate"><span class="pre">random_pick_seed()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.steep_descent"><code class="docutils literal notranslate"><span class="pre">steep_descent()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.step_update"><code class="docutils literal notranslate"><span class="pre">step_update()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.tile_domain_array"><code class="docutils literal notranslate"><span class="pre">tile_domain_array()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangianwalker.html#dorado.lagrangian_walker.tile_local_array"><code class="docutils literal notranslate"><span class="pre">tile_local_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">dorado.routines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.animate_plots"><code class="docutils literal notranslate"><span class="pre">animate_plots()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.draw_travel_path"><code class="docutils literal notranslate"><span class="pre">draw_travel_path()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.get_state"><code class="docutils literal notranslate"><span class="pre">get_state()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.get_time_state"><code class="docutils literal notranslate"><span class="pre">get_time_state()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.plot_exposure_time"><code class="docutils literal notranslate"><span class="pre">plot_exposure_time()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.plot_state"><code class="docutils literal notranslate"><span class="pre">plot_state()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.show_nourishment_area"><code class="docutils literal notranslate"><span class="pre">show_nourishment_area()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.show_nourishment_time"><code class="docutils literal notranslate"><span class="pre">show_nourishment_time()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.snake_plots"><code class="docutils literal notranslate"><span class="pre">snake_plots()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.steady_plots"><code class="docutils literal notranslate"><span class="pre">steady_plots()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.time_plots"><code class="docutils literal notranslate"><span class="pre">time_plots()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="routines.html#dorado.routines.unsteady_plots"><code class="docutils literal notranslate"><span class="pre">unsteady_plots()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parallelrouting.html">dorado.parallel_routing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parallelrouting.html#dorado.parallel_routing.combine_result"><code class="docutils literal notranslate"><span class="pre">combine_result()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelrouting.html#dorado.parallel_routing.parallel_obj"><code class="docutils literal notranslate"><span class="pre">parallel_obj</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelrouting.html#dorado.parallel_routing.parallel_routing"><code class="docutils literal notranslate"><span class="pre">parallel_routing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallelrouting.html#dorado.parallel_routing.run_iter"><code class="docutils literal notranslate"><span class="pre">run_iter()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 <section id="search">
@@ -130,7 +179,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

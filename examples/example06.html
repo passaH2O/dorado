@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 7 - Drawing Particle Travel Paths (DeltaRCM)" href="example07.html" />
@@ -42,7 +43,7 @@
 <p>In this method, we allow the particles to take as many iterations as they need (individually) to get as close as possible to the target travel time that we prescribe.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/0905f09ef8e59a134e5971927e870f4c/set_timestep_anuga_particles.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>After loading the data and establishing the parameters in the same way we did in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, we will change the grid size so that the range of travel times we can obtain in this small example is a bit better constrained. Then we will just define our particle seeding locations and generate the particles so they can be used for the routing.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">10.</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">10.</span>
 <span class="go"># set up the particles</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">53</span><span class="p">))</span>
@@ -53,7 +54,7 @@
 </div>
 <p>We note that by discretizing our grid and the particle routing procedure, we are unable to prescribe precise particle travel times. Due to the gridded scheme, we can only measure particle travel times when particles are located at the center of a cell. So when a target travel time is set, the particle travel times are not precisely that number, but rather the closest times corresponding to when each particle is in a cell center.</p>
 <p>To set a travel time target, we will use the lower-level API and access the <cite>particle_track</cite> module directly, and then use some routines to plot the initial and final particle locations. The target travel time we will be using is 2100 seconds.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="mi">2100</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">run_iteration</span><span class="p">(</span><span class="n">target_time</span><span class="o">=</span><span class="mi">2100</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">routines</span><span class="o">.</span><span class="n">plot_state</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">routines</span><span class="o">.</span><span class="n">plot_final</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Initial and Final Particle Locations&#39;</span><span class="p">)</span>
@@ -65,7 +66,7 @@
 <img alt="../_images/demo2.png" class="plot-directive" src="../_images/demo2.png" />
 </figure>
 <p>To see how close we are to the prescribed target travel time of 2100 seconds, we will get a list of the final travel times that we then print to the console. We can access the data from the most recent step using <cite>get_state</cite>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">finaltimes</span> <span class="o">=</span> <span class="n">routines</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of particle travel times for final particle locations: &#39;</span> <span class="o">+</span>
 <span class="gp">&gt;&gt;&gt; </span>      <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">finaltimes</span><span class="p">)))</span>
 
@@ -172,7 +173,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

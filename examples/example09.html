@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 10 - Routing Particles in Parallel" href="example10.html" />
@@ -41,7 +42,7 @@
 <p><cite>dorado</cite> is fundamentally built on the concept of random walks. We can strip away the directed/weighted nature of the particle routing to return to a regular 2-D random walk process. This is what we will do in this example.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/0eea37275ca9c4c359f5480d828e6865/true_random_walk.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>First we will define our parameters for the unweighted random walk. To do this, we will simulate a constant water depth, and provide no flow information. Then we will set all of our weighting parameters to 0.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado</span> <span class="kn">import</span> <span class="n">particle_track</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado</span> <span class="kn">import</span> <span class="n">routines</span>
 
@@ -57,7 +58,7 @@
 </pre></div>
 </div>
 <p>We will initialize the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.Particles" title="dorado.particle_track.Particles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.Particles</span></code></a> class, seed 50 particles in the center of our artificial domain, and then simulate their movement using the <cite>steady_plots</cite> routine.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">56</span><span class="p">))</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seed_xloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">56</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">seed_yloc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">56</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">50</span>
 
@@ -165,7 +166,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

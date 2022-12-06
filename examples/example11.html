@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 12 - Unsteady Flow Fields" href="example12.html" />
@@ -40,7 +41,7 @@
 <span id="example11"></span><h1>Example 11 - The Travel Time Diffusion Coefficient<a class="headerlink" href="#example-11-the-travel-time-diffusion-coefficient" title="Permalink to this heading">¶</a></h1>
 <p>In this example, we will develop a simple straight channel with steady, uniform flow. Then we will use two different travel time diffusion coefficient values (<cite>diff_coeff</cite>) and look at the impact on the particle travel time distributions at a specific location.</p>
 <p>Shortened code for the synthetic channel creation will be provided, for the full code refer to the <a class="reference download internal" download="" href="../_downloads/a3814eee3ab4138780a8374bcb7ae1d7/traveltime_straight_channel.py"><code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">script</span></code></a>.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">dorado.particle_track</span> <span class="k">as</span> <span class="nn">pt</span>
 
@@ -53,12 +54,12 @@
 </div>
 <p>In the 100 x 50 cell domain, we have a straight channel with flow from the top of the domain to the bottom at -10 m/s. Our cell size is 50m, and the particles will be seeded at row 10. We will define a region of interest that extends to row 70, and apply the <a class="reference internal" href="../apiref/particletrack.html#dorado.particle_track.exposure_time" title="dorado.particle_track.exposure_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dorado.particle_track.exposure_time</span></code></a> function to calculate the travel times of the particles. The region will end at the boundary of row 70. Since the flow velocity is both steady and uniform in this channel, our expected travel time is simply:</p>
 <div class="math">
-<p><img src="../_images/math/0fc6735852312d3f77a8dc30ba3633a13855e8bd.png" alt="\begin{eqnarray}
+<p><img src="_images/math/0fc6735852312d3f77a8dc30ba3633a13855e8bd.png" alt="\begin{eqnarray}
 {\text{Exp. Time} = 59.5 \text{ cells} \times 50 \text{ m/cell} \div 10 \text{ m/s} = 297.5 \text{ seconds}}.
 \end{eqnarray}"/></p>
 </div><p>With this in mind we will conduct two simulations, both using 500 tracer particles. In the first, we will set the travel time diffusion coefficient (<cite>diff_coeff</cite>) to 0, and in the second we will set it to 1.0 (a significant amount of added diffusivity).</p>
 <p>Shortened parameter initialization:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">modelParams</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">v</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="n">dx</span>
@@ -66,7 +67,7 @@
 </pre></div>
 </div>
 <p>Then we will define <cite>diff_coeff</cite>, initialize the Particle class, and do the simulation.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">dc</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">dc</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="c1"># set diff_coeff</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">if</span> <span class="n">dc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
 <span class="gp">&gt;&gt;&gt; </span>       <span class="n">params</span><span class="o">.</span><span class="n">diff_coeff</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -181,7 +182,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

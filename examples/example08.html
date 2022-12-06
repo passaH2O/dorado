@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Example 9 - True Random Walk" href="example09.html" />
@@ -41,7 +42,7 @@
 <p>In this example, we will use the particles movement simulated in <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, and visualize some of the particle travel paths.</p>
 <p>Full example script available <a class="reference download internal" download="" href="../_downloads/b69bf3de903ec893fd03b5a4d15879ca/draw_anuga_particle_paths.py"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
 <p>First run <a class="reference internal" href="example01.html#example01"><span class="std std-ref">Example 1 - Particles in Steady Flow (ANUGA)</span></a>, and then we can access and use the particle travel information output by that example.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dorado.routines</span> <span class="kn">import</span> <span class="n">draw_travel_path</span>
@@ -51,7 +52,7 @@
 </pre></div>
 </div>
 <p>Now we will apply the <cite>draw_travel_path</cite> function. In this example we are going to visualize the travel paths of the first 4 particles, indicated by the list we are providing to the <cite>draw_travel_path</cite> function. We will show every other iteration to visually simplify the path, controlled by <cite>interval</cite> parameter.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">draw_travel_path</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">all_walk_data</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">draw_travel_path</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">all_walk_data</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>                 <span class="s1">&#39;steady_anuga_example&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;travel_paths.png&#39;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                 <span class="n">interval</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">plot_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -153,7 +154,7 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

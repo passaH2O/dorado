@@ -16,6 +16,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dorado.lagrangian_walker" href="lagrangianwalker.html" />
@@ -111,7 +112,7 @@ of defined locations. If unspecified, the default is ‘random’.</p>
 </dd>
 <dt>previous_walk_data<span class="classifier"><cite>dict</cite>, optional</span></dt><dd><p>Dictionary of all prior x locations, y locations, and travel
 times. This input parameter should only be used if ‘new’ or
-‘indpendent’ walk data exists (e.g. data loaded from a .json
+‘independent’ walk data exists (e.g. data loaded from a .json
 file). Otherwise the walk data stored in <cite>self.walk_data</cite> is
 likely to contain the previous information. Order of indices is
 previous_walk_data[field][particle][iter], where e.g.
@@ -604,7 +605,7 @@ assumes data have the same coordinates. It is used as follows:
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
