@@ -13,6 +13,14 @@ To `pip`-install this package, first ensure that you have the dependencies liste
 ::
 
     $ pip install pydorado
+    
+Installation via `conda`
+------------------------
+
+This package is available via `conda-forge <https://anaconda.org/conda-forge>`_ and can be installed using `conda` (or `mamba`) using the command:
+::
+
+    $ conda install -c conda-forge pydorado
 
 
 Installation from source
