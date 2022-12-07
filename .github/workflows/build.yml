@@ -43,14 +43,14 @@ jobs:
         file: ./coverage.xml
         env_vars: OS,PYTHON
         name: codecov-umbrella
-        fail_ci_if_error: true
+        fail_ci_if_error: false
 
   legacy:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-20.04, windows-2019]
         python-version: [2.7]
     env:
       OS: ${{ matrix.os }}

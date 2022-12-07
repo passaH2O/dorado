@@ -1,10 +1,9 @@
 import os
 from setuptools import setup, find_packages
-from dorado import __version__
 
 setup(
     name = 'pydorado',
-    version = __version__,
+    version = '2.5.2',
     license = 'MIT',
     description = 'dorado - Lagrangian particle routing routine via weighted random walks',
     author = 'J. Hariharan, K. Wright, P. Passalacqua',

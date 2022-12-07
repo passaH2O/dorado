@@ -463,7 +463,7 @@ class Particles():
             previous_walk_data : `dict`, optional
                 Dictionary of all prior x locations, y locations, and travel
                 times. This input parameter should only be used if 'new' or
-                'indpendent' walk data exists (e.g. data loaded from a .json
+                'independent' walk data exists (e.g. data loaded from a .json
                 file). Otherwise the walk data stored in `self.walk_data` is
                 likely to contain the previous information. Order of indices is
                 previous_walk_data[field][particle][iter], where e.g.
