@@ -30,6 +30,10 @@ dorado supports Python 2.7 as well as Python 3.5+. For the full distribution inc
 For a lightweight distribution including just the core functionality, use `pip` to install via PyPI:
 
     pip install pydorado
+    
+Installation using `conda` via `conda-forge` is also supported:
+
+    conda install -c conda-forge pydorado
 
 For additional installation options and instructions, refer to the [documentation](https://passah2o.github.io/dorado/install/index.html).
 
