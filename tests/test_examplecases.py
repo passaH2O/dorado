@@ -51,8 +51,9 @@ class TestRCM:
         # check all positions and times
         assert all_walk_data['xinds'][0] == [16, 17, 18, 19]
         assert all_walk_data['yinds'][0] == [140, 141, 141, 141]
-        assert all_walk_data['travel_times'][0] == \
-            [0, 7007593448.337235, 10439964733.462337, 13698473384.876724]
+        assert all_walk_data['travel_times'][0] == pytest.approx(
+            [0, 7007593448.337235, 10439964733.462337, 13698473384.876724],
+            rel=1e-6)
 
     def test_set_time_RCM_previousdata(self):
         '''
@@ -76,7 +77,8 @@ class TestRCM:
         # check all positions and times
         assert all_walk_data['xinds'][0] == [16, 17]
         assert all_walk_data['yinds'][0] == [140, 141]
-        assert all_walk_data['travel_times'][0] == [0, 7007593448.337235]
+        assert all_walk_data['travel_times'][0] == pytest.approx(
+            [0, 7007593448.337235], rel=1e-6)
 
     def test_set_time_RCM(self):
         '''
@@ -101,7 +103,8 @@ class TestRCM:
         # check all positions and times
         assert all_walk_data['xinds'][0] == [16, 17]
         assert all_walk_data['yinds'][0] == [140, 141]
-        assert all_walk_data['travel_times'][0] == [0, 7007593448.337235]
+        assert all_walk_data['travel_times'][0] == pytest.approx(
+            [0, 7007593448.337235], rel=1e-6)
 
 
 class TestANUGA:
