@@ -25,7 +25,7 @@ For user guides and detailed examples, refer to the [documentation](https://pass
 </div>
 
 ## Installation:
-dorado supports Python 2.7 as well as Python 3.5+. For the full distribution including examples, clone this repository using `git clone` and run `python setup.py install` from the cloned directory. To test this "full" installation, you must first install `pytest` via `pip install pytest`. Then from the cloned directory the command `pytest` can be run to ensure that your installed distribution passes all of the unit tests.
+dorado supports Python 3.5+. For the full distribution including examples, clone this repository using `git clone` and run `python setup.py install` from the cloned directory. To test this "full" installation, you must first install `pytest` via `pip install pytest`. Then from the cloned directory the command `pytest` can be run to ensure that your installed distribution passes all of the unit tests.
 
 For a lightweight distribution including just the core functionality, use `pip` to install via PyPI:
 
