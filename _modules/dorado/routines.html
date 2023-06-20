@@ -1,19 +1,15 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dorado.routines &#8212; dorado 2.5.2 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.5.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -61,7 +57,7 @@
 <div class="viewcode-block" id="steady_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.steady_plots">[docs]</a><span class="k">def</span> <span class="nf">steady_plots</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span>
                  <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Automated particle movement in steady flow field.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Automated particle movement in steady flow field.</span>
 
 <span class="sd">    Function to automate plotting of particle movement over a steady flow</span>
 <span class="sd">    fields. Particles all have same number of iterations and are allowed to</span>
@@ -156,7 +152,7 @@
 <div class="viewcode-block" id="unsteady_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.unsteady_plots">[docs]</a><span class="k">def</span> <span class="nf">unsteady_plots</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">Np_tracer</span><span class="p">,</span> <span class="n">seed_xloc</span><span class="p">,</span> <span class="n">seed_yloc</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span>
                    <span class="n">output_base</span><span class="p">,</span> <span class="n">output_type</span><span class="p">,</span>
                    <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Automated particle movement in unsteady flow.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Automated particle movement in unsteady flow.</span>
 
 <span class="sd">    Function to automate plotting of particle movement in an unsteady flow</span>
 <span class="sd">    field (time-varying). Particles all have the same travel time at the end</span>
@@ -329,7 +325,7 @@
 
 
 <div class="viewcode-block" id="time_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.time_plots">[docs]</a><span class="k">def</span> <span class="nf">time_plots</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">num_iter</span><span class="p">,</span> <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Steady flow plots with particle travel times visualized.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Steady flow plots with particle travel times visualized.</span>
 
 <span class="sd">    Make plots with each particle&#39;s travel time visualized.</span>
 <span class="sd">    Routine assumes a steady flow field, but could be expanded to an unsteady</span>
@@ -424,7 +420,7 @@
 <span class="c1"># Functions for plotting/interpreting outputs</span>
 <span class="c1"># --------------------------------------------------------</span>
 <div class="viewcode-block" id="get_state"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.get_state">[docs]</a><span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Pull walk_data values from a specific iteration.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pull walk_data values from a specific iteration.</span>
 
 <span class="sd">    Routine to return slices of the walk_data dict at a given iteration #.</span>
 <span class="sd">    This function provides a shortcut to &#39;smart&#39; indexing of the dict.</span>
@@ -486,7 +482,7 @@
 
 
 <div class="viewcode-block" id="get_time_state"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.get_time_state">[docs]</a><span class="k">def</span> <span class="nf">get_time_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span> <span class="n">target_time</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Pull walk_data values nearest to a specific time.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pull walk_data values nearest to a specific time.</span>
 
 <span class="sd">    Routine to return slices of the walk_data dict at a given travel time.</span>
 <span class="sd">    This function provides a shortcut to &#39;smart&#39; indexing of the dict.</span>
@@ -550,7 +546,7 @@
                        <span class="n">nbins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                        <span class="n">save_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot exposure time distribution of particles in a specified region.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot exposure time distribution of particles in a specified region.</span>
 
 <span class="sd">    Function to plot the exposure time distribution (ETD) of particles to</span>
 <span class="sd">    the specified region. Relies on the output of particle_track.exposure_time</span>
@@ -709,7 +705,7 @@
 <span class="c1"># requires installation of the animation writer &#39;ffmpeg&#39; which is not part of</span>
 <span class="c1"># the default installation set of packages</span>
 <div class="viewcode-block" id="animate_plots"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.animate_plots">[docs]</a><span class="k">def</span> <span class="nf">animate_plots</span><span class="p">(</span><span class="n">start_val</span><span class="p">,</span> <span class="n">end_val</span><span class="p">,</span> <span class="n">folder_name</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Animation routine, requires an optional animation writer.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Animation routine, requires an optional animation writer.</span>
 
 <span class="sd">    Routine to make mp4 animation of the particle routing from png outputs</span>
 <span class="sd">    of the previous plotting routines.</span>
@@ -780,7 +776,7 @@
                      <span class="n">particles_to_follow</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
                      <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;travel_paths.png&#39;</span><span class="p">,</span>
                      <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot_legend</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Make a plot with the travel path of specified particles drawn out.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a plot with the travel path of specified particles drawn out.</span>
 
 <span class="sd">    **Inputs** :</span>
 
@@ -859,7 +855,7 @@
 
 
 <div class="viewcode-block" id="plot_state"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.plot_state">[docs]</a><span class="k">def</span> <span class="nf">plot_state</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">walk_data</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">target_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot particle positions on an array.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot particle positions on an array.</span>
 
 <span class="sd">    **Inputs** :</span>
 
@@ -913,7 +909,7 @@
                 <span class="n">rgba_start</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                 <span class="n">rgba_end</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot particle positions with a trailing tail.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot particle positions with a trailing tail.</span>
 
 <span class="sd">    Loops through existing walk_data history and creates a series of</span>
 <span class="sd">    plots of the particle locations, with recent locations shown as a</span>
@@ -1046,7 +1042,7 @@
 <div class="viewcode-block" id="show_nourishment_area"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.show_nourishment_area">[docs]</a><span class="k">def</span> <span class="nf">show_nourishment_area</span><span class="p">(</span><span class="n">visit_freq</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Reds&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">min_alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                           <span class="n">show_seed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed_color</span><span class="o">=</span><span class="s1">&#39;dodgerblue&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot a smoothed, normalized heatmap of particle visit frequency.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot a smoothed, normalized heatmap of particle visit frequency.</span>
 
 <span class="sd">    Function will plot the history of particle travel locations in walk_data</span>
 <span class="sd">    as a heatmap overtop the specified grid, using the output of</span>
@@ -1138,7 +1134,7 @@
 <div class="viewcode-block" id="show_nourishment_time"><a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.show_nourishment_time">[docs]</a><span class="k">def</span> <span class="nf">show_nourishment_time</span><span class="p">(</span><span class="n">mean_times</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">walk_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma&#39;</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                           <span class="n">show_seed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed_color</span><span class="o">=</span><span class="s1">&#39;dodgerblue&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot a smoothed heatmap of mean particle visit time.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot a smoothed heatmap of mean particle visit time.</span>
 
 <span class="sd">    Function will plot the history of mean particle travel times in walk_data</span>
 <span class="sd">    as a heatmap overtop the specified grid, using the output of</span>
@@ -1309,8 +1305,8 @@
       &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
     </div>
 
