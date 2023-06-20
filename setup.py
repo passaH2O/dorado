@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pydorado',
-    version = '2.5.2',
+    version = '2.5.3',
     license = 'MIT',
     description = 'dorado - Lagrangian particle routing routine via weighted random walks',
     author = 'J. Hariharan, K. Wright, P. Passalacqua',
@@ -12,10 +12,13 @@ setup(
     packages = find_packages(exclude=['*.tests']),
     package_data = {'' : ['*.txt', '*.npz']},
     long_description = 'See project webpage for details: https://github.com/passaH2O/dorado',
-    classifiers = ['Programming Language :: Python :: 2.7',
-                   'Programming Language :: Python :: 3.7',
-                   'Programming Language :: Python :: 3.8',
-		   'Programming Language :: Python :: 3.9'],
+    classifiers = [
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+		'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.11'],
     install_requires = ['numpy','matplotlib','scipy',
                         'future','tqdm'],
 )
