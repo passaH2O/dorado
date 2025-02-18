@@ -1203,7 +1203,7 @@ def unstruct2grid(coordinates,
     if k_nearest_neighbors == 1:  # Only use nearest neighbor
         index_qFun = interpolate.NearestNDInterpolator(inputXY,
                      np.arange(len(x), dtype='int64').transpose())
-        gridqInd = index_qFun(gridXY_array)
+        gridqInd = index_qFun(gridXY_array).astype(int)
 
         # Function to do the interpolation
         def interp_func(data):
