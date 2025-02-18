@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dorado.lagrangian_walker &#8212; dorado 2.5.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <title>dorado.lagrangian_walker &#8212; dorado 2.5.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/documentation_options.js?v=c0370f68"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -37,15 +39,17 @@
 
 <span class="sd">Project Homepage: https://github.com/passaH2O/dorado</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">map</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">random</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">maximum</span><span class="p">,</span> <span class="n">nansum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">builtins</span><span class="w"> </span><span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">map</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">cos</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">maximum</span><span class="p">,</span> <span class="n">nansum</span>
 
 
-<div class="viewcode-block" id="random_pick_seed"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.random_pick_seed">[docs]</a><span class="k">def</span> <span class="nf">random_pick_seed</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">probs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="random_pick_seed">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.random_pick_seed">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_pick_seed</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">probs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Randomly pick a number from array of choices.</span>
 
 <span class="sd">    **Inputs** :</span>
@@ -72,7 +76,10 @@
     <span class="k">return</span> <span class="n">choices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="big_sliding_window"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.big_sliding_window">[docs]</a><span class="k">def</span> <span class="nf">big_sliding_window</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
+
+<div class="viewcode-block" id="big_sliding_window">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.big_sliding_window">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">big_sliding_window</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates 3D array organizing local neighbors at every index</span>
 
 <span class="sd">    Returns a raster of shape (L,W,9) which organizes (along the third</span>
@@ -110,7 +117,10 @@
     <span class="k">return</span> <span class="n">big_ravel</span></div>
 
 
-<div class="viewcode-block" id="tile_local_array"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.tile_local_array">[docs]</a><span class="k">def</span> <span class="nf">tile_local_array</span><span class="p">(</span><span class="n">local_array</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+
+<div class="viewcode-block" id="tile_local_array">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.tile_local_array">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tile_local_array</span><span class="p">(</span><span class="n">local_array</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Take a local array [[NW, N, NE], [W, 0, E], [SW, S, SE]]</span>
 <span class="sd">    and repeat it into an array of shape (L,W,9), where L, W are</span>
 <span class="sd">    the shape of the domain, and the original elements are ordered</span>
@@ -137,7 +147,10 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">local_array</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="tile_domain_array"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.tile_domain_array">[docs]</a><span class="k">def</span> <span class="nf">tile_domain_array</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
+
+<div class="viewcode-block" id="tile_domain_array">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.tile_domain_array">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tile_domain_array</span><span class="p">(</span><span class="n">raster</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Repeat a large 2D array 9 times along the third axis.</span>
 <span class="sd">    Helper function for make_weight.</span>
 
@@ -155,7 +168,10 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">raster</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="mi">9</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="clear_borders"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.clear_borders">[docs]</a><span class="k">def</span> <span class="nf">clear_borders</span><span class="p">(</span><span class="n">tiled_array</span><span class="p">):</span>
+
+<div class="viewcode-block" id="clear_borders">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.clear_borders">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_borders</span><span class="p">(</span><span class="n">tiled_array</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set to zero all the edge elements of a vertical stack</span>
 <span class="sd">    of 2D arrays. Helper function for make_weight.</span>
 
@@ -179,7 +195,10 @@
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="make_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.make_weight">[docs]</a><span class="k">def</span> <span class="nf">make_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">):</span>
+
+<div class="viewcode-block" id="make_weight">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.make_weight">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create the weighting array for particle routing</span>
 
 <span class="sd">    Function to compute the routing weights at each index, which gets</span>
@@ -253,7 +272,10 @@
     <span class="n">Particles</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span></div>
 
 
-<div class="viewcode-block" id="get_weight"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.get_weight">[docs]</a><span class="k">def</span> <span class="nf">get_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_weight">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.get_weight">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_weight</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose new cell location given an initial location.</span>
 
 <span class="sd">    Function to randomly choose 1 of the surrounding 8 cells around the</span>
@@ -283,7 +305,10 @@
     <span class="k">return</span> <span class="n">new_cell</span></div>
 
 
-<div class="viewcode-block" id="calculate_new_ind"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.calculate_new_ind">[docs]</a><span class="k">def</span> <span class="nf">calculate_new_ind</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">new_cell</span><span class="p">,</span> <span class="n">iwalk</span><span class="p">,</span> <span class="n">jwalk</span><span class="p">):</span>
+
+<div class="viewcode-block" id="calculate_new_ind">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.calculate_new_ind">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_new_ind</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">new_cell</span><span class="p">,</span> <span class="n">iwalk</span><span class="p">,</span> <span class="n">jwalk</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add new cell location (1-8 value) to the previous index.</span>
 
 <span class="sd">    **Inputs** :</span>
@@ -315,7 +340,10 @@
     <span class="k">return</span> <span class="n">new_ind</span></div>
 
 
-<div class="viewcode-block" id="step_update"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.step_update">[docs]</a><span class="k">def</span> <span class="nf">step_update</span><span class="p">(</span><span class="n">new_cell</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
+
+<div class="viewcode-block" id="step_update">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.step_update">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_update</span><span class="p">(</span><span class="n">new_cell</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get distance to new particle location.</span>
 
 <span class="sd">    Function to check new location is some distance away from old one,</span>
@@ -344,7 +372,10 @@
     <span class="k">return</span> <span class="n">dist</span></div>
 
 
-<div class="viewcode-block" id="calc_travel_times"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.calc_travel_times">[docs]</a><span class="k">def</span> <span class="nf">calc_travel_times</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">new_cell</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">new_ind</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+
+<div class="viewcode-block" id="calc_travel_times">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.calc_travel_times">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_travel_times</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">new_cell</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">new_ind</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate travel time for particle to get to the new location.</span>
 
 <span class="sd">    Function to calculate the travel time for the particle to get from the</span>
@@ -399,7 +430,10 @@
     <span class="k">return</span> <span class="n">trav_time</span></div>
 
 
-<div class="viewcode-block" id="check_for_boundary"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.check_for_boundary">[docs]</a><span class="k">def</span> <span class="nf">check_for_boundary</span><span class="p">(</span><span class="n">new_inds</span><span class="p">,</span> <span class="n">current_inds</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">):</span>
+
+<div class="viewcode-block" id="check_for_boundary">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.check_for_boundary">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_for_boundary</span><span class="p">(</span><span class="n">new_inds</span><span class="p">,</span> <span class="n">current_inds</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure new location is not a boundary cell.</span>
 
 <span class="sd">    Function to make sure particle is not exiting the boundary with the</span>
@@ -439,7 +473,10 @@
     <span class="k">return</span> <span class="n">new_inds</span></div>
 
 
-<div class="viewcode-block" id="random_pick"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.random_pick">[docs]</a><span class="k">def</span> <span class="nf">random_pick</span><span class="p">(</span><span class="n">probs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="random_pick">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.random_pick">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_pick</span><span class="p">(</span><span class="n">probs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pick value from weighted probability array.</span>
 
 <span class="sd">    Randomly pick a number weighted by array probs (len 8)</span>
@@ -465,7 +502,10 @@
     <span class="k">return</span> <span class="n">idx</span></div>
 
 
-<div class="viewcode-block" id="steep_descent"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.steep_descent">[docs]</a><span class="k">def</span> <span class="nf">steep_descent</span><span class="p">(</span><span class="n">probs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="steep_descent">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.steep_descent">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">steep_descent</span><span class="p">(</span><span class="n">probs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose value with greatest probability, no longer random.</span>
 
 <span class="sd">    Pick the array value with the greatest probability, no longer a</span>
@@ -500,7 +540,10 @@
     <span class="k">return</span> <span class="n">idx</span></div>
 
 
-<div class="viewcode-block" id="particle_stepper"><a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.particle_stepper">[docs]</a><span class="k">def</span> <span class="nf">particle_stepper</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">current_inds</span><span class="p">,</span> <span class="n">travel_times</span><span class="p">):</span>
+
+<div class="viewcode-block" id="particle_stepper">
+<a class="viewcode-back" href="../../apiref/lagrangianwalker.html#dorado.lagrangian_walker.particle_stepper">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">particle_stepper</span><span class="p">(</span><span class="n">Particles</span><span class="p">,</span> <span class="n">current_inds</span><span class="p">,</span> <span class="n">travel_times</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Step particles a single iteration.</span>
 
 <span class="sd">    **Inputs** :</span>
@@ -556,13 +599,14 @@
     <span class="n">travel_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">travel_times</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span></div>
+
 </pre></div>
 
           </div>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../index.html">dorado</a></h1>
 
@@ -573,7 +617,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../quickstart/index.html">Quickstart</a></li>
@@ -606,16 +659,6 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -629,11 +672,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2020, J. Hariharan, K. Wright, P. Passalacqua.
+      &#169;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
     </div>
 
