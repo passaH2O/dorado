@@ -4,7 +4,7 @@
 Installation Instructions
 =========================
 
-dorado is compatible with Python 2.7, 3.6, 3.7, and 3.8. There are only 4 dependencies: `numpy <https://numpy.org/install/>`_, `matplotlib <https://matplotlib.org/3.2.2/users/installing.html>`_, `scipy <https://www.scipy.org/install.html>`_, `future <https://python-future.org/>`_, and `tqdm <https://pypi.org/project/tqdm/>`_.
+dorado is compatible with Python 3.5+. There are only 4 dependencies: `numpy <https://numpy.org/install/>`_, `matplotlib <https://matplotlib.org/3.2.2/users/installing.html>`_, `scipy <https://www.scipy.org/install.html>`_, `future <https://python-future.org/>`_, and `tqdm <https://pypi.org/project/tqdm/>`_.
 
 Installation via `pip`
 ----------------------
