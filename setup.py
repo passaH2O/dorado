@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pydorado',
-    version = '2.5.3',
+    version = '2.5.4',
     license = 'MIT',
     description = 'dorado - Lagrangian particle routing routine via weighted random walks',
     author = 'J. Hariharan, K. Wright, P. Passalacqua',
