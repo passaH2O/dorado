@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=64.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pydorado"
+version = "2.5.4"
+description = "dorado - Lagrangian particle routing routine via weighted random walks"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+authors = [
+    { name = "J. Hariharan", email = "jayaram.hariharan@utexas.edu" },
+    { name = "K. Wright", email = "kyle.wright@twdb.texas.gov" },
+    { name = "P. Passalacqua", email = "paola@austin.utexas.edu" }
+]
+maintainers = [
+    { name = "J. Hariharan", email = "jayaram.hariharan@utexas.edu" },
+    { name = "K. Wright", email = "kyle.wright@twdb.texas.gov" }
+]
+classifiers = [
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14'
+]
+requires-python = ">=2.7"
+dependencies = [
+	"numpy",
+    "matplotlib",
+    "scipy",
+    "future",
+    "tqdm"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "coveralls",
+    "pydorado[docs]"
+]
+docs = [
+	"sphinx",
+	"m2r2",
+	"ipython",
+	"ipykernel"
+]
+
+[project.urls]
+"Homepage" = 'https://github.com/passaH2O/dorado'
+"Bug Reports" = 'https://github.com/passaH2O/dorado/issues'
+"Source" = 'https://github.com/passaH2O/dorado'
+
+[tool.setuptools.package-data]
+"pydorado" = ["*.txt", "*.npz"]
+
+[tool.setuptools]
+packages = ["dorado"]

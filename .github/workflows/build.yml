@@ -108,7 +108,7 @@ jobs:
         pip install ipykernel
     - name: Install dorado
       run: |
-        python setup.py install
+        pip install .
     - name: Build and test documentation
       run: |
         (cd docs && make docs)
