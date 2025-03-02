@@ -33,7 +33,7 @@ Installation from source
 2. From the cloned (or extracted) folder, run the following in the command line:
 ::
 
-   $ python setup.py install
+   $ pip install .
 
 to install the dorado package.
 
@@ -53,11 +53,16 @@ Editable installation from source
 If you'd prefer an "editable" install (meaning that any modifications you make to the code will be used when you import and run scripts), run the following in the command line after cloning the repository (instead of following the above instructions):
 ::
 
-   $ pip install -r requirements.txt
-
    $ pip install -e .
 
 The unit tests can be run (after installing `pytest` as indicated above) by typing:
 ::
 
    $ pytest
+
+If you'd like your installation to include the dependencies needed for testing and locally building the documentation, you can install the package with the following command:
+::
+
+   $ pip install -e .[dev]
+
+This should give you a "developers" installation of the package.
