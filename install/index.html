@@ -59,7 +59,7 @@
 </pre></div>
 </div>
 <p>2. From the cloned (or extracted) folder, run the following in the command line:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install .
 </pre></div>
 </div>
 <p>to install the dorado package.</p>
@@ -75,15 +75,18 @@
 <section id="editable-installation-from-source">
 <h2>Editable installation from source<a class="headerlink" href="#editable-installation-from-source" title="Link to this heading">¶</a></h2>
 <p>If you’d prefer an “editable” install (meaning that any modifications you make to the code will be used when you import and run scripts), run the following in the command line after cloning the repository (instead of following the above instructions):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -r requirements.txt
-
-$ pip install -e .
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .
 </pre></div>
 </div>
 <p>The unit tests can be run (after installing <cite>pytest</cite> as indicated above) by typing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
 </pre></div>
 </div>
+<p>If you’d like your installation to include the dependencies needed for testing and locally building the documentation, you can install the package with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[dev]
+</pre></div>
+</div>
+<p>This should give you a “developers” installation of the package.</p>
 </section>
 </section>
 
@@ -167,7 +170,7 @@ $ pip install -e .
       &#169;2020, J. Hariharan, K. Wright, P. Passalacqua.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.1</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
