@@ -41,6 +41,13 @@ Examples
 
    examples/index
 
+`dorado` In Publications
+########################
+.. toctree::
+   :maxdepth: 1
+
+   publications/index
+
 
 API Reference and Contributing Guidelines
 #########################################
