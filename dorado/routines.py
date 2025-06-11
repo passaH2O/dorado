@@ -566,7 +566,7 @@ def plot_exposure_time(walk_data,
     elif timedelta == 3600:
         timeunit = '[hr]'
     elif timedelta == 86400:
-        timeunit == '[day]'
+        timeunit = '[day]'
     else:
         timeunit = '[' + str(timedelta) + ' s]'
 
