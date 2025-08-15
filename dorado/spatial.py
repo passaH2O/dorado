@@ -235,7 +235,7 @@ def compute_thresholds(exposure_data,
                 np.array(P75).reshape(shape),
                 np.array(P90).reshape(shape))
 
-    def median_absolution_deviation_filter(data, window_size, threshold):
+    def median_absolute_deviation_filter(data, window_size, threshold):
         smoothed = np.zeros_like(data, dtype='float')
         for i in range(data.shape[0]):
             for j in range(data.shape[1]):
