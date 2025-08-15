@@ -22,6 +22,7 @@ def test_grid():
     return elevation, celltype, resolution_factor, timedelta
 
 @pytest.fixture
+# The walk_data defined here is mock data used to test functionality of dorado.spatial(). 
 def walk_data():
     return {
         "yinds": [
