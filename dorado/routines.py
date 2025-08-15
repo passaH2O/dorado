@@ -607,7 +607,7 @@ def plot_exposure_time(walk_data,
     if uniform_timesteps == True:
         end_time = max(end_time)
     else :
-        endtime = min(end_time)
+        end_time = min(end_time)
 
     # Ignore particles that never entered ROI or exited ROI for plotting
     # If never entered, ET of 0
