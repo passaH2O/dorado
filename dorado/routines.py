@@ -513,7 +513,8 @@ def plot_exposure_time(walk_data,
                        nbins=100,
                        save_output=True,
                        verbose=True,
-                       uniform_timesteps=False):
+                       uniform_timesteps=False,
+                       show_thresholds=False):
     """Plot exposure time distribution of particles in a specified region.
 
     Function to plot the exposure time distribution (ETD) of particles to
@@ -555,6 +556,10 @@ def plot_exposure_time(walk_data,
             If True, the maximum  travel time is used. This is useful 
             for unsteady flows where timesteps discretely assigned.
             Default value is False.
+            
+        show_thresholds: `bool`, optional
+            If True, draw horizontal lines on the smoothed CDF at the
+            percentiles in `threshold_levels` and print their corresponding times.
 
     **Outputs** :
 
@@ -656,6 +661,33 @@ def plot_exposure_time(walk_data,
     plt.ylabel('F(t) [-]')
     plt.xlim([0, end_time/timedelta])
     plt.ylim([0, 1])
+    
+    # Print time at exposure time thresholds and plot lines on figure
+    if show_thresholds:
+        ax = plt.gca()
+        targets = (0.50, 0.75, 0.90) 
+        for yval in targets:
+            ax.axhline(y=yval, color='gray', linestyle='--', linewidth=0.75)
+    
+        max_total = float(frac_exited.max())
+        eps = 1e-12
+        for lv in targets:
+            if lv <= max_total + eps:
+                k = int(np.searchsorted(frac_exited, lv, side='left'))  # first index where CDF >= lv
+                k = max(0, min(k, len(full_time_vect) - 1))
+                etime = full_time_vect[k] / timedelta  # same units as x-axis (days if timedelta=86400)
+                if verbose:
+                    print(f"E{int(lv*100)}: {etime:.3g} {timeunit}")
+            else:
+                if verbose:
+                    print(f"E{int(lv*100)}: not reached (max F={max_total:.3f})")
+
+        right_ax = ax.twinx()
+        right_ax.set_ylim(ax.get_ylim())
+        right_ax.set_yticks(list(targets))
+        right_ax.set_yticklabels([r'$E_{50}$', r'$E_{75}$', r'$E_{90}$'])
+
+    
     if save_output:
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'Smooth_CETD.png',
                     bbox_inches='tight')

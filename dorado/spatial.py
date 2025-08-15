@@ -261,15 +261,11 @@ def compute_thresholds(exposure_data,
         return smoothed
 
     E50, E75, E90 = exposure_time_stats(exposure_data)
-    E50 = median_absolution_deviation_filter(E50, window_size, threshold)
-    E75 = median_absolution_deviation_filter(E75, window_size, threshold)
-    E90 = median_absolution_deviation_filter(E90, window_size, threshold)
+    E50 = median_absolute_deviation_filter(E50, window_size, threshold)
+    E75 = median_absolute_deviation_filter(E75, window_size, threshold)
+    E90 = median_absolute_deviation_filter(E90, window_size, threshold)
 
     return E50, E75, E90
-
-
-
-
 
 
 def plot_spatial(exposure_maps,
@@ -305,35 +301,25 @@ def plot_spatial(exposure_maps,
     fig = plt.figure(figsize=(5.48, 1.4), dpi=600)
     gs = GridSpec(2, 4, figure=fig, hspace=0.06, wspace=0.06,
                   height_ratios=[0.53, 0.08], width_ratios=[0.05, 1, 1, 1])
-
     percentiles = [r'$E_{50}$', r'$E_{75}$', r'$E_{90}$']
     for j, label in enumerate(percentiles):
         fig.text(0.255 + 0.25 * j, 0.935, label, va='center', ha='center', fontsize=8)
-
     levels = np.linspace(0, max_exposure, cbar_levels)
     norm = BoundaryNorm(levels, ncolors=cmap.N, clip=False)
     
-
+    axes = []
     for i, data in enumerate(exposure_maps):
         rows, cols = data.shape
         full_rows, full_cols = elevation.shape
-      
-
         extent = [0, full_cols, full_rows, 0]  
         ax = fig.add_subplot(gs[0, i + 1])
-        
         ax.imshow(elevation, cmap='bone', aspect='auto', alpha=0.75,
                   extent=extent, origin='upper')
-    
-    
         ax.imshow(data, cmap=cmap, norm=norm, aspect='auto',
                   interpolation='bilinear', extent=extent, origin='upper')
-    
-
         ax.tick_params(axis='both', which='both', labelsize=8)
         ax.set_xticks([])
         ax.set_yticks([])
-
 
     cax = fig.add_axes([0.149, 0.13, 0.7525, 0.04])
     cbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap),
@@ -344,3 +330,4 @@ def plot_spatial(exposure_maps,
     cbar.ax.set_xticklabels(cbar_labels)
     cbar.ax.tick_params(labelsize=8)
     cbar.set_label(title, fontsize=8)
+    return fig, axes, cax, cbar
