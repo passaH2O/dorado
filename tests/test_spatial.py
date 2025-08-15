@@ -99,7 +99,6 @@ def test_compute_thresholds(test_grid, walk_data):
 
 def test_plot_spatial(test_grid, walk_data):
 
-
     elevation, celltype, resolution_factor, timedelta = test_grid
 
     # systemwide
