@@ -15,8 +15,6 @@ from matplotlib.colors import BoundaryNorm
 from scipy.stats import gaussian_kde
 from scipy.ndimage import gaussian_filter
 
-
-
 def systemwide(walk_data, elevation, celltype, resolution_factor):
     """   
     System-wide exposure time is the cumulative amount of time it takes for a particle in one 
@@ -72,10 +70,6 @@ def systemwide(walk_data, elevation, celltype, resolution_factor):
 
     return exposure_time_data_chunks
 
-
-
-
-
 def _find_common_indices_info(walk_data, xind_range, yind_range):
     """ Extract particle trajectories whose initial positions fall within a specified grid chunk.
     
@@ -113,9 +107,6 @@ def _find_common_indices_info(walk_data, xind_range, yind_range):
                     common_indicies[key].append(walk_data[key][idx])
 
     return common_indicies
-
-
-
 
 def localized(walk_data, elevation, celltype, resolution_factor):
     """
@@ -182,7 +173,6 @@ def percentile_from_cdf(cdf, x_grid, p):
     """
     idx = np.searchsorted(cdf, p)
     return x_grid[idx] if idx < len(x_grid) else np.nan
-
 
 def compute_thresholds(exposure_data,
                               elevation,
@@ -259,7 +249,7 @@ def compute_thresholds(exposure_data,
 def median_absolute_deviation_filter(data, window_size, threshold):
     """
     Smooth a 2D array using local Median Absolute Deviation (MAD) based outlier filter.
-
+    
     **Inputs** :
 
         data : `2D array`
@@ -299,9 +289,6 @@ def median_absolute_deviation_filter(data, window_size, threshold):
             filtered = window[np.abs(window - median) <= (threshold * mad)]
             smoothed[i, j] = np.mean(filtered) if len(filtered) else np.nan
     return smoothed
-
-
-
 
 def plot_spatial(exposure_maps,
                  elevation,
