@@ -18,8 +18,13 @@ from scipy.ndimage import gaussian_filter
 
 
 def systemwide(walk_data, elevation, celltype, resolution_factor):
-    """
-    Compute localized exposure time by dividing the domain into fixed-size spatial chunks.
+    """   
+    System-wide exposure time is the cumulative amount of time it takes for a particle in one 
+    location (initial particle location as a gridded chunk) to exit a larger system (region of interest).
+            initial particle locations: gridded chunks
+            region of interest (ROI): the larger system
+            
+    Compute system-wide exposure time by dividing the domain into fixed-size spatial chunks.
     Each chunk computes exposure time using only particles that started within the chunk,
     and using the celltype binary mask to define the region of interest.
 
@@ -114,10 +119,15 @@ def _find_common_indices_info(walk_data, xind_range, yind_range):
 
 def localized(walk_data, elevation, celltype, resolution_factor):
     """
+    Localized exposure time is the cumulative amount of time it takes for a particle in one 
+    location (initial particle location in gridded chunk) to exit that location (gridded chunk = region of interest)
+            initial particle locations: gridded chunks 
+            region of interest (ROI): gridded chunks
+    
     Compute localized exposure time by dividing the domain into fixed-size spatial chunks.
     Each chunk computes exposure time using only particles that started within the chunk,
     and using the chunk itself as the region of interest.
-
+    
     **Inputs** :
         walk_data : 'dict'
             Dictionary with 'xinds', 'yinds', and 'travel_times'
@@ -165,8 +175,13 @@ def localized(walk_data, elevation, celltype, resolution_factor):
 
     return exposure_time_data_chunks
 
-        
-
+def percentile_from_cdf(cdf, x_grid, p):
+    """
+    Helper function for spatial.compute_thresholds() to return time 
+    (x-value) at the CDF percentile.
+    """
+    idx = np.searchsorted(cdf, p)
+    return x_grid[idx] if idx < len(x_grid) else np.nan
 
 
 def compute_thresholds(exposure_data,
@@ -176,7 +191,7 @@ def compute_thresholds(exposure_data,
                               window_size=5,
                               threshold=3):
     """
-    Compute smoothed exposure time percentiles (E50, E75, E90) on a chunked spatial domain.
+    Compute exposure time percentiles (E50, E75, E90) on a chunked spatial domain.
 
     **Inputs** :
 
@@ -193,11 +208,11 @@ def compute_thresholds(exposure_data,
         resolution_factor : 'int'
             Number of chunks per axis.
 
-        smoothing_window : 'int'
-            Window size for local smoothing.
+        window_size : 'int'
+            Smoothing window size for local smoothing.
 
-        smoothing_threshold : 'float'
-            MAD-based filtering threshold to suppress outliers.
+        threshold : 'float'
+            MAD-based smoothing threshold to filter outliers.
 
     **Outputs** :
 
@@ -205,67 +220,87 @@ def compute_thresholds(exposure_data,
             Smoothed exposure time percentiles for each chunk.
     """
 
-    def exposure_time_stats(exp_list):
-        P50, P75, P90 = [], [], []
-        for item in exp_list:
-            if isinstance(item, list) and len(set(item)) > 0:
-                filtered = [x for x in item if x != 0 and not np.isnan(x)]
-                if len(set(filtered)) < 5:
-                    P50.append(np.nan)
-                    P75.append(np.nan)
-                    P90.append(np.nan)
-                    continue
-                kde = gaussian_kde(filtered)
-                x_grid = np.linspace(min(filtered), max(filtered), 1000)
-                cdf = np.cumsum(kde(x_grid))
-                cdf /= cdf[-1]
-                def pval(p):
-                    idx = np.searchsorted(cdf, p)
-                    return x_grid[idx] if idx < len(x_grid) else np.nan
-                P50.append(pval(0.50) / timedelta)
-                P75.append(pval(0.75) / timedelta)
-                P90.append(pval(0.90) / timedelta)
-            else:
+    P50, P75, P90 = [], [], []
+    for item in exposure_data:
+        if isinstance(item, list) and len(set(item)) > 0:
+            filtered = [x for x in item if x != 0 and not np.isnan(x)]
+            if len(set(filtered)) < 5:
                 P50.append(np.nan)
                 P75.append(np.nan)
                 P90.append(np.nan)
-                
-        shape = (elevation.shape[0] // resolution_factor, elevation.shape[1] // resolution_factor)
-        return (np.array(P50).reshape(shape),
-                np.array(P75).reshape(shape),
-                np.array(P90).reshape(shape))
+                continue
+            kde = gaussian_kde(filtered)
+            x_grid = np.linspace(min(filtered), max(filtered), 1000)
+            cdf = np.cumsum(kde(x_grid))
+            cdf /= cdf[-1]
 
-    def median_absolute_deviation_filter(data, window_size, threshold):
-        smoothed = np.zeros_like(data, dtype='float')
-        for i in range(data.shape[0]):
-            for j in range(data.shape[1]):
-                if np.isnan(data[i, j]):
-                    smoothed[i, j] = np.nan
-                    continue
-                i_min = max(i - window_size // 2, 0)
-                i_max = min(i + window_size // 2 + 1, data.shape[0])
-                j_min = max(j - window_size // 2, 0)
-                j_max = min(j + window_size // 2 + 1, data.shape[1])
-                window = data[i_min:i_max, j_min:j_max].flatten()
-                window = window[~np.isnan(window)]
-                if len(window) == 0:
-                    smoothed[i, j] = np.nan
-                    continue
-                median = np.median(window)
-                mad = np.median(np.abs(window - median))
-                if mad == 0:
-                    smoothed[i, j] = median
-                    continue
-                filtered = window[np.abs(window - median) <= (threshold * mad)]
-                smoothed[i, j] = np.mean(filtered) if len(filtered) else np.nan
-        return smoothed
 
-    E50, E75, E90 = exposure_time_stats(exposure_data)
+
+            P50.append(percentile_from_cdf(cdf, x_grid, 0.50) / timedelta)
+            P75.append(percentile_from_cdf(cdf, x_grid, 0.75)/ timedelta)
+            P90.append(percentile_from_cdf(cdf, x_grid, 0.90) / timedelta)
+        else:
+            P50.append(np.nan)
+            P75.append(np.nan)
+            P90.append(np.nan)
+            
+    shape = (elevation.shape[0] // resolution_factor, 
+             elevation.shape[1] // resolution_factor)
+    
+    E50 = np.array(P50).reshape(shape)
+    E75 = np.array(P75).reshape(shape)
+    E90 = np.array(P90).reshape(shape)
+
     E50 = median_absolute_deviation_filter(E50, window_size, threshold)
     E75 = median_absolute_deviation_filter(E75, window_size, threshold)
     E90 = median_absolute_deviation_filter(E90, window_size, threshold)
-
     return E50, E75, E90
+
+def median_absolute_deviation_filter(data, window_size, threshold):
+    """
+    Smooth a 2D array using local Median Absolute Deviation (MAD) based outlier filter.
+
+    **Inputs** :
+
+        data : `2D array`
+            Percentile array to smooth.
+
+        window_size : 'int'
+            Smoothing window size for local smoothing.
+
+        threshold : 'float'
+            MAD-based smoothing threshold to filter outliers.
+
+    **Outputs** :
+
+        smoothed : '2D arrays'
+            Smoothed exposure time percentiles for each chunk.
+    """
+    smoothed = np.zeros_like(data, dtype='float')
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            if np.isnan(data[i, j]):
+                smoothed[i, j] = np.nan
+                continue
+            i_min = max(i - window_size // 2, 0)
+            i_max = min(i + window_size // 2 + 1, data.shape[0])
+            j_min = max(j - window_size // 2, 0)
+            j_max = min(j + window_size // 2 + 1, data.shape[1])
+            window = data[i_min:i_max, j_min:j_max].flatten()
+            window = window[~np.isnan(window)]
+            if len(window) == 0:
+                smoothed[i, j] = np.nan
+                continue
+            median = np.median(window)
+            mad = np.median(np.abs(window - median))
+            if mad == 0:
+                smoothed[i, j] = median
+                continue
+            filtered = window[np.abs(window - median) <= (threshold * mad)]
+            smoothed[i, j] = np.mean(filtered) if len(filtered) else np.nan
+    return smoothed
+
+
 
 
 def plot_spatial(exposure_maps,
