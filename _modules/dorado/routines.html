@@ -4,13 +4,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dorado.routines &#8212; dorado 2.5.4 documentation</title>
+    <title>dorado.routines &#8212; dorado 2.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
-    <script src="../../_static/documentation_options.js?v=c0370f68"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -564,7 +564,9 @@
                        <span class="n">timedelta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                        <span class="n">nbins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                        <span class="n">save_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                       <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">uniform_timesteps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">show_thresholds</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot exposure time distribution of particles in a specified region.</span>
 
 <span class="sd">    Function to plot the exposure time distribution (ETD) of particles to</span>
@@ -598,6 +600,18 @@
 <span class="sd">            Toggles whether or not messages print to the</span>
 <span class="sd">            console. If False, nothing is output, if True, messages are output.</span>
 <span class="sd">            Default value is True. Errors are always raised.</span>
+<span class="sd">                    </span>
+<span class="sd">        uniform_timesteps: `bool`, optional</span>
+<span class="sd">            Toggles whether or not output had a uniform timestep.</span>
+<span class="sd">            This is useful for unsteady flows. If False (default), </span>
+<span class="sd">            The end of ETD is set as the minimum travel time. </span>
+<span class="sd">            If True, the maximum  travel time is used. This is useful </span>
+<span class="sd">            for unsteady flows where timesteps discretely assigned.</span>
+<span class="sd">            Default value is False.</span>
+<span class="sd">            </span>
+<span class="sd">        show_thresholds: `bool`, optional</span>
+<span class="sd">            If True, draw horizontal lines on the smoothed CDF at the</span>
+<span class="sd">            percentiles in `threshold_levels` and print their corresponding times.</span>
 
 <span class="sd">    **Outputs** :</span>
 
@@ -641,10 +655,16 @@
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">exposure_times</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span>
     <span class="n">exposure_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">exposure_times</span><span class="p">)</span>
 
-    <span class="c1"># Set end of ETD as the minimum travel time of particles</span>
-    <span class="c1"># Exposure times after that are unreliable because not all particles have</span>
+    <span class="c1"># For default settings (False), dorado will set end of ETD as the minimum travel </span>
+    <span class="c1"># time of particles. Exposure times after that are unreliable because not all particles have</span>
     <span class="c1"># traveled for that long</span>
-    <span class="n">end_time</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+    <span class="c1"># Some uses may manually assign timesteps (e.x. unstructured_grid_Delft3dFM.ipynb),</span>
+    <span class="c1"># so maximum exposure times are reliable and should be used.</span>
+    <span class="c1"># Only toggle this to True if this has been done. </span>
+    <span class="k">if</span> <span class="n">uniform_timesteps</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
 
     <span class="c1"># Ignore particles that never entered ROI or exited ROI for plotting</span>
     <span class="c1"># If never entered, ET of 0</span>
@@ -693,6 +713,33 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;F(t) [-]&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="o">/</span><span class="n">timedelta</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Print time at exposure time thresholds and plot lines on figure</span>
+    <span class="k">if</span> <span class="n">show_thresholds</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">)</span> 
+        <span class="k">for</span> <span class="n">yval</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">yval</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+    
+        <span class="n">max_total</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">frac_exited</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-12</span>
+        <span class="k">for</span> <span class="n">lv</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lv</span> <span class="o">&lt;=</span> <span class="n">max_total</span> <span class="o">+</span> <span class="n">eps</span><span class="p">:</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">frac_exited</span><span class="p">,</span> <span class="n">lv</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">))</span>  <span class="c1"># first index where CDF &gt;= lv</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_time_vect</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">etime</span> <span class="o">=</span> <span class="n">full_time_vect</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">/</span> <span class="n">timedelta</span>  <span class="c1"># same units as x-axis (days if timedelta=86400)</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">lv</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">etime</span><span class="si">:</span><span class="s2">.3g</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timeunit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">lv</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="si">}</span><span class="s2">: not reached (max F=</span><span class="si">{</span><span class="n">max_total</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="n">right_ax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+        <span class="n">right_ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">())</span>
+        <span class="n">right_ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
+        <span class="n">right_ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="sa">r</span><span class="s1">&#39;$E_</span><span class="si">{50}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$E_</span><span class="si">{75}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$E_</span><span class="si">{90}</span><span class="s1">$&#39;</span><span class="p">])</span>
+
+    
     <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;figs&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">+</span><span class="s1">&#39;Smooth_CETD.png&#39;</span><span class="p">,</span>
                     <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
@@ -720,6 +767,146 @@
                     <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="plot_exposure_time_thresholds">
+<a class="viewcode-back" href="../../apiref/routines.html#dorado.routines.plot_exposure_time_thresholds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_exposure_time_thresholds</span><span class="p">(</span><span class="n">walk_data</span><span class="p">,</span>
+                                  <span class="n">exposure_times</span><span class="p">,</span>
+                                  <span class="n">folder_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">timedelta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                  <span class="n">nbins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                  <span class="n">save_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">uniform_timesteps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot smoothed CDF of exposure time with E50, E75, E90 horizontal lines and labels.</span>
+<span class="sd">        (Identical input to plot_exposure_time)</span>
+
+<span class="sd">    Function to plot the exposure time distribution (ETD) of particles to</span>
+<span class="sd">    the specified region. Relies on the output of particle_track.exposure_time</span>
+
+<span class="sd">    **Inputs** :</span>
+
+<span class="sd">        walk_data : `dict`</span>
+<span class="sd">            Output of a previous function call to run_iteration.</span>
+
+<span class="sd">        exposure_times : `list`</span>
+<span class="sd">            List [] of floats containing the output of</span>
+<span class="sd">            particle_track.exposure_time</span>
+
+<span class="sd">        folder_name : `str`, optional</span>
+<span class="sd">            Path to folder in which to save output plots.</span>
+
+<span class="sd">        timedelta : `int or float`, optional</span>
+<span class="sd">            Unit of time for time-axis of ETD plots, specified as time</span>
+<span class="sd">            in seconds (e.g. an input of 60 plots things by minute).</span>
+
+<span class="sd">        nbins : `int`, optional</span>
+<span class="sd">            Number of bins to use as the time axis for differential ETD.</span>
+<span class="sd">            Using fewer bins smoothes out curves.</span>
+
+<span class="sd">        save_output : `bool`, optional</span>
+<span class="sd">            Controls whether or not the output images/data are saved to disk.</span>
+<span class="sd">            Default value is True.</span>
+
+<span class="sd">        verbose : `bool`, optional</span>
+<span class="sd">            Toggles whether or not messages print to the</span>
+<span class="sd">            console. If False, nothing is output, if True, messages are output.</span>
+<span class="sd">            Default value is True. Errors are always raised.</span>
+<span class="sd">            </span>
+<span class="sd">        uniform_timesteps: `bool`, optional</span>
+<span class="sd">            Toggles whether or not output had a uniform timestep.</span>
+<span class="sd">            This is useful for unsteady flows. If False (default), </span>
+<span class="sd">            The end of ETD is set as the minimum travel time. </span>
+<span class="sd">            If True, the maximum  travel time is used. This is useful </span>
+<span class="sd">            for unsteady flows where timesteps discretely assigned.</span>
+<span class="sd">            Default value is False.</span>
+
+<span class="sd">    **Outputs** :</span>
+
+<span class="sd">        If `save_output` is set to True, script saves plots of the cumulative</span>
+<span class="sd">        and differential forms of the ETD as a png and the list of exposure</span>
+<span class="sd">        times as a json (&#39;human-readable&#39;) text file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">])</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">timedelta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">timeunit</span> <span class="o">=</span> <span class="s1">&#39;[s]&#39;</span>
+    <span class="k">elif</span> <span class="n">timedelta</span> <span class="o">==</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="n">timeunit</span> <span class="o">=</span> <span class="s1">&#39;[m]&#39;</span>
+    <span class="k">elif</span> <span class="n">timedelta</span> <span class="o">==</span> <span class="mi">3600</span><span class="p">:</span>
+        <span class="n">timeunit</span> <span class="o">=</span> <span class="s1">&#39;[hr]&#39;</span>
+    <span class="k">elif</span> <span class="n">timedelta</span> <span class="o">==</span> <span class="mi">86400</span><span class="p">:</span>
+        <span class="n">timeunit</span> <span class="o">=</span> <span class="s1">&#39;[day]&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">timeunit</span> <span class="o">=</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timedelta</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; s]&#39;</span>
+
+    <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;figs&#39;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;figs&#39;</span><span class="p">)</span>
+
+    <span class="n">exposure_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">exposure_times</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">uniform_timesteps</span><span class="p">:</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+
+    <span class="n">plotting_times</span> <span class="o">=</span> <span class="n">exposure_times</span><span class="p">[</span><span class="n">exposure_times</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">]</span>
+    <span class="n">plotting_times</span> <span class="o">=</span> <span class="n">plotting_times</span><span class="p">[</span><span class="n">plotting_times</span> <span class="o">&lt;</span> <span class="mf">0.99</span> <span class="o">*</span> <span class="n">end_time</span><span class="p">]</span>
+    <span class="n">num_particles_included</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotting_times</span><span class="p">)</span>
+
+    <span class="n">full_time_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">plotting_times</span><span class="p">))</span>
+    <span class="n">full_time_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">full_time_vect</span><span class="p">,</span> <span class="p">[</span><span class="n">end_time</span><span class="p">])</span>
+
+    <span class="n">frac_exited</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_particles_included</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">Np_tracer</span>
+    <span class="n">frac_exited</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frac_exited</span><span class="p">,</span>
+                            <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">num_particles_included</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">)])</span>
+
+    <span class="n">create_smooth_CDF</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">full_time_vect</span><span class="p">,</span>
+                                                   <span class="n">frac_exited</span><span class="p">,</span>
+                                                   <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;previous&#39;</span><span class="p">)</span>
+    <span class="n">smooth_time_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">nbins</span><span class="p">)</span>
+    <span class="n">smooth_CDF</span> <span class="o">=</span> <span class="n">create_smooth_CDF</span><span class="p">(</span><span class="n">smooth_time_vect</span><span class="p">)</span>
+
+    <span class="c1"># Plot smoothed CDF with labeled horizontal lines</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">smooth_time_vect</span> <span class="o">/</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">smooth_CDF</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Cumulative Exposure Time Distribution&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time &#39;</span> <span class="o">+</span> <span class="n">timeunit</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;F(t) [-]&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">/</span> <span class="n">timedelta</span><span class="p">])</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Percentile markers</span>
+    <span class="n">E50_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">smooth_CDF</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">)</span>
+    <span class="n">E75_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">smooth_CDF</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">E90_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">smooth_CDF</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">)</span>
+
+    <span class="n">E50_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">smooth_time_vect</span><span class="p">[</span><span class="n">E50_idx</span><span class="p">]</span> <span class="o">/</span> <span class="n">timedelta</span><span class="p">)</span>
+    <span class="n">E75_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">smooth_time_vect</span><span class="p">[</span><span class="n">E75_idx</span><span class="p">]</span> <span class="o">/</span> <span class="n">timedelta</span><span class="p">)</span>
+    <span class="n">E90_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">smooth_time_vect</span><span class="p">[</span><span class="n">E90_idx</span><span class="p">]</span> <span class="o">/</span> <span class="n">timedelta</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E50:&#39;</span><span class="p">,</span> <span class="n">E50_time</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E75:&#39;</span><span class="p">,</span> <span class="n">E75_time</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;E90:&#39;</span><span class="p">,</span> <span class="n">E90_time</span><span class="p">,</span> <span class="n">timeunit</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">yval</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">]:</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">yval</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+
+    <span class="n">right_ax1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+    <span class="n">right_ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ax1</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">())</span>
+    <span class="n">right_ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">])</span>
+    <span class="n">right_ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="sa">r</span><span class="s1">&#39;$E_</span><span class="si">{50}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$E_</span><span class="si">{75}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$E_</span><span class="si">{90}</span><span class="s1">$&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">save_output</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">folder_name</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;figs&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;Smooth_CETD_thresholds.png&#39;</span><span class="p">,</span>
+                    <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span></div>
+
+        
 
 <span class="c1"># Function to automate animation of the png outputs</span>
 <span class="c1"># requires installation of the animation writer &#39;ffmpeg&#39; which is not part of</span>
@@ -1342,7 +1529,7 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2020, J. Hariharan, K. Wright, P. Passalacqua.
+      &#169;2020, J. Hariharan, K. Wright, P. Passalacqua, C. R. R. Turner.
       
       |
       Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
