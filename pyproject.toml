@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydorado"
-version = "2.5.4"
+version = "2.6.0"
 description = "dorado - Lagrangian particle routing routine via weighted random walks"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { file = "LICENSE" }
