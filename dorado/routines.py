@@ -212,7 +212,7 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     datalist = sorted(datalist)
     if num_steps > max(len(depthlist), len(datalist)):
         handle_verbose_deprecation(verbose)
-        logger.warning('Warning: num_steps exceeds number of model outputs in'
+        logger.warning('num_steps exceeds number of model outputs in'
               ' output_base')
         logger.warning('Setting num_steps to equal number of model outputs')
         num_steps = max(len(depthlist), len(datalist))
