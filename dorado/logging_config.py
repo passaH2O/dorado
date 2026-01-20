@@ -39,7 +39,13 @@ def setup_logging(level="WARNING", handler=None):
         dorado.setup_logging("DEBUG", handler=logging.FileHandler("dorado.log"))
 
     """
-    logger.setLevel(getattr(logging, level.upper()))
+    try:
+        numeric_level = getattr(logging, level.upper())
+    except AttributeError:
+        raise ValueError(
+            f"Invalid logging level: {level}. Must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL"
+        )
+    logger.setLevel(numeric_level)
     if not logger.handlers:
         h = handler or logging.StreamHandler()
         h.setFormatter(
