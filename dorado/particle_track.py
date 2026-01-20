@@ -98,7 +98,7 @@ class modelParams:
             **Deprecated**. Use :func:`dorado.setup_logging` instead.
             Legacy parameter to toggle console output. If True, enables INFO
             level logging. If False, sets logging to ERROR only.
-            Default is True.
+            Default is None (equivalent to True, or INFO level logging).
 
     This list of expected parameter values can also be obtained by querying the
     class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
@@ -122,7 +122,7 @@ class modelParams:
         self.qy = None
         self.u = None
         self.v = None
-        self.verbose = True  # print things by default
+        self.verbose = None
 
 
 class Particles():
@@ -142,7 +142,7 @@ class Particles():
         """
         # pass verbose (deprecated - use dorado.setup_logging() instead)
         if getattr(params, 'verbose', None) is None:
-            self.verbose = True  # set verbosity on if somehow missing
+            self.verbose = True  # set verbosity on if None or missing
         else:
             self.verbose = params.verbose
             handle_verbose_deprecation(params.verbose)
