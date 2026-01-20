@@ -843,6 +843,7 @@ def plot_exposure_time_thresholds(walk_data,
     E75_time = int(smooth_time_vect[E75_idx] / timedelta)
     E90_time = int(smooth_time_vect[E90_idx] / timedelta)
 
+    handle_verbose_deprecation(verbose)
     logger.info(f'E50: {E50_time} {timeunit}')
     logger.info(f'E75: {E75_time} {timeunit}')
     logger.info(f'E90: {E90_time} {timeunit}')
