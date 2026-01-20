@@ -54,10 +54,5 @@ docs = [
 [tool.setuptools.package-data]
 "pydorado" = ["*.txt", "*.npz"]
 
-[dependency-groups]
-dev = [
-    "pytest>=4.6.7",
-]
-
 [tool.setuptools]
 packages = ["dorado"]
