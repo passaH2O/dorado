@@ -63,7 +63,7 @@ def systemwide(walk_data, elevation, celltype, resolution_factor):
 
             if np.any(in_regions[r0:r1, c0:c1]):
                 chunk_walk = _find_common_indices_info(walk_data, (r0, r1), (c0, c1))
-                exp_data = pt.exposure_time(chunk_walk, regions, verbose=False)
+                exp_data = pt.exposure_time(chunk_walk, regions)
                 exposure_time_data_chunks.append(exp_data)
             else:
                 exposure_time_data_chunks.append(np.nan)

@@ -64,3 +64,6 @@ target/
 
 # SublimeText docs
 *.sublime-*
+
+# uv
+uv.lock
