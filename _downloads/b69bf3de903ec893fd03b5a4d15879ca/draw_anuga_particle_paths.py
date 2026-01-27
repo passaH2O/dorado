@@ -13,7 +13,8 @@ data = np.load(data_path)
 depth = data['depth']
 
 # load the walk data
-all_walk_data = json.load(open('steady_anuga_example'+os.sep+'data'+os.sep+'data.txt'))
+with open('steady_anuga_example'+os.sep+'data'+os.sep+'data.txt') as f:
+    all_walk_data = json.load(f)
 
 # Draw the travel path
 draw_travel_path(depth, all_walk_data, [0, 1, 2, 3],
