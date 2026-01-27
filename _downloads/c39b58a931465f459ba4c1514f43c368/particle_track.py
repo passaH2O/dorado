@@ -15,6 +15,7 @@ from math import pi
 import numpy as np
 from tqdm import tqdm
 import dorado.lagrangian_walker as lw
+from dorado.logging_config import logger, handle_verbose_deprecation
 
 
 class modelParams:
@@ -94,9 +95,10 @@ class modelParams:
             used to route the particles. Default value is False.
 
         verbose : `bool`, optional
-            Toggles whether or not warnings and print output are output to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None (equivalent to True, or INFO level logging).
 
     This list of expected parameter values can also be obtained by querying the
     class attributes with `dir(modelParams)`, `modelParams.__dict__`, or
@@ -120,7 +122,7 @@ class modelParams:
         self.qy = None
         self.u = None
         self.v = None
-        self.verbose = True  # print things by default
+        self.verbose = None
 
 
 class Particles():
@@ -138,11 +140,12 @@ class Particles():
         possible/sensible
 
         """
-        # pass verbose
+        # pass verbose (deprecated - use dorado.setup_logging() instead)
         if getattr(params, 'verbose', None) is None:
-            self.verbose = True  # set verbosity on if somehow missing
+            self.verbose = True  # set verbosity on if None or missing
         else:
             self.verbose = params.verbose
+            handle_verbose_deprecation(params.verbose)
 
         # REQUIRED PARAMETERS #
         # Define the length along one cell face (assuming square cells)
@@ -264,8 +267,7 @@ class Particles():
         try:
             self.theta = float(params.theta)
         except Exception:
-            if self.verbose:
-                print("Theta parameter not specified - using 1.0")
+            logger.info("Theta parameter not specified - using 1.0")
             self.theta = 1.0  # if unspecified use 1
 
         # Gamma parameter used to weight the random walk
@@ -275,8 +277,7 @@ class Particles():
         try:
             self.gamma = float(params.gamma)
         except Exception:
-            if self.verbose:
-                print("Gamma parameter not specified - using 0.05")
+            logger.info("Gamma parameter not specified - using 0.05")
             self.gamma = 0.05
 
         try:
@@ -292,28 +293,24 @@ class Particles():
             self.diff_coeff = float(params.diff_coeff)
         except Exception:
             if getattr(params, 'steepest_descent', False) is True:
-                if self.verbose:
-                    print("Diffusion disabled for steepest descent")
+                logger.info("Diffusion disabled for steepest descent")
                 self.diff_coeff = 0.0
             else:
-                if self.verbose:
-                    print("Diffusion coefficient not specified - using 0.2")
+                logger.info("Diffusion coefficient not specified - using 0.2")
                 self.diff_coeff = 0.2
 
         # Minimum depth for cell to be considered wet
         try:
             self.dry_depth = params.dry_depth
         except Exception:
-            if self.verbose:
-                print("minimum depth for wetness not defined - using 10 cm")
+            logger.info("minimum depth for wetness not defined - using 10 cm")
             self.dry_depth = 0.1
 
         # Cell types: 2 = land, 1 = channel, 0 = ocean, -1 = edge
         try:
             self.cell_type = params.cell_type
         except Exception:
-            if self.verbose:
-                print("Cell Types not specified - Estimating from depth")
+            logger.info("Cell Types not specified - Estimating from depth")
             self.cell_type = np.zeros_like(self.depth, dtype='int')
             self.cell_type[self.depth < self.dry_depth] = 2
             self.cell_type = np.pad(self.cell_type[1:-1, 1:-1], 1, 'constant',
@@ -324,16 +321,13 @@ class Particles():
         # note: chooses randomly in event of ties
         try:
             if params.steepest_descent is True:
-                if self.verbose:
-                    print("Using steepest descent")
+                logger.info("Using steepest descent")
                 self.steepest_descent = True
             else:
-                if self.verbose:
-                    print("Using weighted random walk")
+                logger.info("Using weighted random walk")
                 self.steepest_descent = False
         except Exception:
-            if self.verbose:
-                print("Using weighted random walk")
+            logger.info("Using weighted random walk")
             self.steepest_descent = False
 
         # DEFAULT PARAMETERS (Can be defined otherwise) #
@@ -889,7 +883,7 @@ def ind2coord(walk_data, raster_origin, raster_size, cellsize):
 
 def exposure_time(walk_data,
                   region_of_interest,
-                  verbose=True):
+                  verbose=None):
     """Measure exposure time distribution of particles in a specified region.
 
     Function to measure the exposure time distribution (ETD) of particles to
@@ -961,10 +955,10 @@ def exposure_time(walk_data,
 
     # single print statement
     if len(_short_list) > 0:
-        if verbose:
-            print(str(len(_short_list)) + ' Particles within ROI at final'
-                  ' timestep.\n' + 'Particles are: ' + str(_short_list) +
-                  '\nRun more iterations to get full tail of ETD.')
+        handle_verbose_deprecation(verbose)
+        logger.info(str(len(_short_list)) + ' Particles within ROI at final'
+              ' timestep.\n' + 'Particles are: ' + str(_short_list) +
+              '\nRun more iterations to get full tail of ETD.')
 
     return exposure_times.tolist()
 
