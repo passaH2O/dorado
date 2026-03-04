@@ -395,7 +395,7 @@ class Particles():
                                     [pi, 0, 0],
                                     [5*pi/4, 3*pi/2, 7*pi/4]])
             
-        # OPTIONAL: Boundary polygon for island flagging
+        # OPTIONAL: Boundary polygon for roi flagging
         # Check if the parameter class has a boundary_polygon attribute.
         if getattr(params, 'ROI', None) is not None:
             self.ROI = params.ROI
@@ -523,8 +523,8 @@ class Particles():
         new_yinds = [[new_start_yindices[i]] for i in
                      list(range(Np_tracer))]
         new_times = [[new_start_times[i]] for i in list(range(Np_tracer))]
-        # Initialize the island flag list with a list of zeros 
-        new_island_flags = [[0] for i in range(Np_tracer)]
+        # Initialize the roi flag list with a list of zeros 
+        new_roi_flags = [[0] for i in range(Np_tracer)]
         # Initialize the depth tracker list with a list of zeros
         new_depths = [[0] for i in range(Np_tracer)]
 
@@ -532,7 +532,7 @@ class Particles():
         start_xindices = new_xinds
         start_yindices = new_yinds
         start_times = new_times
-        start_island_flags= new_island_flags
+        start_roi_flags= new_roi_flags
         start_depths = new_depths
 
         if self.walk_data is not None:
@@ -542,14 +542,14 @@ class Particles():
             internal_xinds = self.walk_data['xinds']
             internal_yinds = self.walk_data['yinds']
             internal_times = self.walk_data['travel_times']
-            internal_flags = self.walk_data['island_flags']
+            internal_flags = self.walk_data['roi_flags']
             internal_depths = self.walk_data['depths']
 
             # combine internal and new lists of particle information
             start_xindices = internal_xinds + start_xindices
             start_yindices = internal_yinds + start_yindices
             start_times = internal_times + start_times
-            start_island_flags = internal_flags + start_island_flags
+            start_roi_flags = internal_flags + start_roi_flags
             start_depths = internal_depths + start_depths
 
         if previous_walk_data is not None:
@@ -560,14 +560,14 @@ class Particles():
             prev_xinds = previous_walk_data['xinds']
             prev_yinds = previous_walk_data['yinds']
             prev_times = previous_walk_data['travel_times']
-            prev_flags = previous_walk_data['island_flags']
+            prev_flags = previous_walk_data['roi_flags']
             prev_depths = previous_walk_data['depths']
 
             # combine previous and new lists of particle information
             start_xindices = prev_xinds + start_xindices
             start_yindices = prev_yinds + start_yindices
             start_times = prev_times + start_times
-            start_island_flags= prev_flags + start_island_flags
+            start_roi_flags= prev_flags + start_roi_flags
             start_depths = prev_depths + start_depths
 
         # determine the new total number of particles we have now
@@ -577,7 +577,7 @@ class Particles():
         init_walk_data['xinds'] = start_xindices
         init_walk_data['yinds'] = start_yindices
         init_walk_data['travel_times'] = start_times
-        init_walk_data['island_flags']= start_island_flags
+        init_walk_data['roi_flags']= start_roi_flags
         init_walk_data['depths'] = start_depths
         
         # store the initialized walk data within self
@@ -641,7 +641,7 @@ class Particles():
         start_times = [all_times[i][-1] for i in
                        list(range(self.Np_tracer))]
         # most recent flags
-        all_flags = self.walk_data['island_flags']
+        all_flags = self.walk_data['roi_flags']
         start_flags = [all_flags[1][-1] for i in
                        list(range(self.Np_tracer))]
         # most recent depths
@@ -655,7 +655,7 @@ class Particles():
         # Do the particle movement
         if target_time is None:
             # If we're not aiming for a specific time, step the particles
-            new_inds, travel_times, island_flags, depths = lw.particle_stepper(self, start_pairs,
+            new_inds, travel_times, roi_flags, depths = lw.particle_stepper(self, start_pairs,
                                                          start_times, start_flags, start_depths)
 
             for ii in list(range(self.Np_tracer)):
@@ -666,14 +666,14 @@ class Particles():
                     all_xinds[ii].append(new_inds[ii][0])
                     all_yinds[ii].append(new_inds[ii][1])
                     all_times[ii].append(travel_times[ii])
-                    all_flags[ii].append(island_flags[ii])
+                    all_flags[ii].append(roi_flags[ii])
                     all_depths[ii].append(depths[ii])
                     
             # Store travel information in all_walk_data
             all_walk_data['xinds'] = all_xinds
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
-            all_walk_data['island_flags'] = all_flags
+            all_walk_data['roi_flags'] = all_flags
             all_walk_data['depths'] = all_depths
 
         else:
@@ -701,7 +701,7 @@ class Particles():
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times, island_flags, depths = lw.particle_stepper(self, [[all_xinds[ii][-1], all_yinds[ii][-1]]],
+                        new_inds, travel_times, roi_flags, depths = lw.particle_stepper(self, [[all_xinds[ii][-1], all_yinds[ii][-1]]],
                                                                                     [all_times[ii][-1]], [all_flags[ii][-1]], [all_depths[ii][-1]])
                         # Don't duplicate location
                         # if particle is standing still at a boundary
@@ -710,7 +710,7 @@ class Particles():
                             all_xinds[ii].append(new_inds[0][0])
                             all_yinds[ii].append(new_inds[0][1])
                             all_times[ii].append(travel_times[0])
-                            all_flags[ii].append(island_flags[0])
+                            all_flags[ii].append(roi_flags[0])
                             all_depths[ii].append(depths[0])
                         else:
                             break
@@ -728,7 +728,7 @@ class Particles():
             all_walk_data['xinds'] = all_xinds
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
-            all_walk_data['island_flags'] = all_flags
+            all_walk_data['roi_flags'] = all_flags
             all_walk_data['depths'] = all_depths
             
             # write out warning if particles exceed step limit

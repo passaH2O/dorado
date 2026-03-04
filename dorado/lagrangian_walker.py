@@ -467,7 +467,7 @@ def steep_descent(probs):
     return idx
 
 
-def particle_stepper(Particles, current_inds, travel_times, island_flags, depths, ROI=None):
+def particle_stepper(Particles, current_inds, travel_times, roi_flags, depths, ROI=None):
     """Step particles a single iteration.
 
     **Inputs** :
@@ -481,8 +481,8 @@ def particle_stepper(Particles, current_inds, travel_times, island_flags, depths
         travel_times : `list`
             List of initial travel times for the particles
 
-        island_flags : 'list'
-            List of initial island flags for the particles
+        roi_flags : 'list'
+            List of initial roi flags for the particles
             
         depths : 'list'
             List of initial depths at the particle current_inds
@@ -500,7 +500,7 @@ def particle_stepper(Particles, current_inds, travel_times, island_flags, depths
         travel_times : `list`
             List of the travel times associated with the particle movements
             
-        island_flags : 'list'
+        roi_flags : 'list'
             List of the flags associated with the particle movements
             
         depths : 'list'
@@ -556,7 +556,7 @@ def particle_stepper(Particles, current_inds, travel_times, island_flags, depths
                     new_flags.append(0)
             else:  # If particle is outside the bounds of the raster
                 new_flags.append(0)
-        island_flags = new_flags
+        roi_flags = new_flags
         
     # Assign depth value 
     new_depths = []
@@ -565,4 +565,4 @@ def particle_stepper(Particles, current_inds, travel_times, island_flags, depths
         
     depths = new_depths
 
-    return new_inds, travel_times, island_flags, depths
+    return new_inds, travel_times, roi_flags, depths
