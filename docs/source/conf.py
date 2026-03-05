@@ -22,8 +22,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'dorado'
-copyright = '2020, J. Hariharan, K. Wright, P. Passalacqua'
-author = 'J. Hariharan, K. Wright, P. Passalacqua'
+copyright = '2020, J. Hariharan, K. Wright, P. Passalacqua, C. R. R. Turner'
+author = 'J. Hariharan, K. Wright, P. Passalacqua, C. R. R. Turner'
 
 # release/version , including alpha/beta/rc tags
 version = pr.__version__

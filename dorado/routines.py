@@ -8,6 +8,7 @@ from __future__ import division, print_function, absolute_import
 from builtins import range
 from .particle_track import Particles
 from .particle_track import modelParams
+from .logging_config import logger, handle_verbose_deprecation
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
@@ -23,7 +24,7 @@ import json
 # --------------------------------------------------------
 def steady_plots(particle, num_iter,
                  folder_name=None, save_output=True,
-                 verbose=True):
+                 verbose=None):
     """Automated particle movement in steady flow field.
 
     Function to automate plotting of particle movement over a steady flow
@@ -47,9 +48,10 @@ def steady_plots(particle, num_iter,
             Default value is True.
 
         verbose : `bool`, optional
-            Toggles whether or not messages print to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
 
     **Outputs** :
 
@@ -67,8 +69,8 @@ def steady_plots(particle, num_iter,
         if folder_name is None:
             folder_name = os.getcwd()
         if os.path.exists(folder_name):
-            if verbose:
-                print('Saving files in existing directory')
+            handle_verbose_deprecation(verbose)
+            logger.info('Saving files in existing directory')
         else:
             os.makedirs(folder_name)
         if not os.path.exists(folder_name+os.sep+'figs'):
@@ -118,7 +120,7 @@ def steady_plots(particle, num_iter,
 
 def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
                    output_base, output_type,
-                   folder_name=None, verbose=True):
+                   folder_name=None, verbose=None):
     """Automated particle movement in unsteady flow.
 
     Function to automate plotting of particle movement in an unsteady flow
@@ -164,9 +166,10 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
             Path to folder in which to save output plots.
 
         verbose : `bool`, optional
-            Toggles whether or not messages print to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
 
     **Outputs** :
 
@@ -186,8 +189,8 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     if folder_name is None:
         folder_name = os.getcwd()
     if os.path.exists(folder_name):
-        if verbose:
-            print('Saving files in existing directory')
+        handle_verbose_deprecation(verbose)
+        logger.info('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
     if not os.path.exists(folder_name+os.sep+'figs'):
@@ -208,10 +211,10 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     qylist = sorted(qylist)
     datalist = sorted(datalist)
     if num_steps > max(len(depthlist), len(datalist)):
-        if verbose:
-            print('Warning: num_steps exceeds number of model outputs in'
-                  ' output_base')
-            print('Setting num_steps to equal number of model outputs')
+        handle_verbose_deprecation(verbose)
+        logger.warning('num_steps exceeds number of model outputs in'
+              ' output_base')
+        logger.warning('Setting num_steps to equal number of model outputs')
         num_steps = max(len(depthlist), len(datalist))
 
     # Create vector of target times
@@ -291,7 +294,7 @@ def unsteady_plots(dx, Np_tracer, seed_xloc, seed_yloc, num_steps, timestep,
     return walk_data
 
 
-def time_plots(particle, num_iter, folder_name=None, verbose=True):
+def time_plots(particle, num_iter, folder_name=None, verbose=None):
     """Steady flow plots with particle travel times visualized.
 
     Make plots with each particle's travel time visualized.
@@ -311,9 +314,10 @@ def time_plots(particle, num_iter, folder_name=None, verbose=True):
             Path to folder in which to save output plots.
 
         verbose : `bool`, optional
-            Toggles whether or not messages print to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
 
     **Outputs** :
 
@@ -327,8 +331,8 @@ def time_plots(particle, num_iter, folder_name=None, verbose=True):
     if folder_name is None:
         folder_name = os.getcwd()
     if os.path.exists(folder_name):
-        if verbose:
-            print('Saving files in existing directory')
+        handle_verbose_deprecation(verbose)
+        logger.info('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
     if not os.path.exists(folder_name+os.sep+'figs'):
@@ -386,7 +390,7 @@ def time_plots(particle, num_iter, folder_name=None, verbose=True):
 # --------------------------------------------------------
 # Functions for plotting/interpreting outputs
 # --------------------------------------------------------
-def get_state(walk_data, iteration=-1, verbose=True):
+def get_state(walk_data, iteration=-1, verbose=None):
     """Pull walk_data values from a specific iteration.
 
     Routine to return slices of the walk_data dict at a given iteration #.
@@ -403,9 +407,10 @@ def get_state(walk_data, iteration=-1, verbose=True):
             to -1, i.e. the most recent step
 
         verbose : `bool`, optional
-            Toggles whether or not messages print to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
 
     **Outputs** :
 
@@ -456,14 +461,14 @@ def get_state(walk_data, iteration=-1, verbose=True):
             iter_exceeds_warning += 1
 
     if iter_exceeds_warning > 0:
-        if verbose:
-            print('Note: %s particles have not reached %s iterations' % \
-                  (iter_exceeds_warning, iteration))
+        handle_verbose_deprecation(verbose)
+        logger.info('Note: %s particles have not reached %s iterations' % \
+              (iter_exceeds_warning, iteration))
 
     return xinds, yinds, times, flags, depths
 
 
-def get_time_state(walk_data, target_time, verbose=True):
+def get_time_state(walk_data, target_time, verbose=None):
     """Pull walk_data values nearest to a specific time.
 
     Routine to return slices of the walk_data dict at a given travel time.
@@ -478,9 +483,10 @@ def get_time_state(walk_data, target_time, verbose=True):
             Travel time at which to slice the dictionary.
 
         verbose : `bool`, optional
-            Toggles whether or not messages print to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
 
     **Outputs** :
 
@@ -515,8 +521,8 @@ def get_time_state(walk_data, target_time, verbose=True):
         times.append(walk_data['travel_times'][ii][tt])
 
         if times_ii[-1] < target_time:
-            if verbose:
-                print('Note: Particle '+str(ii)+' never reached target_time')
+            handle_verbose_deprecation(verbose)
+            logger.info('Note: Particle '+str(ii)+' never reached target_time')
 
     return xinds, yinds, times
 
@@ -527,7 +533,9 @@ def plot_exposure_time(walk_data,
                        timedelta=1,
                        nbins=100,
                        save_output=True,
-                       verbose=True):
+                       verbose=None,
+                       uniform_timesteps=False,
+                       show_thresholds=False):
     """Plot exposure time distribution of particles in a specified region.
 
     Function to plot the exposure time distribution (ETD) of particles to
@@ -558,9 +566,22 @@ def plot_exposure_time(walk_data,
             Default value is True.
 
         verbose : `bool`, optional
-            Toggles whether or not messages print to the
-            console. If False, nothing is output, if True, messages are output.
-            Default value is True. Errors are always raised.
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
+                    
+        uniform_timesteps: `bool`, optional
+            Toggles whether or not output had a uniform timestep.
+            This is useful for unsteady flows. If False (default), 
+            The end of ETD is set as the minimum travel time. 
+            If True, the maximum  travel time is used. This is useful 
+            for unsteady flows where timesteps discretely assigned.
+            Default value is False.
+            
+        show_thresholds: `bool`, optional
+            If True, draw horizontal lines on the smoothed CDF at the
+            percentiles in `threshold_levels` and print their corresponding times.
 
     **Outputs** :
 
@@ -590,8 +611,8 @@ def plot_exposure_time(walk_data,
         if folder_name is None:
             folder_name = os.getcwd()
         if os.path.exists(folder_name):
-            if verbose:
-                print('Saving files in existing directory')
+            handle_verbose_deprecation(verbose)
+            logger.info('Saving files in existing directory')
         else:
             os.makedirs(folder_name)
         if not os.path.exists(folder_name+os.sep+'figs'):
@@ -604,10 +625,16 @@ def plot_exposure_time(walk_data,
         json.dump(exposure_times, open(fpath, 'w'))
     exposure_times = np.array(exposure_times)
 
-    # Set end of ETD as the minimum travel time of particles
-    # Exposure times after that are unreliable because not all particles have
+    # For default settings (False), dorado will set end of ETD as the minimum travel 
+    # time of particles. Exposure times after that are unreliable because not all particles have
     # traveled for that long
-    end_time = min(end_time)
+    # Some uses may manually assign timesteps (e.x. unstructured_grid_Delft3dFM.ipynb),
+    # so maximum exposure times are reliable and should be used.
+    # Only toggle this to True if this has been done. 
+    if uniform_timesteps == True:
+        end_time = max(end_time)
+    else :
+        end_time = min(end_time)
 
     # Ignore particles that never entered ROI or exited ROI for plotting
     # If never entered, ET of 0
@@ -656,6 +683,33 @@ def plot_exposure_time(walk_data,
     plt.ylabel('F(t) [-]')
     plt.xlim([0, end_time/timedelta])
     plt.ylim([0, 1])
+    
+    # Print time at exposure time thresholds and plot lines on figure
+    if show_thresholds:
+        ax = plt.gca()
+        targets = (0.50, 0.75, 0.90) 
+        for yval in targets:
+            ax.axhline(y=yval, color='gray', linestyle='--', linewidth=0.75)
+    
+        max_total = float(frac_exited.max())
+        eps = 1e-12
+        for lv in targets:
+            if lv <= max_total + eps:
+                k = int(np.searchsorted(frac_exited, lv, side='left'))  # first index where CDF >= lv
+                k = max(0, min(k, len(full_time_vect) - 1))
+                etime = full_time_vect[k] / timedelta  # same units as x-axis (days if timedelta=86400)
+                handle_verbose_deprecation(verbose)
+                logger.info(f"E{int(lv*100)}: {etime:.3g} {timeunit}")
+            else:
+                handle_verbose_deprecation(verbose)
+                logger.info(f"E{int(lv*100)}: not reached (max F={max_total:.3f})")
+
+        right_ax = ax.twinx()
+        right_ax.set_ylim(ax.get_ylim())
+        right_ax.set_yticks(list(targets))
+        right_ax.set_yticklabels([r'$E_{50}$', r'$E_{75}$', r'$E_{90}$'])
+
+    
     if save_output:
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'Smooth_CETD.png',
                     bbox_inches='tight')
@@ -682,6 +736,145 @@ def plot_exposure_time(walk_data,
         plt.savefig(folder_name+os.sep+'figs'+os.sep+'ETD.png',
                     bbox_inches='tight')
 
+def plot_exposure_time_thresholds(walk_data,
+                                  exposure_times,
+                                  folder_name=None,
+                                  timedelta=1,
+                                  nbins=100,
+                                  save_output=True,
+                                  verbose=None,
+                                  uniform_timesteps=False):
+    """Plot smoothed CDF of exposure time with E50, E75, E90 horizontal lines and labels.
+        (Identical input to plot_exposure_time)
+
+    Function to plot the exposure time distribution (ETD) of particles to
+    the specified region. Relies on the output of particle_track.exposure_time
+
+    **Inputs** :
+
+        walk_data : `dict`
+            Output of a previous function call to run_iteration.
+
+        exposure_times : `list`
+            List [] of floats containing the output of
+            particle_track.exposure_time
+
+        folder_name : `str`, optional
+            Path to folder in which to save output plots.
+
+        timedelta : `int or float`, optional
+            Unit of time for time-axis of ETD plots, specified as time
+            in seconds (e.g. an input of 60 plots things by minute).
+
+        nbins : `int`, optional
+            Number of bins to use as the time axis for differential ETD.
+            Using fewer bins smoothes out curves.
+
+        save_output : `bool`, optional
+            Controls whether or not the output images/data are saved to disk.
+            Default value is True.
+
+        verbose : `bool`, optional
+            **Deprecated**. Use :func:`dorado.setup_logging` instead.
+            Legacy parameter to toggle console output. If True, enables INFO
+            level logging. If False, sets logging to ERROR only.
+            Default is None.
+            
+        uniform_timesteps: `bool`, optional
+            Toggles whether or not output had a uniform timestep.
+            This is useful for unsteady flows. If False (default), 
+            The end of ETD is set as the minimum travel time. 
+            If True, the maximum  travel time is used. This is useful 
+            for unsteady flows where timesteps discretely assigned.
+            Default value is False.
+
+    **Outputs** :
+
+        If `save_output` is set to True, script saves plots of the cumulative
+        and differential forms of the ETD as a png and the list of exposure
+        times as a json ('human-readable') text file.
+    """
+
+    Np_tracer = len(walk_data['xinds'])
+    x, y, end_time = get_state(walk_data)
+
+    if timedelta == 1:
+        timeunit = '[s]'
+    elif timedelta == 60:
+        timeunit = '[m]'
+    elif timedelta == 3600:
+        timeunit = '[hr]'
+    elif timedelta == 86400:
+        timeunit = '[day]'
+    else:
+        timeunit = '[' + str(timedelta) + ' s]'
+
+    if save_output:
+        if folder_name is None:
+            folder_name = os.getcwd()
+        if not os.path.exists(folder_name + os.sep + 'figs'):
+            os.makedirs(folder_name + os.sep + 'figs')
+
+    exposure_times = np.array(exposure_times)
+
+    if uniform_timesteps:
+        end_time = max(end_time)
+    else:
+        end_time = min(end_time)
+
+    plotting_times = exposure_times[exposure_times > 1e-6]
+    plotting_times = plotting_times[plotting_times < 0.99 * end_time]
+    num_particles_included = len(plotting_times)
+
+    full_time_vect = np.append([0], np.sort(plotting_times))
+    full_time_vect = np.append(full_time_vect, [end_time])
+
+    frac_exited = np.arange(0, num_particles_included + 1,
+                            dtype='float') / Np_tracer
+    frac_exited = np.append(frac_exited,
+                            [float(num_particles_included) / float(Np_tracer)])
+
+    create_smooth_CDF = scipy.interpolate.interp1d(full_time_vect,
+                                                   frac_exited,
+                                                   kind='previous')
+    smooth_time_vect = np.linspace(0, end_time, nbins)
+    smooth_CDF = create_smooth_CDF(smooth_time_vect)
+
+    # Plot smoothed CDF with labeled horizontal lines
+    fig, ax1 = plt.subplots(figsize=(5, 3), dpi=150)
+    ax1.plot(smooth_time_vect / timedelta, smooth_CDF, color='black')
+    ax1.set_title('Cumulative Exposure Time Distribution')
+    ax1.set_xlabel('Time ' + timeunit)
+    ax1.set_ylabel('F(t) [-]')
+    ax1.set_xlim([0, end_time / timedelta])
+    ax1.set_ylim([0, 1])
+
+    # Percentile markers
+    E50_idx = np.searchsorted(smooth_CDF, 0.50)
+    E75_idx = np.searchsorted(smooth_CDF, 0.75)
+    E90_idx = np.searchsorted(smooth_CDF, 0.90)
+
+    E50_time = int(smooth_time_vect[E50_idx] / timedelta)
+    E75_time = int(smooth_time_vect[E75_idx] / timedelta)
+    E90_time = int(smooth_time_vect[E90_idx] / timedelta)
+
+    handle_verbose_deprecation(verbose)
+    logger.info(f'E50: {E50_time} {timeunit}')
+    logger.info(f'E75: {E75_time} {timeunit}')
+    logger.info(f'E90: {E90_time} {timeunit}')
+
+    for yval in [0.5, 0.75, 0.90]:
+        ax1.axhline(y=yval, color='gray', linestyle='--', linewidth=0.75)
+
+    right_ax1 = ax1.twinx()
+    right_ax1.set_ylim(ax1.get_ylim())
+    right_ax1.set_yticks([0.5, 0.75, 0.90])
+    right_ax1.set_yticklabels([r'$E_{50}$', r'$E_{75}$', r'$E_{90}$'])
+
+    if save_output:
+        plt.savefig(folder_name + os.sep + 'figs' + os.sep + 'Smooth_CETD_thresholds.png',
+                    bbox_inches='tight')
+        
 
 # Function to automate animation of the png outputs
 # requires installation of the animation writer 'ffmpeg' which is not part of
@@ -890,7 +1083,7 @@ def snake_plots(grid,
                 tail_length=12,
                 rgba_start=[1, 0.4, 0.2, 1],
                 rgba_end=[1, 0.3, 0.1, 0],
-                verbose=True):
+                verbose=None):
     """Plot particle positions with a trailing tail.
 
     Loops through existing walk_data history and creates a series of
@@ -955,8 +1148,8 @@ def snake_plots(grid,
     if folder_name is None:
         folder_name = os.getcwd()
     if os.path.exists(folder_name):
-        if verbose:
-            print('Saving files in existing directory')
+        handle_verbose_deprecation(verbose)
+        logger.info('Saving files in existing directory')
     else:
         os.makedirs(folder_name)
     if not os.path.exists(folder_name+os.sep+'figs'):
