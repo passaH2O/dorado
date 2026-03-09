@@ -424,14 +424,9 @@ def get_state(walk_data, iteration=-1, verbose=None):
             List containing equivalent of
             walk_data['travel_times'][:][iteration]
             
-        flags: 'list'
-            List containing equivalent of
-            walk_data['roi_flags'][:][iteration]
-           
-        depths: 'list'
-            List containing equivalent of
-            walk_data['depths'][:][iteration] 
-        
+        updated_optional : `dict of lists`
+            A dictionary of lists of optional outputs for the particle stepper. 
+
 
     """
     iteration = int(iteration)
@@ -440,24 +435,31 @@ def get_state(walk_data, iteration=-1, verbose=None):
     xinds = []
     yinds = []
     times = []
-    flags = []
-    depths = []
+    updated_optional = {} 
+
     iter_exceeds_warning = 0
+
+    base_vars = ['xinds', 'yinds', 'travel_times']
+    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
+
+    for key in optional_vars:
+        updated_optional[key] = []
+
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
         try:
             xinds.append(walk_data['xinds'][ii][iteration])
             yinds.append(walk_data['yinds'][ii][iteration])
             times.append(walk_data['travel_times'][ii][iteration])
-            flags.append(walk_data['roi_flags'][ii][iteration])
-            depths.append(walk_data['depths'][ii][iteration])
+            for var in optional_vars:
+                updated_optional[var].append(walk_data[var][ii][iteration])
         except IndexError:
             # If target iter exceeds walk history, return last iter
             xinds.append(walk_data['xinds'][ii][-1])
             yinds.append(walk_data['yinds'][ii][-1])
             times.append(walk_data['travel_times'][ii][-1])
-            flags.append(walk_data['roi_flags'][ii][-1])
-            depths.append(walk_data['depths'][ii][-1])
+            for var in optional_vars:
+                updated_optional[var].append(walk_data[var][ii][-1])
             iter_exceeds_warning += 1
 
     if iter_exceeds_warning > 0:
@@ -465,8 +467,7 @@ def get_state(walk_data, iteration=-1, verbose=None):
         logger.info('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
 
-    return xinds, yinds, times, flags, depths
-
+    return xinds, yinds, times, updated_optional
 
 def get_time_state(walk_data, target_time, verbose=None):
     """Pull walk_data values nearest to a specific time.

@@ -467,7 +467,7 @@ def steep_descent(probs):
     return idx
 
 
-def particle_stepper(Particles, current_inds, travel_times, roi_flags, depths, ROI=None):
+def particle_stepper(Particles, current_inds, travel_times, start_optional):
     """Step particles a single iteration.
 
     **Inputs** :
@@ -481,16 +481,9 @@ def particle_stepper(Particles, current_inds, travel_times, roi_flags, depths, R
         travel_times : `list`
             List of initial travel times for the particles
 
-        roi_flags : 'list'
-            List of initial roi flags for the particles
-            
-        depths : 'list'
-            List of initial depths at the particle current_inds
-            
-        ROI : 'np.array' , optional
-            A binary raster indicating cells within a specified ROI.
-            If not provided, the function will use the ROI stored
-            in the Particles object (if any).
+        start_optional: 'dict of lists'
+            A dictionary of lists of optional user inputs for the particle stepper. Options are shown in the particles object documentation.
+        
 
     **Outputs** :
 
@@ -500,16 +493,12 @@ def particle_stepper(Particles, current_inds, travel_times, roi_flags, depths, R
         travel_times : `list`
             List of the travel times associated with the particle movements
             
-        roi_flags : 'list'
-            List of the flags associated with the particle movements
-            
-        depths : 'list'
-            List of the depths associated with the particle movements
+        updated_optional : `dict of lists`
+            A dictionary of lists of optional outputs for the particle stepper. Options are shown in the particles object documentation.
 
     """
-    # If no ROI is explicitly passed, try to use the one stored in Particles to monitor particle movement in certain areas
-    if ROI is None:
-        ROI = Particles.ROI
+    # Use roi_grid from the particle object if it exists, otherwise use None
+    ROI = getattr(Particles, 'roi_grid', None)
         
     inds = current_inds  # get indices as coordinates in the domain
     # split the indices into tuples
@@ -543,26 +532,26 @@ def particle_stepper(Particles, current_inds, travel_times, roi_flags, depths, R
                     for i in range(0, len(travel_times))]
     travel_times = list(travel_times)
 
-    # Check if particles moved into the region of interest
+    # Optional variables
+    updated_optional = {}
+    
+    # ROI flags
     if ROI is not None:
-        new_flags = []
-        for (x, y) in new_inds:
-            # Ensure x, y are within the bounds of the raster (ROI)
-            if (0 <= x < ROI.shape[0]) and (0 <= y < ROI.shape[1]):
-            # Use the binary raster to flag particles
-                if ROI[x, y] == 1:  # Particle is within ROI 
-                    new_flags.append(1)
-                else:  # Particle is outside ROI
-                    new_flags.append(0)
-            else:  # If particle is outside the bounds of the raster
-                new_flags.append(0)
-        roi_flags = new_flags
-        
-    # Assign depth value 
-    new_depths = []
-    for (x,y) in new_inds:
-        new_depths.append(round(Particles.depth[x, y], 5))
-        
-    depths = new_depths
+        roi_flags = []
+        for x, y in new_inds:
+            if 0 <= x < ROI.shape[0] and 0 <= y < ROI.shape[1]:
+                roi_flags.append(1 if ROI[x, y] == 1 else 0)
+            else:
+                roi_flags.append(0)
+        updated_optional['roi_flag'] = roi_flags
+    
+    # Depths
+    updated_optional['depth'] = [Particles.depth[x, y] for x, y in new_inds]
+    
+    # Include other optional variables if needed
+    for var, vals in start_optional.items():
+        if var not in updated_optional:
+            # Keep previous value if nothing to update
+            updated_optional[var] = vals
 
-    return new_inds, travel_times, roi_flags, depths
+    return new_inds, travel_times, updated_optional
