@@ -390,7 +390,7 @@ def time_plots(particle, num_iter, folder_name=None, verbose=None):
 # --------------------------------------------------------
 # Functions for plotting/interpreting outputs
 # --------------------------------------------------------
-def get_state(walk_data, iteration=-1, verbose=None):
+def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
     """Pull walk_data values from a specific iteration.
 
     Routine to return slices of the walk_data dict at a given iteration #.
@@ -405,6 +405,11 @@ def get_state(walk_data, iteration=-1, verbose=None):
         iteration : `int`, optional
             Iteration number at which to slice the dictionary. Defaults
             to -1, i.e. the most recent step
+
+        tracked_variables : `list`, optional
+            List of strings corresponding to any additional variables tracked,
+            as defined in the Particles class.
+            Default is none. 
 
         verbose : `bool`, optional
             **Deprecated**. Use :func:`dorado.setup_logging` instead.
@@ -441,7 +446,9 @@ def get_state(walk_data, iteration=-1, verbose=None):
     iter_exceeds_warning = 0
 
     base_vars = ['xinds', 'yinds', 'travel_times']
-    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
+    optional_vars = [var for var in walk_data.keys()
+                     if var not in base_vars
+                     and (tracked_variables is not None and var in tracked_variables)]
 
     for key in optional_vars:
         updated_optional[key] = []
@@ -468,12 +475,12 @@ def get_state(walk_data, iteration=-1, verbose=None):
         logger.info('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
 
-    if len(updated_optional) > 0:
+    if tracked_variables is not None and optional_vars:
         return xinds, yinds, times, updated_optional
     else:
         return xinds, yinds, times
 
-def get_time_state(walk_data, target_time, verbose=None):
+def get_time_state(walk_data, target_time, tracked_variables=None, verbose=None):
     """Pull walk_data values nearest to a specific time.
 
     Routine to return slices of the walk_data dict at a given travel time.
@@ -486,6 +493,11 @@ def get_time_state(walk_data, target_time, verbose=None):
 
         target_time : `float`
             Travel time at which to slice the dictionary.
+
+        tracked_variables : `list`, optional
+            List of strings corresponding to any additional variables tracked,
+            as defined in the Particles class.
+            Default is none.
 
         verbose : `bool`, optional
             **Deprecated**. Use :func:`dorado.setup_logging` instead.
@@ -520,6 +532,16 @@ def get_time_state(walk_data, target_time, verbose=None):
     xinds = []
     yinds = []
     times = []
+    updated_optional = {}
+
+    base_vars = ['xinds', 'yinds', 'travel_times']
+    optional_vars = [var for var in walk_data.keys()
+                     if var not in base_vars
+                     and (tracked_variables is not None and var in tracked_variables)]
+
+    for key in optional_vars:
+        updated_optional[key] = []
+    
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
         times_ii = np.array(walk_data['travel_times'][ii])
@@ -529,12 +551,16 @@ def get_time_state(walk_data, target_time, verbose=None):
         xinds.append(walk_data['xinds'][ii][tt])
         yinds.append(walk_data['yinds'][ii][tt])
         times.append(walk_data['travel_times'][ii][tt])
-
+        for var in optional_vars:
+            updated_optional[var].append(walk_data[var][ii][tt])
         if times_ii[-1] < target_time:
             handle_verbose_deprecation(verbose)
             logger.info('Note: Particle '+str(ii)+' never reached target_time')
 
-    return xinds, yinds, times
+    if tracked_variables is not None and optional_vars:
+        return xinds, yinds, times, updated_optional
+    else:
+        return xinds, yinds, times
 
 
 def plot_exposure_time(walk_data,
