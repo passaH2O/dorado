@@ -424,8 +424,9 @@ def get_state(walk_data, iteration=-1, verbose=None):
             List containing equivalent of
             walk_data['travel_times'][:][iteration]
             
-        updated_optional : `dict of lists`
-            A dictionary of lists of optional outputs for the particle stepper. 
+        updated_optional : `dict of lists`, optional if used
+            A dictionary of lists of optional outputs for the particle stepper
+            containing equivalent of walk_data[var][:][iteration] for each var.
 
 
     """
@@ -467,7 +468,10 @@ def get_state(walk_data, iteration=-1, verbose=None):
         logger.info('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
 
-    return xinds, yinds, times, updated_optional
+    if len(updated_optional) > 0:
+        return xinds, yinds, times, updated_optional
+    else:
+        return xinds, yinds, times
 
 def get_time_state(walk_data, target_time, verbose=None):
     """Pull walk_data values nearest to a specific time.
@@ -504,6 +508,11 @@ def get_time_state(walk_data, target_time, verbose=None):
             where i represents the index at which travel time is nearest
             to input. Times will differ slightly from input time due to
             the nature of the method.
+
+        updated_optional : `dict of lists`, optional if used
+            A dictionary of lists of optional outputs for the particle stepper, 
+            containing equivalent of walk_data[var][:][i] for each var,
+            where i represents the index at which travel time is nearest to input.
 
     """
     Np_tracer = len(walk_data['xinds'])  # Number of particles
@@ -593,7 +602,7 @@ def plot_exposure_time(walk_data,
     # Initialize arrays to record exposure time of each particle
     Np_tracer = len(walk_data['xinds'])  # Number of particles
     # Record final travel times
-    x, y, end_time, f, d = get_state(walk_data)
+    x, y, end_time, optional_state = get_state(walk_data)
 
     # Handle the timedelta
     if timedelta == 1:
