@@ -505,12 +505,25 @@ def get_time_state(walk_data, target_time, verbose=None):
             to input. Times will differ slightly from input time due to
             the nature of the method.
 
+        updated_optional : `dict of lists`
+            A dictionary of lists of optional outputs for the particle stepper
+            containing the equavalent of walk_data[var][:][i], where i 
+            represents the index at which travel time is nearest to input.
+
     """
     Np_tracer = len(walk_data['xinds'])  # Number of particles
 
     xinds = []
     yinds = []
     times = []
+    updated_optional = {}
+
+    base_vars = ['xinds', 'yinds', 'travel_times']
+    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
+
+    for key in optional_vars:
+        updated_optional[key] = []
+    
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
         times_ii = np.array(walk_data['travel_times'][ii])
@@ -520,12 +533,13 @@ def get_time_state(walk_data, target_time, verbose=None):
         xinds.append(walk_data['xinds'][ii][tt])
         yinds.append(walk_data['yinds'][ii][tt])
         times.append(walk_data['travel_times'][ii][tt])
-
+        for var in optional_vars:
+            updated_optional[var].append(walk_data[var][ii][tt])
         if times_ii[-1] < target_time:
             handle_verbose_deprecation(verbose)
             logger.info('Note: Particle '+str(ii)+' never reached target_time')
 
-    return xinds, yinds, times
+    return xinds, yinds, times, updated_optional
 
 
 def plot_exposure_time(walk_data,
