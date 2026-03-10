@@ -25,6 +25,8 @@ params.qx = np.zeros((3,3))
 params.qy = np.ones((3,3))
 params.theta = 1
 params.model = 'DeltaRCM'
+params.roi_grid = np.ones((3,3))
+params.particle_variables = ['depth', 'qx'] # optional variables to track with particles
 goodparams = copy.deepcopy(params)  # don't corrupt these good parameters
 particle = particle_track.Particles(params)
 
@@ -104,6 +106,24 @@ def test_steep_other():
     params.steepest_descent = 'other'
     particle = particle_track.Particles(params)
     assert particle.steepest_descent == False
+
+def test_roi_grid():
+    if getattr(params, 'roi_grid', None) is not None:
+        assert particle.roi_grid is not None
+    else:
+        assert particle.roi_grid is None
+
+def test_optional_particle_variables():
+    for var in getattr(params, 'particle_variables', []):
+        assert var in particle.particle_variables
+
+    if getattr(params, 'roi_grid', None) is not None:
+        assert 'roi_flag' in particle.particle_variables
+    else:
+        assert 'roi_flag' not in particle.particle_variables
+
+    # optional_outputs should exactly match particle_variables
+    assert set(particle.optional_outputs) == set(particle.particle_variables)
 
 # testing of the run_iteration function
 def test_start_pairs_X():
@@ -266,6 +286,19 @@ def test_manual_reset():
     particle.clear_walk_data()
     assert (particle.walk_data is None) is True
 
+def test_run_iteration_optional_variables():
+    # test that optional variables are being tracked in walk data
+    particle = particle_track.Particles(params)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    all_walk_data = particle.run_iteration()
+    # Check that all optional particle variables are in the returned walk_data
+    for var in getattr(params, 'particle_variables', []):
+        assert var in all_walk_data, f"{var} missing from walk_data"
+    # roi_flag is included only if roi_grid exists
+    if getattr(params, 'roi_grid', None) is not None:
+        assert 'roi_flag' in all_walk_data, "roi_flag missing from walk_data"
+    else:
+        assert 'roi_flag' not in all_walk_data
 
 class TestValueErrors:
     """
