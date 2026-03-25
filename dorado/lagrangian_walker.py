@@ -535,23 +535,13 @@ def particle_stepper(Particles, current_inds, travel_times, start_optional):
     # Optional variables
     updated_optional = {}
     
-    # ROI flags
     if ROI is not None:
-        roi_flags = []
-        for x, y in new_inds:
-            if 0 <= x < ROI.shape[0] and 0 <= y < ROI.shape[1]:
-                roi_flags.append(1 if ROI[x, y] == 1 else 0)
-            else:
-                roi_flags.append(0)
-        updated_optional['roi_flag'] = roi_flags
-    
-    # Depths
-    updated_optional['depth'] = [Particles.depth[x, y] for x, y in new_inds]
-    
-    # Include other optional variables if needed
-    for var, vals in start_optional.items():
+        updated_optional['roi_flag'] = [1 if ROI[x, y] == 1 else 0 for x, y in new_inds]
+
+    for var, _ in start_optional.items():
         if var not in updated_optional:
-            # Keep previous value if nothing to update
-            updated_optional[var] = vals
+            if var in Particles.available_particle_vars:
+                grid = Particles.available_particle_vars[var]
+                updated_optional[var] = [grid[x, y] for x, y in new_inds]
 
     return new_inds, travel_times, updated_optional

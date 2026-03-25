@@ -390,15 +390,16 @@ class Particles():
                                     [5*pi/4, 3*pi/2, 7*pi/4]])
             
         # Binary roi in the shape of model grid for particle flagging with each step
-        # Check if the parameter class has a boundary_polygon attribute.
         if getattr(params, 'roi_grid', None) is not None:
+            if params.roi_grid.shape != self.depth.shape:
+                raise ValueError("roi_grid shape " + str(params.roi_grid.shape) +
+                                " does not match model grid shape " +
+                                str(self.depth.shape) +
+                                ". roi_grid must be the same shape as the depth array.")
             self.roi_grid = params.roi_grid
-            if self.verbose:
-                print("roi provided and stored in the particle object.")
+            logger.info("roi provided and stored in the particle object.")
         else:
             self.roi_grid = None
-            if self.verbose:
-                print("No roi grid provided; no particle flagging will occur,")
                 
         # initialize number of particles as 0
         self.Np_tracer = 0
@@ -1336,30 +1337,25 @@ def unstruct2grid(coordinates,
 
 def flux_proportional_seeding(Q, 
                              N_total,
-                             num_steps,
-                             col_index = 0):
+                             num_steps):
     """ Compute flux-proportional particle counts per timestep.
 
     This function is useful if seeding particles under unsteady discharge conditions
     by enforcing that the number of particles seeded at each timestep is proportional 
     to the magnitude of discharge at that timestep.
 
-
     **Inputs** :
     ----------
         Q : 'np.ndarray'
             Discharge array where:
             rows = timestep since model start where seeding is occurring
-            columns = discharge values at those intervals.
+            column = discharge values at those intervals
        
         N_total : 'int'
             Total number of particles to seed.
 
         num_steps : 'int', 
             Number of timesteps where seeding occurs.
-
-        col_index : 'int', optional
-            Column index in Excel to use for discharge (0-based). Default is 0.
 
     **Outputs** :
     -------
@@ -1368,14 +1364,8 @@ def flux_proportional_seeding(Q,
             Array of integer particle counts per seeding timestep.
 
     """
-    import numpy as np
-    import os
-
-    # Extract discharge column
-    Q_raw = Q[:num_steps, col_index]
-
     # Take absolute value for flow reversals
-    Q_abs = np.abs(Q_raw)
+    Q_abs = np.abs(Q)
 
     # Ensure correct number of steps
     if len(Q_abs) < num_steps:
