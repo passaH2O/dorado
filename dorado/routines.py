@@ -390,7 +390,7 @@ def time_plots(particle, num_iter, folder_name=None, verbose=None):
 # --------------------------------------------------------
 # Functions for plotting/interpreting outputs
 # --------------------------------------------------------
-def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
+def get_state(walk_data, iteration=-1, verbose=None):
     """Pull walk_data values from a specific iteration.
 
     Routine to return slices of the walk_data dict at a given iteration #.
@@ -405,11 +405,6 @@ def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
         iteration : `int`, optional
             Iteration number at which to slice the dictionary. Defaults
             to -1, i.e. the most recent step
-
-        tracked_variables : `list`, optional
-            List of strings corresponding to any additional variables tracked,
-            as defined in the Particles class.
-            Default is none. 
 
         verbose : `bool`, optional
             **Deprecated**. Use :func:`dorado.setup_logging` instead.
@@ -429,7 +424,7 @@ def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
             List containing equivalent of
             walk_data['travel_times'][:][iteration]
             
-        updated_optional : `dict of lists`, optional if used
+        optional_data : `dict of lists`, optional 
             A dictionary of lists of optional outputs for the particle stepper
             containing equivalent of walk_data[var][:][iteration] for each var.
 
@@ -441,17 +436,15 @@ def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
     xinds = []
     yinds = []
     times = []
-    updated_optional = {} 
+    optional_data = {} 
 
     iter_exceeds_warning = 0
 
     base_vars = ['xinds', 'yinds', 'travel_times']
-    optional_vars = [var for var in walk_data.keys()
-                     if var not in base_vars
-                     and (tracked_variables is not None and var in tracked_variables)]
+    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
 
     for key in optional_vars:
-        updated_optional[key] = []
+        optional_data[key] = []
 
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
@@ -460,14 +453,14 @@ def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
             yinds.append(walk_data['yinds'][ii][iteration])
             times.append(walk_data['travel_times'][ii][iteration])
             for var in optional_vars:
-                updated_optional[var].append(walk_data[var][ii][iteration])
+                optional_data[var].append(walk_data[var][ii][iteration])
         except IndexError:
             # If target iter exceeds walk history, return last iter
             xinds.append(walk_data['xinds'][ii][-1])
             yinds.append(walk_data['yinds'][ii][-1])
             times.append(walk_data['travel_times'][ii][-1])
             for var in optional_vars:
-                updated_optional[var].append(walk_data[var][ii][-1])
+                optional_data[var].append(walk_data[var][ii][-1])
             iter_exceeds_warning += 1
 
     if iter_exceeds_warning > 0:
@@ -475,12 +468,12 @@ def get_state(walk_data, iteration=-1, tracked_variables=None, verbose=None):
         logger.info('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
 
-    if tracked_variables is not None and optional_vars:
-        return xinds, yinds, times, updated_optional
+    if optional_vars:
+        return xinds, yinds, times, optional_data
     else:
         return xinds, yinds, times
 
-def get_time_state(walk_data, target_time, tracked_variables=None, verbose=None):
+def get_time_state(walk_data, target_time, verbose=None):
     """Pull walk_data values nearest to a specific time.
 
     Routine to return slices of the walk_data dict at a given travel time.
@@ -493,11 +486,6 @@ def get_time_state(walk_data, target_time, tracked_variables=None, verbose=None)
 
         target_time : `float`
             Travel time at which to slice the dictionary.
-
-        tracked_variables : `list`, optional
-            List of strings corresponding to any additional variables tracked,
-            as defined in the Particles class.
-            Default is none.
 
         verbose : `bool`, optional
             **Deprecated**. Use :func:`dorado.setup_logging` instead.
@@ -521,10 +509,10 @@ def get_time_state(walk_data, target_time, tracked_variables=None, verbose=None)
             to input. Times will differ slightly from input time due to
             the nature of the method.
 
-        updated_optional : `dict of lists`, optional if used
-            A dictionary of lists of optional outputs for the particle stepper, 
-            containing equivalent of walk_data[var][:][i] for each var,
-            where i represents the index at which travel time is nearest to input.
+        optional_data : `dict of lists`, optional 
+            A dictionary of lists of optional outputs for the particle stepper
+            containing equivalent of walk_data[var][:][iteration] for each var.
+
 
     """
     Np_tracer = len(walk_data['xinds'])  # Number of particles
@@ -532,15 +520,13 @@ def get_time_state(walk_data, target_time, tracked_variables=None, verbose=None)
     xinds = []
     yinds = []
     times = []
-    updated_optional = {}
+    optional_data = {}
 
     base_vars = ['xinds', 'yinds', 'travel_times']
-    optional_vars = [var for var in walk_data.keys()
-                     if var not in base_vars
-                     and (tracked_variables is not None and var in tracked_variables)]
+    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
 
     for key in optional_vars:
-        updated_optional[key] = []
+        optional_data[key] = []
     
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
@@ -552,13 +538,13 @@ def get_time_state(walk_data, target_time, tracked_variables=None, verbose=None)
         yinds.append(walk_data['yinds'][ii][tt])
         times.append(walk_data['travel_times'][ii][tt])
         for var in optional_vars:
-            updated_optional[var].append(walk_data[var][ii][tt])
+            optional_data[var].append(walk_data[var][ii][tt])
         if times_ii[-1] < target_time:
             handle_verbose_deprecation(verbose)
             logger.info('Note: Particle '+str(ii)+' never reached target_time')
 
-    if tracked_variables is not None and optional_vars:
-        return xinds, yinds, times, updated_optional
+    if optional_vars:
+        return xinds, yinds, times, optional_data
     else:
         return xinds, yinds, times
 
