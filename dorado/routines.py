@@ -400,7 +400,7 @@ def get_state(walk_data, iteration=-1, verbose=None):
     **Inputs** :
 
         walk_data : `dict`
-            Dictionary of all x and y locations and travel times
+            Dictionary of all x and y locations,travel times, and flags
 
         iteration : `int`, optional
             Iteration number at which to slice the dictionary. Defaults
@@ -423,6 +423,11 @@ def get_state(walk_data, iteration=-1, verbose=None):
         times : `list`
             List containing equivalent of
             walk_data['travel_times'][:][iteration]
+            
+        optional_data : `dict of lists`, optional 
+            A dictionary of lists of optional outputs for the particle stepper
+            containing equivalent of walk_data[var][:][iteration] for each var.
+
 
     """
     iteration = int(iteration)
@@ -431,18 +436,31 @@ def get_state(walk_data, iteration=-1, verbose=None):
     xinds = []
     yinds = []
     times = []
+    optional_data = {} 
+
     iter_exceeds_warning = 0
+
+    base_vars = ['xinds', 'yinds', 'travel_times']
+    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
+
+    for key in optional_vars:
+        optional_data[key] = []
+
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
         try:
             xinds.append(walk_data['xinds'][ii][iteration])
             yinds.append(walk_data['yinds'][ii][iteration])
             times.append(walk_data['travel_times'][ii][iteration])
+            for var in optional_vars:
+                optional_data[var].append(walk_data[var][ii][iteration])
         except IndexError:
             # If target iter exceeds walk history, return last iter
             xinds.append(walk_data['xinds'][ii][-1])
             yinds.append(walk_data['yinds'][ii][-1])
             times.append(walk_data['travel_times'][ii][-1])
+            for var in optional_vars:
+                optional_data[var].append(walk_data[var][ii][-1])
             iter_exceeds_warning += 1
 
     if iter_exceeds_warning > 0:
@@ -450,8 +468,10 @@ def get_state(walk_data, iteration=-1, verbose=None):
         logger.info('Note: %s particles have not reached %s iterations' % \
               (iter_exceeds_warning, iteration))
 
-    return xinds, yinds, times
-
+    if optional_vars:
+        return xinds, yinds, times, optional_data
+    else:
+        return xinds, yinds, times
 
 def get_time_state(walk_data, target_time, verbose=None):
     """Pull walk_data values nearest to a specific time.
@@ -489,12 +509,25 @@ def get_time_state(walk_data, target_time, verbose=None):
             to input. Times will differ slightly from input time due to
             the nature of the method.
 
+        optional_data : `dict of lists`, optional 
+            A dictionary of lists of optional outputs for the particle stepper
+            containing equivalent of walk_data[var][:][iteration] for each var.
+
+
     """
     Np_tracer = len(walk_data['xinds'])  # Number of particles
 
     xinds = []
     yinds = []
     times = []
+    optional_data = {}
+
+    base_vars = ['xinds', 'yinds', 'travel_times']
+    optional_vars = [var for var in walk_data.keys() if var not in base_vars]
+
+    for key in optional_vars:
+        optional_data[key] = []
+    
     # Pull out the specified value
     for ii in list(range(Np_tracer)):
         times_ii = np.array(walk_data['travel_times'][ii])
@@ -504,12 +537,16 @@ def get_time_state(walk_data, target_time, verbose=None):
         xinds.append(walk_data['xinds'][ii][tt])
         yinds.append(walk_data['yinds'][ii][tt])
         times.append(walk_data['travel_times'][ii][tt])
-
+        for var in optional_vars:
+            optional_data[var].append(walk_data[var][ii][tt])
         if times_ii[-1] < target_time:
             handle_verbose_deprecation(verbose)
             logger.info('Note: Particle '+str(ii)+' never reached target_time')
 
-    return xinds, yinds, times
+    if optional_vars:
+        return xinds, yinds, times, optional_data
+    else:
+        return xinds, yinds, times
 
 
 def plot_exposure_time(walk_data,
@@ -577,7 +614,7 @@ def plot_exposure_time(walk_data,
     # Initialize arrays to record exposure time of each particle
     Np_tracer = len(walk_data['xinds'])  # Number of particles
     # Record final travel times
-    x, y, end_time = get_state(walk_data)
+    x, y, end_time, optional_state = get_state(walk_data)
 
     # Handle the timedelta
     if timedelta == 1:

@@ -8,6 +8,7 @@ import sys, os
 sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
 
 from dorado import particle_track
+from dorado import parallel_routing
 import numpy as np
 
 # init some parameters
@@ -25,6 +26,8 @@ params.qx = np.zeros((3,3))
 params.qy = np.ones((3,3))
 params.theta = 1
 params.model = 'DeltaRCM'
+params.roi_grid = np.ones((3,3))
+params.particle_variables = ['depth', 'qx'] # optional variables to track with particles
 goodparams = copy.deepcopy(params)  # don't corrupt these good parameters
 particle = particle_track.Particles(params)
 
@@ -104,6 +107,24 @@ def test_steep_other():
     params.steepest_descent = 'other'
     particle = particle_track.Particles(params)
     assert particle.steepest_descent == False
+
+def test_roi_grid():
+    if getattr(params, 'roi_grid', None) is not None:
+        assert particle.roi_grid is not None
+    else:
+        assert particle.roi_grid is None
+
+def test_optional_particle_variables():
+    for var in getattr(params, 'particle_variables', []):
+        assert var in particle.particle_variables
+
+    if getattr(params, 'roi_grid', None) is not None:
+        assert 'roi_flag' in particle.particle_variables
+    else:
+        assert 'roi_flag' not in particle.particle_variables
+
+    # optional_outputs should exactly match particle_variables
+    assert set(particle.optional_outputs) == set(particle.particle_variables)
 
 # testing of the run_iteration function
 def test_start_pairs_X():
@@ -266,6 +287,19 @@ def test_manual_reset():
     particle.clear_walk_data()
     assert (particle.walk_data is None) is True
 
+def test_run_iteration_optional_variables():
+    # test that optional variables are being tracked in walk data
+    particle = particle_track.Particles(params)
+    particle.generate_particles(Np_tracer, seed_xloc, seed_yloc)
+    all_walk_data = particle.run_iteration()
+    # Check that all optional particle variables are in the returned walk_data
+    for var in getattr(params, 'particle_variables', []):
+        assert var in all_walk_data, f"{var} missing from walk_data"
+    # roi_flag is included only if roi_grid exists
+    if getattr(params, 'roi_grid', None) is not None:
+        assert 'roi_flag' in all_walk_data, "roi_flag missing from walk_data"
+    else:
+        assert 'roi_flag' not in all_walk_data
 
 class TestValueErrors:
     """
@@ -348,6 +382,29 @@ class TestValueErrors:
         params.v = np.ones((3,3))
         with pytest.raises(ValueError):
             particle = particle_track.Particles(params)
+    
+    def test_roi_grid_shape_mismatch(self):
+        params = particle_track.modelParams()
+        params.dx = 1
+        params.depth = np.ones((3,3))
+        params.topography = np.zeros((3,3))
+        params.u = np.ones((3,3))
+        params.v = np.ones((3,3))
+        params.roi_grid = np.ones((4,4))  # Mismatched shape
+        with pytest.raises(ValueError):
+            particle = particle_track.Particles(params)
+
+    def test_roi_with_only_stage(self):
+        params = particle_track.modelParams()
+        params.dx = 1
+        params.stage = np.ones((3,3))
+        params.topography = np.zeros((3,3))
+        params.u = np.ones((3,3))
+        params.v = np.ones((3,3))
+        params.roi_grid = np.ones((3,3))
+        particle = particle_track.Particles(params)
+        # should work so make assertion
+        assert particle.roi_grid.shape == (3,3)
 
     def test_rcm_model_uv(self):
         params = particle_track.modelParams()
@@ -606,3 +663,44 @@ def test_unstruct2grid_bounds():
                                      [2., 2., 2.],
                                      [2., 2., 2.],
                                      [1., 1., 1.]]))
+    
+def test_flux_proportional_seeding():
+    num_total_particles = 1000
+    num_seeding_steps = 10
+    q = np.ones((10,1))*200
+    q[0] = 400  # Increase flux in the first cell
+    q[1] = 100  # Decrease flux in the second cell
+    q[9] = 100  # Decrease flux in the last cell (q sums to 1000)
+    flux_normalized_particle_counts = particle_track.flux_proportional_seeding(q, num_total_particles, num_seeding_steps)
+    assert len(flux_normalized_particle_counts) == num_seeding_steps
+    assert sum(flux_normalized_particle_counts) == num_total_particles
+    assert flux_normalized_particle_counts[0] > flux_normalized_particle_counts[1]
+    assert flux_normalized_particle_counts[1] == flux_normalized_particle_counts[9]
+
+
+def test_parallel_routing():
+    """Test the parallel routing functionality of the particle tracking model with optional outputs."""
+    # Set up parameters for the particle tracking
+    params = particle_track.modelParams()
+    params.dx = 1
+    params.depth = np.ones((5, 5))
+    params.stage = np.ones((5, 5))
+    params.qx = np.zeros((5, 5))
+    params.qy = np.ones((5, 5))
+    params.particle_variables = ['depth', 'qx']  # Optional variables to track
+    params.seed_xloc = [1, 2]
+    params.seed_yloc = [1, 2]
+    params.Np_tracer = 2  # Number of particles to generate
+    params.model = 'DeltaRCM'
+
+    # Create the particle object
+    particle = particle_track.Particles(params)
+
+    # Run parallel routing with a specified number of cores
+    num_cores = 2  # Adjust based on your machine's capabilities
+    num_iter = 5   # Number of iterations to run
+    par_result = parallel_routing.parallel_routing(particle, num_iter, params.Np_tracer, params.seed_xloc, params.seed_yloc, num_cores)
+
+    assert len(par_result['xinds']) == params.Np_tracer * num_cores
+    assert 'depth' in par_result
+    assert 'qx' in par_result

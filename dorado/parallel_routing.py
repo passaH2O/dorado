@@ -33,8 +33,8 @@ def run_iter(pobj):
     **Outputs** :
 
         all_walk_data : `list`
-            Nested list of all x and y locations and travel times, with
-            details same as input previous_walk_data
+            Nested list of all x and y locations, travel times, and 
+            any optional variables, with details same as input previous_walk_data
 
     """
     pobj.particles.generate_particles(pobj.Np_tracer, pobj.seed_xloc,
@@ -59,27 +59,18 @@ def combine_result(par_result):
         par_result : `list`
             List of length(num_cores) with a dictionary of the beg/end indices
             and travel times for each particle computed by that process/core
-
+    
     **Outputs** :
-
-        single_result : `list`
-            Nested list that matches 'all_walk_data'
-
+        single_result : `dict`
+            Combined results dictionary containing all tracked variables.
     """
     # initiate final results dictionary
-    single_result = dict()
-    single_result['x_inds'] = []
-    single_result['y_inds'] = []
-    single_result['travel_times'] = []
+    single_result = {var: [] for var in par_result[0].keys()}
 
     # populate the dictionary
-    # loop through results for each core
-    for i in range(0, len(par_result)):
-        # append results for each category
-        for j in range(0, len(par_result[i][0])):
-            single_result['x_inds'].append(par_result[i][0][j])
-            single_result['y_inds'].append(par_result[i][1][j])
-            single_result['travel_times'].append(par_result[i][2][j])
+    for result in par_result:
+        for var in result.keys():
+            single_result[var].extend(result[var])
 
     return single_result
 
@@ -139,7 +130,7 @@ def parallel_routing(particles, num_iter, Np_tracer, seed_xloc, seed_yloc,
 
     """
     # make parallel object to assign to function
-    pobj = parallel_obj
+    pobj = parallel_obj()
     pobj.particles = particles
     pobj.num_iter = num_iter
     pobj.Np_tracer = Np_tracer
@@ -154,4 +145,7 @@ def parallel_routing(particles, num_iter, Np_tracer, seed_xloc, seed_yloc,
     par_result = p.map(run_iter, p_list)
     p.terminate()
 
-    return par_result
+    # combine results before returning to user
+    combined = combine_result(par_result)
+
+    return combined

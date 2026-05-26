@@ -467,7 +467,7 @@ def steep_descent(probs):
     return idx
 
 
-def particle_stepper(Particles, current_inds, travel_times):
+def particle_stepper(Particles, current_inds, travel_times, start_optional):
     """Step particles a single iteration.
 
     **Inputs** :
@@ -481,6 +481,10 @@ def particle_stepper(Particles, current_inds, travel_times):
         travel_times : `list`
             List of initial travel times for the particles
 
+        start_optional: 'dict of lists'
+            A dictionary of lists of optional user inputs for the particle stepper. Options are shown in the particles object documentation.
+        
+
     **Outputs** :
 
         new_inds : `list`
@@ -488,8 +492,14 @@ def particle_stepper(Particles, current_inds, travel_times):
 
         travel_times : `list`
             List of the travel times associated with the particle movements
+            
+        updated_optional : `dict of lists`
+            A dictionary of lists of optional outputs for the particle stepper. Options are shown in the particles object documentation.
 
     """
+    # Use roi_grid from the particle object if it exists, otherwise use None
+    ROI = getattr(Particles, 'roi_grid', None)
+        
     inds = current_inds  # get indices as coordinates in the domain
     # split the indices into tuples
     inds_tuple = [(inds[i][0], inds[i][1]) for i in range(len(inds))]
@@ -522,4 +532,16 @@ def particle_stepper(Particles, current_inds, travel_times):
                     for i in range(0, len(travel_times))]
     travel_times = list(travel_times)
 
-    return new_inds, travel_times
+    # Optional variables
+    updated_optional = {}
+    
+    if ROI is not None:
+        updated_optional['roi_flag'] = [1 if ROI[x, y] == 1 else 0 for x, y in new_inds]
+
+    for var, _ in start_optional.items():
+        if var not in updated_optional:
+            if var in Particles.available_particle_vars:
+                grid = Particles.available_particle_vars[var]
+                updated_optional[var] = [grid[x, y] for x, y in new_inds]
+
+    return new_inds, travel_times, updated_optional
