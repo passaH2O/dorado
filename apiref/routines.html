@@ -108,7 +108,7 @@ By default returns information on the most recent step</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
 <div><dl>
-<dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all x and y locations and travel times</p>
+<dt>walk_data<span class="classifier"><cite>dict</cite></span></dt><dd><p>Dictionary of all x and y locations,travel times, and flags</p>
 </dd>
 <dt>iteration<span class="classifier"><cite>int</cite>, optional</span></dt><dd><p>Iteration number at which to slice the dictionary. Defaults
 to -1, i.e. the most recent step</p>
@@ -129,6 +129,9 @@ Default is None.</p>
 </dd>
 <dt>times<span class="classifier"><cite>list</cite></span></dt><dd><p>List containing equivalent of
 walk_data[‘travel_times’][:][iteration]</p>
+</dd>
+<dt>optional_data<span class="classifier"><cite>dict of lists</cite>, optional</span></dt><dd><p>A dictionary of lists of optional outputs for the particle stepper
+containing equivalent of walk_data[var][:][iteration] for each var.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -167,6 +170,9 @@ represents the index at which travel time is nearest to input.</p>
 where i represents the index at which travel time is nearest
 to input. Times will differ slightly from input time due to
 the nature of the method.</p>
+</dd>
+<dt>optional_data<span class="classifier"><cite>dict of lists</cite>, optional</span></dt><dd><p>A dictionary of lists of optional outputs for the particle stepper
+containing equivalent of walk_data[var][:][iteration] for each var.</p>
 </dd>
 </dl>
 </div></blockquote>

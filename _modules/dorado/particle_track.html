@@ -433,7 +433,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>
                                     <span class="p">[</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                     <span class="p">[</span><span class="mi">5</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">]])</span>
-
+            
+        <span class="c1"># Binary roi in the shape of model grid for particle flagging with each step</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;roi_grid&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">roi_grid</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;roi_grid shape &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">roi_grid</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span>
+                                <span class="s2">&quot; does not match model grid shape &quot;</span> <span class="o">+</span>
+                                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span>
+                                <span class="s2">&quot;. roi_grid must be the same shape as the depth array.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi_grid</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">roi_grid</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;roi provided and stored in the particle object.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi_grid</span> <span class="o">=</span> <span class="kc">None</span>
+                
         <span class="c1"># initialize number of particles as 0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -441,8 +453,39 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># initialize routing weights array</span>
-        <span class="n">lw</span><span class="o">.</span><span class="n">make_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">lw</span><span class="o">.</span><span class="n">make_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+        <span class="c1"># -------------------------------------------------------</span>
+        <span class="c1"># Define additional variables to track with particle movement (beyond xinds, yinds, and travel_times)</span>
+        <span class="c1"># Usage: params = pt.modelParams(); params.particle_variables = [&#39;depth&#39;, &#39;roi_flag&#39;]</span>
+        <span class="c1"># -------------------------------------------------------</span>
+        <span class="c1"># Base variables always stored</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_walk_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">,</span> <span class="s1">&#39;yinds&#39;</span><span class="p">,</span> <span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Available grid variables that can be sampled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_particle_vars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+            <span class="s1">&#39;stage&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stage</span><span class="p">,</span>
+            <span class="s1">&#39;qx&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">qx</span><span class="p">,</span>
+            <span class="s1">&#39;qy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">qy</span><span class="p">,</span>
+            <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span>
+            <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Read optional variables from params</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s1">&#39;particle_variables&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">particle_variables</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">particle_variables</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">particle_variables</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;roi_flag&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle_variables</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">particle_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;roi_flag&#39;</span><span class="p">)</span>
+
+        <span class="c1"># optional outputs follow particle variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_outputs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_variables</span><span class="p">)</span>
+
+        <span class="c1"># Combine base + optional variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracked_variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_walk_variables</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle_variables</span></div>
 
 
     <span class="c1"># function to clear walk data if you&#39;ve made a mistake while generating it</span>
@@ -525,6 +568,8 @@
                                                                      <span class="n">method</span><span class="p">)</span>
 
         <span class="n">init_walk_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># create init_walk_data dictionary</span>
+        <span class="c1"># define base variables again</span>
+        <span class="n">base_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_walk_variables</span>
 
         <span class="c1"># initialize new travel times list</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">seed_time</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
@@ -563,6 +608,20 @@
         <span class="n">start_yindices</span> <span class="o">=</span> <span class="n">new_yinds</span>
         <span class="n">start_times</span> <span class="o">=</span> <span class="n">new_times</span>
 
+        <span class="c1"># initialize optional variables from available_particle_vars</span>
+        <span class="n">optional_start_vars</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracked_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="o">==</span> <span class="s1">&#39;roi_flag&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">optional_start_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_grid</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">]</span>
+                                                <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">new_start_xindices</span><span class="p">,</span> <span class="n">new_start_yindices</span><span class="p">)]</span>
+                <span class="k">elif</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_particle_vars</span><span class="p">:</span>
+                    <span class="n">grid_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_particle_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                    <span class="n">optional_start_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="n">grid_values</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]]</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">new_start_xindices</span><span class="p">,</span> <span class="n">new_start_yindices</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> is not a recognized variable to track. Available variables are: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_particle_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> and &#39;roi_flag&#39; (if roi_grid is provided).&quot;</span><span class="p">)</span>
+
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># if there is walk_data from a previous call to the generator,</span>
             <span class="c1"># or from simulating particle transport previously, then we want</span>
@@ -575,6 +634,12 @@
             <span class="n">start_xindices</span> <span class="o">=</span> <span class="n">internal_xinds</span> <span class="o">+</span> <span class="n">start_xindices</span>
             <span class="n">start_yindices</span> <span class="o">=</span> <span class="n">internal_yinds</span> <span class="o">+</span> <span class="n">start_yindices</span>
             <span class="n">start_times</span> <span class="o">=</span> <span class="n">internal_times</span> <span class="o">+</span> <span class="n">start_times</span>
+            
+            <span class="c1"># merge optional variables with self.walk_data</span>
+            <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">new_var_list</span> <span class="ow">in</span> <span class="n">optional_start_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">:</span>
+                    <span class="n">internal_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                    <span class="n">optional_start_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">internal_var</span> <span class="o">+</span> <span class="n">new_var_list</span>
 
         <span class="k">if</span> <span class="n">previous_walk_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># If the generator has been run before, or if new</span>
@@ -590,6 +655,12 @@
             <span class="n">start_yindices</span> <span class="o">=</span> <span class="n">prev_yinds</span> <span class="o">+</span> <span class="n">start_yindices</span>
             <span class="n">start_times</span> <span class="o">=</span> <span class="n">prev_times</span> <span class="o">+</span> <span class="n">start_times</span>
 
+            <span class="c1"># merge optional variables with previous_walk_data</span>
+            <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">new_var_list</span> <span class="ow">in</span> <span class="n">optional_start_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">previous_walk_data</span><span class="p">:</span>
+                    <span class="n">prev_var</span> <span class="o">=</span> <span class="n">previous_walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                    <span class="n">optional_start_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev_var</span> <span class="o">+</span> <span class="n">new_var_list</span>
+
         <span class="c1"># determine the new total number of particles we have now</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_xindices</span><span class="p">)</span>
 
@@ -597,6 +668,7 @@
         <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_xindices</span>
         <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_yindices</span>
         <span class="n">init_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_times</span>
+        <span class="n">init_walk_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">optional_start_vars</span><span class="p">)</span>
 
         <span class="c1"># store the initialized walk data within self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span> <span class="o">=</span> <span class="n">init_walk_data</span></div>
@@ -661,6 +733,17 @@
         <span class="n">all_times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
         <span class="n">start_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
                        <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">))]</span>
+        <span class="c1"># optional variables</span>
+        <span class="n">optional_vars</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracked_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">,</span> <span class="s1">&#39;yinds&#39;</span><span class="p">,</span> <span class="s1">&#39;travel_times&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">:</span>
+                    <span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">)]</span>
+        
+        <span class="n">start_optional</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="p">[</span><span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">)]</span>
+                        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">}</span>
 
         <span class="c1"># merge x and y indices into list of [x,y] pairs</span>
         <span class="n">start_pairs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">start_xindices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">start_yindices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
@@ -669,8 +752,8 @@
         <span class="c1"># Do the particle movement</span>
         <span class="k">if</span> <span class="n">target_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># If we&#39;re not aiming for a specific time, step the particles</span>
-            <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_pairs</span><span class="p">,</span>
-                                                         <span class="n">start_times</span><span class="p">)</span>
+            <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span><span class="p">,</span> <span class="n">updated_optional</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_pairs</span><span class="p">,</span>
+                                                         <span class="n">start_times</span><span class="p">,</span> <span class="n">start_optional</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">)):</span>
                 <span class="c1"># Don&#39;t duplicate location</span>
@@ -680,11 +763,15 @@
                     <span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_inds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_inds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
                     <span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">travel_times</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
-
+                    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+                        <span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">updated_optional</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+                    
             <span class="c1"># Store travel information in all_walk_data</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_xinds</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_yinds</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_times</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+                <span class="n">all_walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If we ARE aiming for a specific time</span>
@@ -711,10 +798,9 @@
                     <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_time</span><span class="p">)</span> <span class="o">&gt;=</span> \
                           <span class="nb">abs</span><span class="p">(</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">est_next_dt</span> <span class="o">-</span> <span class="n">target_time</span><span class="p">):</span>
                         <span class="c1"># for particle ii, take a step from most recent index</span>
-                        <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span>
-                            <span class="bp">self</span><span class="p">,</span> <span class="p">[[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]],</span>
-                            <span class="p">[</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-
+                        <span class="n">new_inds</span><span class="p">,</span> <span class="n">travel_times</span><span class="p">,</span> <span class="n">updated_optional</span> <span class="o">=</span> <span class="n">lw</span><span class="o">.</span><span class="n">particle_stepper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]],[</span><span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                                                                                       <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="p">[</span><span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">})</span>
+                
                         <span class="c1"># Don&#39;t duplicate location</span>
                         <span class="c1"># if particle is standing still at a boundary</span>
                         <span class="k">if</span> <span class="n">new_inds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[</span><span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
@@ -722,6 +808,8 @@
                             <span class="n">all_xinds</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_inds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
                             <span class="n">all_yinds</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_inds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
                             <span class="n">all_times</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">travel_times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+                                <span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">updated_optional</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="k">break</span>
 
@@ -738,7 +826,9 @@
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_xinds</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_yinds</span>
             <span class="n">all_walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_times</span>
-
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+                <span class="n">all_walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">optional_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+            
             <span class="c1"># write out warning if particles exceed step limit</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_iter_particles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_iter_particles</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;Particles&quot;</span>
@@ -984,7 +1074,7 @@
     <span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">])</span>  <span class="c1"># Number of particles</span>
     <span class="c1"># Array to be populated</span>
     <span class="n">exposure_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">Np_tracer</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
-    <span class="c1"># list of particles that don&#39;t exit ROI</span>
+    <span class="c1"># list of particles that don&#39;t exit roi</span>
     <span class="n">_short_list</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Loop through particles to measure exposure time</span>
@@ -1320,6 +1410,67 @@
     <span class="n">gridded_quantity</span> <span class="o">=</span> <span class="n">interp_func</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">interp_func</span><span class="p">,</span> <span class="n">gridded_quantity</span></div>
+
+
+<div class="viewcode-block" id="flux_proportional_seeding">
+<a class="viewcode-back" href="../../apiref/particletrack.html#dorado.particle_track.flux_proportional_seeding">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">flux_proportional_seeding</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> 
+                             <span class="n">N_total</span><span class="p">,</span>
+                             <span class="n">num_steps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Compute flux-proportional particle counts per timestep.</span>
+
+<span class="sd">    This function is useful if seeding particles under unsteady discharge conditions</span>
+<span class="sd">    by enforcing that the number of particles seeded at each timestep is proportional </span>
+<span class="sd">    to the magnitude of discharge at that timestep.</span>
+
+<span class="sd">    **Inputs** :</span>
+<span class="sd">    ----------</span>
+<span class="sd">        Q : &#39;np.ndarray&#39;</span>
+<span class="sd">            Discharge array where:</span>
+<span class="sd">            rows = timestep since model start where seeding is occurring</span>
+<span class="sd">            column = discharge values at those intervals</span>
+<span class="sd">       </span>
+<span class="sd">        N_total : &#39;int&#39;</span>
+<span class="sd">            Total number of particles to seed.</span>
+
+<span class="sd">        num_steps : &#39;int&#39;, </span>
+<span class="sd">            Number of timesteps where seeding occurs.</span>
+
+<span class="sd">    **Outputs** :</span>
+<span class="sd">    -------</span>
+
+<span class="sd">        particles_per_timestep : `numpy.ndarray`</span>
+<span class="sd">            Array of integer particle counts per seeding timestep.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Take absolute value for flow reversals</span>
+    <span class="n">Q_abs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+
+    <span class="c1"># Ensure correct number of steps</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Q_abs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_steps</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough timesteps in the discharge array to match num_steps.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Ensure total discharge is nonzero</span>
+    <span class="n">Q_sum</span> <span class="o">=</span> <span class="n">Q_abs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">Q_sum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All discharge values are zero. Cannot distribute particles.&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Compute ideal particle counts</span>
+    <span class="n">N_float</span> <span class="o">=</span> <span class="n">Q_abs</span> <span class="o">/</span> <span class="n">Q_abs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="n">N_total</span>
+    <span class="n">N_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">N_float</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Remainder distribution</span>
+    <span class="n">remainders</span> <span class="o">=</span> <span class="n">N_float</span> <span class="o">-</span> <span class="n">N_int</span>
+    <span class="n">N_remaining</span> <span class="o">=</span> <span class="n">N_total</span> <span class="o">-</span> <span class="n">N_int</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">N_remaining</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">add_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">remainders</span><span class="p">)[</span><span class="o">-</span><span class="n">N_remaining</span><span class="p">:]</span>
+        <span class="n">N_int</span><span class="p">[</span><span class="n">add_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Final check</span>
+    <span class="k">assert</span> <span class="n">N_int</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="n">N_total</span><span class="p">,</span> <span class="s2">&quot;Particle rounding failed!&quot;</span>
+
+    <span class="k">return</span> <span class="n">N_int</span></div>
 
 </pre></div>
 

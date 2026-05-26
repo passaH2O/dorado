@@ -446,7 +446,7 @@
 <span class="sd">    **Inputs** :</span>
 
 <span class="sd">        walk_data : `dict`</span>
-<span class="sd">            Dictionary of all x and y locations and travel times</span>
+<span class="sd">            Dictionary of all x and y locations,travel times, and flags</span>
 
 <span class="sd">        iteration : `int`, optional</span>
 <span class="sd">            Iteration number at which to slice the dictionary. Defaults</span>
@@ -469,6 +469,11 @@
 <span class="sd">        times : `list`</span>
 <span class="sd">            List containing equivalent of</span>
 <span class="sd">            walk_data[&#39;travel_times&#39;][:][iteration]</span>
+<span class="sd">            </span>
+<span class="sd">        optional_data : `dict of lists`, optional </span>
+<span class="sd">            A dictionary of lists of optional outputs for the particle stepper</span>
+<span class="sd">            containing equivalent of walk_data[var][:][iteration] for each var.</span>
+
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">iteration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">iteration</span><span class="p">)</span>
@@ -477,18 +482,31 @@
     <span class="n">xinds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">yinds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">optional_data</span> <span class="o">=</span> <span class="p">{}</span> 
+
     <span class="n">iter_exceeds_warning</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">base_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">,</span> <span class="s1">&#39;yinds&#39;</span><span class="p">,</span> <span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
+    <span class="n">optional_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">walk_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_vars</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+        <span class="n">optional_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
     <span class="c1"># Pull out the specified value</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">)):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">xinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">iteration</span><span class="p">])</span>
             <span class="n">yinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">iteration</span><span class="p">])</span>
             <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">iteration</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+                <span class="n">optional_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">iteration</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="c1"># If target iter exceeds walk history, return last iter</span>
             <span class="n">xinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">yinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+                <span class="n">optional_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">iter_exceeds_warning</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">if</span> <span class="n">iter_exceeds_warning</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -496,8 +514,10 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Note: </span><span class="si">%s</span><span class="s1"> particles have not reached </span><span class="si">%s</span><span class="s1"> iterations&#39;</span> <span class="o">%</span> \
               <span class="p">(</span><span class="n">iter_exceeds_warning</span><span class="p">,</span> <span class="n">iteration</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">xinds</span><span class="p">,</span> <span class="n">yinds</span><span class="p">,</span> <span class="n">times</span></div>
-
+    <span class="k">if</span> <span class="n">optional_vars</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">xinds</span><span class="p">,</span> <span class="n">yinds</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">optional_data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">xinds</span><span class="p">,</span> <span class="n">yinds</span><span class="p">,</span> <span class="n">times</span></div>
 
 
 <div class="viewcode-block" id="get_time_state">
@@ -538,12 +558,25 @@
 <span class="sd">            to input. Times will differ slightly from input time due to</span>
 <span class="sd">            the nature of the method.</span>
 
+<span class="sd">        optional_data : `dict of lists`, optional </span>
+<span class="sd">            A dictionary of lists of optional outputs for the particle stepper</span>
+<span class="sd">            containing equivalent of walk_data[var][:][iteration] for each var.</span>
+
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">])</span>  <span class="c1"># Number of particles</span>
 
     <span class="n">xinds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">yinds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">optional_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">base_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">,</span> <span class="s1">&#39;yinds&#39;</span><span class="p">,</span> <span class="s1">&#39;travel_times&#39;</span><span class="p">]</span>
+    <span class="n">optional_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">walk_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_vars</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+        <span class="n">optional_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    
     <span class="c1"># Pull out the specified value</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Np_tracer</span><span class="p">)):</span>
         <span class="n">times_ii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
@@ -553,12 +586,16 @@
         <span class="n">xinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">tt</span><span class="p">])</span>
         <span class="n">yinds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;yinds&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">tt</span><span class="p">])</span>
         <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">tt</span><span class="p">])</span>
-
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">optional_vars</span><span class="p">:</span>
+            <span class="n">optional_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="n">ii</span><span class="p">][</span><span class="n">tt</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">times_ii</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target_time</span><span class="p">:</span>
             <span class="n">handle_verbose_deprecation</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Note: Particle &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; never reached target_time&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">xinds</span><span class="p">,</span> <span class="n">yinds</span><span class="p">,</span> <span class="n">times</span></div>
+    <span class="k">if</span> <span class="n">optional_vars</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">xinds</span><span class="p">,</span> <span class="n">yinds</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">optional_data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">xinds</span><span class="p">,</span> <span class="n">yinds</span><span class="p">,</span> <span class="n">times</span></div>
 
 
 
@@ -629,7 +666,7 @@
     <span class="c1"># Initialize arrays to record exposure time of each particle</span>
     <span class="n">Np_tracer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">walk_data</span><span class="p">[</span><span class="s1">&#39;xinds&#39;</span><span class="p">])</span>  <span class="c1"># Number of particles</span>
     <span class="c1"># Record final travel times</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">optional_state</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">(</span><span class="n">walk_data</span><span class="p">)</span>
 
     <span class="c1"># Handle the timedelta</span>
     <span class="k">if</span> <span class="n">timedelta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>

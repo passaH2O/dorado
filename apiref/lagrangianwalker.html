@@ -229,7 +229,7 @@ for use when routing. Called when the object gets instantiated.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dorado.lagrangian_walker.particle_stepper">
-<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">particle_stepper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#particle_stepper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.particle_stepper" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dorado.lagrangian_walker.</span></span><span class="sig-name descname"><span class="pre">particle_stepper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">travel_times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_optional</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/lagrangian_walker.html#particle_stepper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.lagrangian_walker.particle_stepper" title="Link to this definition">¶</a></dt>
 <dd><p>Step particles a single iteration.</p>
 <p><strong>Inputs</strong> :</p>
 <blockquote>
@@ -240,6 +240,8 @@ for use when routing. Called when the object gets instantiated.</p>
 </dd>
 <dt>travel_times<span class="classifier"><cite>list</cite></span></dt><dd><p>List of initial travel times for the particles</p>
 </dd>
+<dt>start_optional: ‘dict of lists’</dt><dd><p>A dictionary of lists of optional user inputs for the particle stepper. Options are shown in the particles object documentation.</p>
+</dd>
 </dl>
 </div></blockquote>
 <p><strong>Outputs</strong> :</p>
@@ -248,6 +250,8 @@ for use when routing. Called when the object gets instantiated.</p>
 <dt>new_inds<span class="classifier"><cite>list</cite></span></dt><dd><p>List of the new particle locations after the single iteration</p>
 </dd>
 <dt>travel_times<span class="classifier"><cite>list</cite></span></dt><dd><p>List of the travel times associated with the particle movements</p>
+</dd>
+<dt>updated_optional<span class="classifier"><cite>dict of lists</cite></span></dt><dd><p>A dictionary of lists of optional outputs for the particle stepper. Options are shown in the particles object documentation.</p>
 </dd>
 </dl>
 </div></blockquote>

@@ -388,7 +388,19 @@ class Particles():
             self.angles = np.array([[3*pi/4, pi/2, pi/4],
                                     [pi, 0, 0],
                                     [5*pi/4, 3*pi/2, 7*pi/4]])
-
+            
+        # Binary roi in the shape of model grid for particle flagging with each step
+        if getattr(params, 'roi_grid', None) is not None:
+            if params.roi_grid.shape != self.depth.shape:
+                raise ValueError("roi_grid shape " + str(params.roi_grid.shape) +
+                                " does not match model grid shape " +
+                                str(self.depth.shape) +
+                                ". roi_grid must be the same shape as the depth array.")
+            self.roi_grid = params.roi_grid
+            logger.info("roi provided and stored in the particle object.")
+        else:
+            self.roi_grid = None
+                
         # initialize number of particles as 0
         self.Np_tracer = 0
 
@@ -398,6 +410,37 @@ class Particles():
         # initialize routing weights array
         lw.make_weight(self)
 
+        # -------------------------------------------------------
+        # Define additional variables to track with particle movement (beyond xinds, yinds, and travel_times)
+        # Usage: params = pt.modelParams(); params.particle_variables = ['depth', 'roi_flag']
+        # -------------------------------------------------------
+        # Base variables always stored
+        self.base_walk_variables = ['xinds', 'yinds', 'travel_times']
+
+        # Available grid variables that can be sampled
+        self.available_particle_vars = {
+            'depth': self.depth,
+            'stage': self.stage,
+            'qx': self.qx,
+            'qy': self.qy,
+            'u': self.u,
+            'v': self.v,
+        }
+
+        # Read optional variables from params
+        if getattr(params, 'particle_variables', None) is not None:
+            self.particle_variables = params.particle_variables
+        else:
+            self.particle_variables = []
+
+        if 'roi_flag' not in self.particle_variables and self.roi_grid is not None:
+            self.particle_variables.append('roi_flag')
+
+        # optional outputs follow particle variables
+        self.optional_outputs = list(self.particle_variables)
+
+        # Combine base + optional variables
+        self.tracked_variables = self.base_walk_variables + self.particle_variables
 
     # function to clear walk data if you've made a mistake while generating it
     def clear_walk_data(self):
@@ -474,6 +517,8 @@ class Particles():
                                                                      method)
 
         init_walk_data = dict()  # create init_walk_data dictionary
+        # define base variables again
+        base_vars = self.base_walk_variables
 
         # initialize new travel times list
         if (seed_time != 0) and (self.verbose is True):
@@ -512,6 +557,20 @@ class Particles():
         start_yindices = new_yinds
         start_times = new_times
 
+        # initialize optional variables from available_particle_vars
+        optional_start_vars = dict()
+        for var in self.tracked_variables:
+            if var not in base_vars:
+                if var == 'roi_flag' and self.roi_grid is not None:
+                    optional_start_vars[var] = [[1 if self.roi_grid[x, y] == 1 else 0]
+                                                for x, y in zip(new_start_xindices, new_start_yindices)]
+                elif var in self.available_particle_vars:
+                    grid_values = self.available_particle_vars[var]
+                    optional_start_vars[var] = [[grid_values[x, y]] for x, y in zip(new_start_xindices, new_start_yindices)]
+                else:
+                    raise ValueError(f"Variable {var} is not a recognized variable to track. Available variables are: {list(self.available_particle_vars.keys())} and 'roi_flag' (if roi_grid is provided).")
+
+
         if self.walk_data is not None:
             # if there is walk_data from a previous call to the generator,
             # or from simulating particle transport previously, then we want
@@ -524,6 +583,12 @@ class Particles():
             start_xindices = internal_xinds + start_xindices
             start_yindices = internal_yinds + start_yindices
             start_times = internal_times + start_times
+            
+            # merge optional variables with self.walk_data
+            for var, new_var_list in optional_start_vars.items():
+                if var in self.walk_data:
+                    internal_var = self.walk_data[var]
+                    optional_start_vars[var] = internal_var + new_var_list
 
         if previous_walk_data is not None:
             # If the generator has been run before, or if new
@@ -539,6 +604,12 @@ class Particles():
             start_yindices = prev_yinds + start_yindices
             start_times = prev_times + start_times
 
+            # merge optional variables with previous_walk_data
+            for var, new_var_list in optional_start_vars.items():
+                if var in previous_walk_data:
+                    prev_var = previous_walk_data[var]
+                    optional_start_vars[var] = prev_var + new_var_list
+
         # determine the new total number of particles we have now
         self.Np_tracer = len(start_xindices)
 
@@ -546,6 +617,7 @@ class Particles():
         init_walk_data['xinds'] = start_xindices
         init_walk_data['yinds'] = start_yindices
         init_walk_data['travel_times'] = start_times
+        init_walk_data.update(optional_start_vars)
 
         # store the initialized walk data within self
         self.walk_data = init_walk_data
@@ -607,6 +679,17 @@ class Particles():
         all_times = self.walk_data['travel_times']
         start_times = [all_times[i][-1] for i in
                        list(range(self.Np_tracer))]
+        # optional variables
+        optional_vars = {}
+        for var in self.tracked_variables:
+            if var not in ['xinds', 'yinds', 'travel_times']:
+                if var in self.walk_data:
+                    optional_vars[var] = self.walk_data[var]
+                else:
+                    optional_vars[var] = [[None] for _ in range(self.Np_tracer)]
+        
+        start_optional = {var: [optional_vars[var][i][-1] for i in range(self.Np_tracer)]
+                        for var in optional_vars}
 
         # merge x and y indices into list of [x,y] pairs
         start_pairs = [[start_xindices[i], start_yindices[i]] for i in
@@ -615,8 +698,8 @@ class Particles():
         # Do the particle movement
         if target_time is None:
             # If we're not aiming for a specific time, step the particles
-            new_inds, travel_times = lw.particle_stepper(self, start_pairs,
-                                                         start_times)
+            new_inds, travel_times, updated_optional = lw.particle_stepper(self, start_pairs,
+                                                         start_times, start_optional)
 
             for ii in list(range(self.Np_tracer)):
                 # Don't duplicate location
@@ -626,11 +709,15 @@ class Particles():
                     all_xinds[ii].append(new_inds[ii][0])
                     all_yinds[ii].append(new_inds[ii][1])
                     all_times[ii].append(travel_times[ii])
-
+                    for var in optional_vars:
+                        optional_vars[var][ii].append(updated_optional[var][ii])
+                    
             # Store travel information in all_walk_data
             all_walk_data['xinds'] = all_xinds
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
+            for var in optional_vars:
+                all_walk_data[var] = optional_vars[var]
 
         else:
             # If we ARE aiming for a specific time
@@ -657,10 +744,9 @@ class Particles():
                     while abs(all_times[ii][-1] - target_time) >= \
                           abs(all_times[ii][-1] + est_next_dt - target_time):
                         # for particle ii, take a step from most recent index
-                        new_inds, travel_times = lw.particle_stepper(
-                            self, [[all_xinds[ii][-1], all_yinds[ii][-1]]],
-                            [all_times[ii][-1]])
-
+                        new_inds, travel_times, updated_optional = lw.particle_stepper(self, [[all_xinds[ii][-1], all_yinds[ii][-1]]],[all_times[ii][-1]],
+                                                                                       {var: [optional_vars[var][ii][-1]] for var in optional_vars})
+                
                         # Don't duplicate location
                         # if particle is standing still at a boundary
                         if new_inds[0] != [all_xinds[ii][-1],
@@ -668,6 +754,8 @@ class Particles():
                             all_xinds[ii].append(new_inds[0][0])
                             all_yinds[ii].append(new_inds[0][1])
                             all_times[ii].append(travel_times[0])
+                            for var in optional_vars:
+                                optional_vars[var][ii].append(updated_optional[var][0])
                         else:
                             break
 
@@ -684,7 +772,9 @@ class Particles():
             all_walk_data['xinds'] = all_xinds
             all_walk_data['yinds'] = all_yinds
             all_walk_data['travel_times'] = all_times
-
+            for var in optional_vars:
+                all_walk_data[var] = optional_vars[var]
+            
             # write out warning if particles exceed step limit
             if (len(_iter_particles) > 0) and (self.verbose is True):
                 warnings.warn(str(len(_iter_particles)) + "Particles"
@@ -917,7 +1007,7 @@ def exposure_time(walk_data,
     Np_tracer = len(walk_data['xinds'])  # Number of particles
     # Array to be populated
     exposure_times = np.zeros([Np_tracer], dtype='float')
-    # list of particles that don't exit ROI
+    # list of particles that don't exit roi
     _short_list = []
 
     # Loop through particles to measure exposure time
@@ -1244,3 +1334,61 @@ def unstruct2grid(coordinates,
     gridded_quantity = interp_func(quantity)
 
     return interp_func, gridded_quantity
+
+def flux_proportional_seeding(Q, 
+                             N_total,
+                             num_steps):
+    """ Compute flux-proportional particle counts per timestep.
+
+    This function is useful if seeding particles under unsteady discharge conditions
+    by enforcing that the number of particles seeded at each timestep is proportional 
+    to the magnitude of discharge at that timestep.
+
+    **Inputs** :
+    ----------
+        Q : 'np.ndarray'
+            Discharge array where:
+            rows = timestep since model start where seeding is occurring
+            column = discharge values at those intervals
+       
+        N_total : 'int'
+            Total number of particles to seed.
+
+        num_steps : 'int', 
+            Number of timesteps where seeding occurs.
+
+    **Outputs** :
+    -------
+
+        particles_per_timestep : `numpy.ndarray`
+            Array of integer particle counts per seeding timestep.
+
+    """
+    # Take absolute value for flow reversals
+    Q_abs = np.abs(Q)
+
+    # Ensure correct number of steps
+    if len(Q_abs) < num_steps:
+        raise ValueError("Not enough timesteps in the discharge array to match num_steps.")
+
+    # Ensure total discharge is nonzero
+    Q_sum = Q_abs.sum()
+    if Q_sum == 0:
+        raise ValueError("All discharge values are zero. Cannot distribute particles.")
+    
+    # Compute ideal particle counts
+    N_float = Q_abs / Q_abs.sum() * N_total
+    N_int = np.floor(N_float).astype(int)
+
+    # Remainder distribution
+    remainders = N_float - N_int
+    N_remaining = N_total - N_int.sum()
+
+    if N_remaining > 0:
+        add_idx = np.argsort(remainders)[-N_remaining:]
+        N_int[add_idx] += 1
+
+    # Final check
+    assert N_int.sum() == N_total, "Particle rounding failed!"
+
+    return N_int

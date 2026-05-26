@@ -224,6 +224,39 @@ in order of particle ID.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="dorado.particle_track.flux_proportional_seeding">
+<span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">flux_proportional_seeding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N_total</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#flux_proportional_seeding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.flux_proportional_seeding" title="Link to this definition">¶</a></dt>
+<dd><p>Compute flux-proportional particle counts per timestep.</p>
+<p>This function is useful if seeding particles under unsteady discharge conditions
+by enforcing that the number of particles seeded at each timestep is proportional
+to the magnitude of discharge at that timestep.</p>
+<section id="inputs">
+<h2><strong>Inputs</strong> :<a class="headerlink" href="#inputs" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>Q<span class="classifier">‘np.ndarray’</span></dt><dd><p>Discharge array where:
+rows = timestep since model start where seeding is occurring
+column = discharge values at those intervals</p>
+</dd>
+<dt>N_total<span class="classifier">‘int’</span></dt><dd><p>Total number of particles to seed.</p>
+</dd>
+<dt>num_steps<span class="classifier">‘int’,</span></dt><dd><p>Number of timesteps where seeding occurs.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="outputs">
+<h2><strong>Outputs</strong> :<a class="headerlink" href="#outputs" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><dl>
+<dt>particles_per_timestep<span class="classifier"><cite>numpy.ndarray</cite></span></dt><dd><p>Array of integer particle counts per seeding timestep.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dorado.particle_track.gen_input_check">
 <span class="sig-prename descclassname"><span class="pre">dorado.particle_track.</span></span><span class="sig-name descname"><span class="pre">gen_input_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Np_tracer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_xloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_yloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dorado/particle_track.html#gen_input_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dorado.particle_track.gen_input_check" title="Link to this definition">¶</a></dt>
 <dd><p>Check the inputs provided to <code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_particles()</span></code>.</p>

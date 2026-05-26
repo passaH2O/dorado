@@ -70,8 +70,8 @@
 <span class="sd">    **Outputs** :</span>
 
 <span class="sd">        all_walk_data : `list`</span>
-<span class="sd">            Nested list of all x and y locations and travel times, with</span>
-<span class="sd">            details same as input previous_walk_data</span>
+<span class="sd">            Nested list of all x and y locations, travel times, and </span>
+<span class="sd">            any optional variables, with details same as input previous_walk_data</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pobj</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">generate_particles</span><span class="p">(</span><span class="n">pobj</span><span class="o">.</span><span class="n">Np_tracer</span><span class="p">,</span> <span class="n">pobj</span><span class="o">.</span><span class="n">seed_xloc</span><span class="p">,</span>
@@ -99,27 +99,18 @@
 <span class="sd">        par_result : `list`</span>
 <span class="sd">            List of length(num_cores) with a dictionary of the beg/end indices</span>
 <span class="sd">            and travel times for each particle computed by that process/core</span>
-
+<span class="sd">    </span>
 <span class="sd">    **Outputs** :</span>
-
-<span class="sd">        single_result : `list`</span>
-<span class="sd">            Nested list that matches &#39;all_walk_data&#39;</span>
-
+<span class="sd">        single_result : `dict`</span>
+<span class="sd">            Combined results dictionary containing all tracked variables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initiate final results dictionary</span>
-    <span class="n">single_result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">single_result</span><span class="p">[</span><span class="s1">&#39;x_inds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">single_result</span><span class="p">[</span><span class="s1">&#39;y_inds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">single_result</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">single_result</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">par_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
 
     <span class="c1"># populate the dictionary</span>
-    <span class="c1"># loop through results for each core</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">par_result</span><span class="p">)):</span>
-        <span class="c1"># append results for each category</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">par_result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
-            <span class="n">single_result</span><span class="p">[</span><span class="s1">&#39;x_inds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par_result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
-            <span class="n">single_result</span><span class="p">[</span><span class="s1">&#39;y_inds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par_result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
-            <span class="n">single_result</span><span class="p">[</span><span class="s1">&#39;travel_times&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par_result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">par_result</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">single_result</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">single_result</span></div>
 
@@ -188,7 +179,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># make parallel object to assign to function</span>
-    <span class="n">pobj</span> <span class="o">=</span> <span class="n">parallel_obj</span>
+    <span class="n">pobj</span> <span class="o">=</span> <span class="n">parallel_obj</span><span class="p">()</span>
     <span class="n">pobj</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">particles</span>
     <span class="n">pobj</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">=</span> <span class="n">num_iter</span>
     <span class="n">pobj</span><span class="o">.</span><span class="n">Np_tracer</span> <span class="o">=</span> <span class="n">Np_tracer</span>
@@ -203,7 +194,10 @@
     <span class="n">par_result</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">run_iter</span><span class="p">,</span> <span class="n">p_list</span><span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">par_result</span></div>
+    <span class="c1"># combine results before returning to user</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">combine_result</span><span class="p">(</span><span class="n">par_result</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">combined</span></div>
 
 </pre></div>
 
