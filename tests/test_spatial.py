@@ -4,6 +4,7 @@ Created on Mon Aug 11 13:18:10 2025
 
 @author: cturn
 """
+import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
 import pytest
@@ -100,7 +101,7 @@ def test_plot_spatial(test_grid, walk_data):
         elevation=elevation,
         max_exposure=7,
         cbar_levels=7,
-        cmap=plt.get_cmap("plasma_r"),
+        cmap=matplotlib.colormaps["plasma_r"] if hasattr(matplotlib, "colormaps") else plt.get_cmap("plasma_r"),
         title="Test System-Wide (s)")
     plt.close("all")
 
@@ -112,6 +113,6 @@ def test_plot_spatial(test_grid, walk_data):
         elevation=elevation,
         max_exposure=7,
         cbar_levels=7,
-        cmap=plt.get_cmap("viridis_r"),
+        cmap=matplotlib.colormaps["viridis_r"] if hasattr(matplotlib, "colormaps") else plt.get_cmap("viridis_r"),
         title="Test Localized (s)")
     plt.close("all")
