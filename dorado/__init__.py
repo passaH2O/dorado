@@ -1,4 +1,10 @@
-__version__ = "2.7.0"
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("pydorado")
+except PackageNotFoundError:
+    __version__ = "unknown"
+
 
 from . import lagrangian_walker
 from . import parallel_routing
