@@ -1304,7 +1304,11 @@ def show_nourishment_area(visit_freq, grid=None, walk_data=None,
     alphas = Normalize(0, amax, clip=True)(visit_freq)  # Normalize alphas
     alphas = np.clip(alphas, min_alpha, 1)
     colors = Normalize(np.nanmin(visit_freq), 1)(visit_freq)  # Normalize color
-    cmap = plt.cm.get_cmap(cmap)
+    if isinstance(cmap, str):
+        try:
+            cmap = matplotlib.colormaps[cmap]
+        except AttributeError:
+            cmap = plt.cm.get_cmap(cmap)
     colors = cmap(colors)
     colors[..., -1] = alphas
 
@@ -1390,7 +1394,11 @@ def show_nourishment_time(mean_times, grid=None, walk_data=None,
     alphas = np.clip(alphas, min_alpha, 1)
     colors = Normalize(np.nanmin(mean_times),
                        np.nanmax(mean_times))(mean_times)  # Normalize colors
-    cmap = plt.cm.get_cmap(cmap)
+    if isinstance(cmap, str):
+        try:
+            cmap = matplotlib.colormaps[cmap]
+        except AttributeError:
+            cmap = plt.cm.get_cmap(cmap)
     colors = cmap(colors)
     colors[..., -1] = alphas
 
